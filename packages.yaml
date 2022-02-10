@@ -1,0 +1,42 @@
+cross_tools:
+  defaults:
+    unpack: |
+      tar xf ${SOURCES}/{name}-{version}.tar.{ext}
+      cd {name}-{version}
+  packages:
+    - file:
+        version: 5.19
+        url: ftp://ftp.astron.com/pub/file/file-{version}.tar.gz
+        build: |
+          ./configure --prefix=/ --disable-static
+          make ${MAKEOPTS}
+          make DESTDIR=${D} install
+    - m4:
+        version: 1.4.19
+        url: https://ftp.gnu.org/gnu/m4/m4-{version}.tar.xz
+        build: |
+          ./configure --prefix=/
+          make ${MAKEOPTS}
+          make DESTDIR=${D} install
+    - ncurses:
+        version: 6.3
+        url: https://ftp.gnu.org/gnu/ncurses/ncurses-{version}.tar.gz
+        build: |
+          ./configure --prefix=/ --without-debug --without-shared
+          make ${MAKEOPTS} -C include
+          make ${MAKEOPTS} -C progs tic
+          install -v -m755 progs/tic ${D}/bin
+    - pkg-config-lite:
+        version: 0.28-1
+        url: http://sourceforge.net/projects/pkgconfiglite/files/{version}/pkg-config-lite-{version}.tar.gz
+        build: |
+          ./configure --prefix=/ --host=${CLFS_TARGET} --with-pc-path=${CLFS_TOOLS}/lib/pkgconfig:${CLFS_TOOLS}/share/pkgconfig
+          make ${MAKEOPTS}
+          make DESTDIR=${CLFS_CROSS_TOOLS} install
+    - binutils:
+        url: http://ftp.gnu.org/gnu/binutils/binutils-{version}.tar.xz
+        version: 2.38
+        build: |
+          AR=ar AS=as ./configure --prefix=${CROSS_LFS_TOOLS} --host=${CLFS_HOST} --target=${CLFS_TARGET} --with-sysroot=${CLFS} --with-lib-path=${CLFS_TOOLS}/lib --disable-lns --disable-static --enable-64-bit-bfd --disable-multilib --disable-werror
+          make ${MAKEOPTS}
+          make DESTDIR=${CLFS_CROSS_TOOLS} install
