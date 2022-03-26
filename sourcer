@@ -1,0 +1,44 @@
+#!/usr/bin/python3
+
+import os
+import logging
+from yaml import safe_load
+import sys
+
+class Sourcer:
+
+	"""
+	This class is responsible for parsing sources.yaml and performing various actions, such as downloading all source code
+	or accessing metadata for a particular set of sources.
+	"""
+
+	sources = {}
+
+	def __init__(self, infile):
+		with open(infile, "r") as myf:
+			for top_name, src_cats in safe_load(myf.read()).items():
+				for cat_name, cat_contents in src_cats.items():
+					if "defaults" in cat_contents:
+						defaults = cat_contents["defaults"].copy()
+					else:
+						defaults = {}
+					for pkg_block in cat_contents["packages"]:
+						if len(pkg_block.keys()) != 1:
+							raise ValueError(f"Unexpected YAML: {pkg_block}")
+						name = list(pkg_block.keys())[0]
+						innards = list(pkg_block.values())[0]
+						if isinstance(innards, str):
+							# pkgname: '1.2.3' short format:
+							local_pkginfo = { "version" : innards }
+						else:
+							local_pkginfo = innards
+						pkginfo = defaults.copy()
+						pkginfo.update(local_pkginfo)
+						pkginfo["name"] = name
+						pkginfo["url"] = pkginfo["url"].format(version=pkginfo["version"], name=name)
+						self.sources[name] = pkginfo
+if __name__ == "__main__":
+	sourcer = Sourcer("sources.yaml")
+	print(sourcer.sources[sys.argv[1]])
+
+# vim: ts=4 sw=4 noet
