@@ -1,12 +1,28 @@
 #!/usr/bin/python3
-
+import argparse
 import os
-import logging
+
 from yaml import safe_load
-import sys
+
+CLI_CONFIG = {
+	"fetch": {"action": "store_true", "default": False},
+	"list": {"action": "store_true", "default": False}
+}
+
+
+def parse_args():
+	ap = argparse.ArgumentParser()
+	for arg, kwargs in CLI_CONFIG.items():
+		if "positional" in kwargs and kwargs["positional"]:
+			new_kwargs = kwargs.copy()
+			del new_kwargs["positional"]
+			ap.add_argument(arg, **new_kwargs)
+		else:
+			ap.add_argument("--" + arg, **kwargs)
+	return ap.parse_args()
+
 
 class Sourcer:
-
 	"""
 	This class is responsible for parsing sources.yaml and performing various actions, such as downloading all source code
 	or accessing metadata for a particular set of sources.
@@ -29,16 +45,49 @@ class Sourcer:
 						innards = list(pkg_block.values())[0]
 						if isinstance(innards, str):
 							# pkgname: '1.2.3' short format:
-							local_pkginfo = { "version" : innards }
+							local_pkginfo = {"version": innards}
+						elif isinstance(innards, float):
+							local_pkginfo = {"version": str(innards)}
 						else:
 							local_pkginfo = innards
 						pkginfo = defaults.copy()
 						pkginfo.update(local_pkginfo)
 						pkginfo["name"] = name
-						pkginfo["url"] = pkginfo["url"].format(version=pkginfo["version"], name=name)
+						pkginfo["sources"] = []
+						if "url" in pkginfo and isinstance(pkginfo["url"], str):
+							sources = [pkginfo["url"]]
+							del pkginfo["url"]
+						elif "urls" in pkginfo and isinstance("urls", list):
+							sources = pkginfo["urls"]
+							del pkginfo["urls"]
+						else:
+							raise ValueError(f"Expecting string ('url') or list of strings ('urls'): {pkginfo['url']}")
+						sources_kwargs = {}
+						for kwarg in [ "ext" ]:
+							if kwarg in pkginfo:
+								sources_kwargs[kwarg] = pkginfo[kwarg]
+						for url in sources:
+							pkginfo["sources"].append(url.format(version=pkginfo["version"], name=name, **sources_kwargs))
 						self.sources[name] = pkginfo
+
+	def fetch(self):
+		os.makedirs("sources", exist_ok=True)
+		for key, val in sourcer.sources.items():
+			print(f"Fetching {key}")
+			for url in val["sources"]:
+				outfile = os.path.basename(url)
+				if not os.path.exists(f"sources/{outfile}"):
+					os.system(f"( cd sources && wget -nc {url})")
+
+
 if __name__ == "__main__":
 	sourcer = Sourcer("sources.yaml")
-	print(sourcer.sources[sys.argv[1]])
+	args = parse_args()
+	if args.fetch:
+		print("Fetching!")
+		sourcer.fetch()
+	if args.list:
+		for key, val in sourcer.sources.items():
+			print(key, val)
 
 # vim: ts=4 sw=4 noet
