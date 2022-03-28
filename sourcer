@@ -5,8 +5,8 @@ import os
 from yaml import safe_load
 
 CLI_CONFIG = {
-	"fetch": {"action": "store_true", "default": False},
-	"list": {"action": "store_true", "default": False}
+	"action": {"positional": True},
+	"sources": {"positional": True, "nargs": "?"}
 }
 
 
@@ -79,15 +79,20 @@ class Sourcer:
 				if not os.path.exists(f"sources/{outfile}"):
 					os.system(f"( cd sources && wget -nc {url})")
 
+	def unpack(self, sources):
+		for source in sources:
+			for url in self.sources[source]["sources"]:
+				tarball = url.split("/")[-1]
+				print(f"export {source.upper()}_VERSION=\"{self.sources[source]['version']}\"")
+				print(f"run this >> cd ${{CLFS}}/build && tar xf ${{CLFS}}/sources/{tarball}")
+
 
 if __name__ == "__main__":
 	sourcer = Sourcer("sources.yaml")
 	args = parse_args()
-	if args.fetch:
-		print("Fetching!")
-		sourcer.fetch()
-	if args.list:
-		for key, val in sourcer.sources.items():
-			print(key, val)
+	if args.action == "unpack":
+		sources = args.sources.split(",")
+		sourcer.unpack(sources)
+
 
 # vim: ts=4 sw=4 noet

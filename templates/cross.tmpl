@@ -1,23 +1,24 @@
 #!/bin/bash
 exec /usr/bin/env -i /bin/bash --noprofile --norc << "EOF"
+set -e
+set -o pipefail
+set -u
 set +h
 umask 022
 export HOME=/home/drobbins
-export SOURCES=/home/drobbins/sexybeast/sources
-export CLFS=$HOME/sexybeast
-export CLFS_CROSS_TOOLS=${CLFS}/cross-tools
-export D=${CLFS_CROSS_TOOLS}
+export CLFS=$HOME/clfs
+mkdir "${CLFS}/cross-tools"
+mkdir "${CLFS}/tools"
+mkdir "${CLFS}/sources"
+mkdir "${CLFS}/build"
+eval $(sourcer --unpack {{sources}})
 export LC_ALL=POSIX
-export PATH=$CLFS/cross-tools/bin:/bin:/usr/bin
-export MAKEOPTS="-j4"
-unset CFLAGS CXXFLAGS
-echo Hello.
 export CLFS_HOST=$(echo ${MACHTYPE} | sed -e 's/-[^-]*/-cross/')
-export CLFS_TARGET="powerpc64-unknown-linux-gnu"
-export BUILD64="-m64"
-die() {
-	echo "Build error."
-	exit 1
-}
+export CLFS_TARGET="aarch64-unknown-linux-musl"
+export CLFS_ARCH="arm64"
+export CLFS_CFLAGS=""
+export MAKEFLAGS="-j$(nproc) -l$(nproc)"
+export PATH=$CLFS/cross-tools/bin:/bin:/usr/bin
+unset CFLAGS CXXFLAGS
 {{build_steps}}
 EOF
