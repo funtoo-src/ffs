@@ -71,7 +71,7 @@ class Sourcer:
 						self.sources[name] = pkginfo
 
 	def fetch(self):
-		os.makedirs("sources", exist_ok=True)
+		os.makedirs("../sources", exist_ok=True)
 		for key, val in sourcer.sources.items():
 			print(f"Fetching {key}")
 			for url in val["sources"]:
@@ -80,15 +80,22 @@ class Sourcer:
 					os.system(f"( cd sources && wget -nc {url})")
 
 	def unpack(self, sources):
+		os.makedirs(os.path.join(os.environ["CLFS"], "build"), exist_ok=True)
+		first_source = None
 		for source in sources:
+			if first_source is None:
+				first_source = self.sources[source]
 			for url in self.sources[source]["sources"]:
 				tarball = url.split("/")[-1]
+				print(f"cd ${{CLFS}}/build && tar xf ${{CLFS}}/sources/{tarball}")
 				print(f"export {source.upper()}_VERSION=\"{self.sources[source]['version']}\"")
-				print(f"run this >> cd ${{CLFS}}/build && tar xf ${{CLFS}}/sources/{tarball}")
+				print(f"cd ${{CLFS}}/build/{first_source['name']}-{first_source['version']}")
 
 
 if __name__ == "__main__":
-	sourcer = Sourcer("sources.yaml")
+	if "CLFS" not in os.environ:
+		raise EnvironmentError("Please set CLFS environment variable.")
+	sourcer = Sourcer(os.path.join(os.environ["CLFS"], "sources.yaml"))
 	args = parse_args()
 	if args.action == "unpack":
 		sources = args.sources.split(",")

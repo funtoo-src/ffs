@@ -6,19 +6,21 @@ set -u
 set +h
 umask 022
 export HOME=/home/drobbins
-export CLFS=$HOME/clfs
-mkdir "${CLFS}/cross-tools"
-mkdir "${CLFS}/tools"
-mkdir "${CLFS}/sources"
-mkdir "${CLFS}/build"
-eval $(sourcer --unpack {{sources}})
+export CLFS=$HOME/development/ffs
+install -d "${CLFS}/cross-tools"
+install -d "${CLFS}/tools"
+install -d "${CLFS}/sources"
+install -d "${CLFS}/build"
+export PATH=${CLFS}/bin:${CLFS}/cross-tools/bin:/bin:/usr/bin
+rm -rf "${CLFS}"/build/*
+{{unpack}}
 export LC_ALL=POSIX
 export CLFS_HOST=$(echo ${MACHTYPE} | sed -e 's/-[^-]*/-cross/')
 export CLFS_TARGET="aarch64-unknown-linux-musl"
 export CLFS_ARCH="arm64"
 export CLFS_CFLAGS=""
 export MAKEFLAGS="-j$(nproc) -l$(nproc)"
-export PATH=$CLFS/cross-tools/bin:/bin:/usr/bin
+
 unset CFLAGS CXXFLAGS
 {{build_steps}}
 EOF
