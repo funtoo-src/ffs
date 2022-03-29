@@ -48,11 +48,13 @@ class Sourcer:
 						else:
 							raise ValueError(f"Expecting string ('url') or list of strings ('urls'): {pkginfo['url']}")
 						sources_kwargs = {}
-						for kwarg in [ "ext" ]:
+						for kwarg in [ "ext"]:
 							if kwarg in pkginfo:
 								sources_kwargs[kwarg] = pkginfo[kwarg]
 						for url in sources:
 							pkginfo["sources"].append(url.format(version=pkginfo["version"], name=name, **sources_kwargs))
+						if "srcdir" in pkginfo:
+							pkginfo["srcdir"] = pkginfo["srcdir"].format(version=pkginfo["version"])
 						self.sources[name] = pkginfo
 
 	def fetch(self):
@@ -74,8 +76,12 @@ class Sourcer:
 			for url in self.sources[source]["sources"]:
 				tarball = url.split("/")[-1]
 				out += f"cd ${{CLFS}}/build && tar xf ${{CLFS}}/sources/{tarball}\n"
-				out += f"export {source.upper()}_VERSION=\"{self.sources[source]['version']}\"\n"
-		out += f"cd ${{CLFS}}/build/{first_source['name']}-{first_source['version']}\n"
+				out += f"export {source.replace('-','_').upper()}_VERSION=\"{self.sources[source]['version']}\"\n"
+		if "srcdir" in first_source:
+			srcdir = first_source["srcdir"]
+		else:
+			srcdir = f"{first_source['name']}-{first_source['version']}"
+		out += f"cd ${{CLFS}}/build/{srcdir}\n"
 		return out
 
 
