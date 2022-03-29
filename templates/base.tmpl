@@ -20,7 +20,7 @@ export CLFS_TARGET="aarch64-unknown-linux-musl"
 export CLFS_ARCH="arm64"
 export CLFS_CFLAGS=""
 export MAKEFLAGS="-j$(nproc) -l$(nproc)"
-
 unset CFLAGS CXXFLAGS
+{% block env %}{% endblock %}
 {{build_steps}}
 EOF

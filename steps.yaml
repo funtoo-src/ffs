@@ -1,6 +1,6 @@
 cross_tools:
   defaults:
-    template: cross.tmpl
+    template: base.tmpl
   steps:
     - linux: |
         make mrproper
@@ -91,3 +91,80 @@ cross_tools:
           LD_FOR_TARGET="${CLFS_TARGET}-ld"
         make install
 
+tools:
+  defaults:
+    template: tools.tmpl
+  steps:
+    - gmp: |
+        CC_FOR_BUILD=gcc \
+        ./configure \
+        --prefix=${CLFS}/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --enable-cxx
+        make
+        make install
+    - mpfr: |
+        ./configure \
+        --prefix=${CLFS}/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make install
+    - mpc: |
+        ./configure \
+        --prefix=${CLFS}/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make install
+    - isl: |
+        ./configure \
+        --prefix=${CLFS}/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make install
+    - zlib: |
+        ./configure \
+        --prefix=${CLFS}/tools
+        make
+        make install
+    - binutils: |
+        mkdir binutils-build && cd binutils-build
+        ../configure \
+        --prefix=${CLFS}/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --target=${CLFS_TARGET} \
+        --with-lib-path=${CLFS}/tools/lib \
+        --disable-nls \
+        --enable-shared \
+        --enable-64-bit-bfd \
+        --disable-multilib \
+        --enable-gold=yes \
+        --enable-plugins \
+        --with-system-zlib \
+        --enable-threads
+        make
+        make install
+    - gcc: |
+        sed -i 's|^RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET|& -nostdinc++|' configure
+        mkdir gcc-build && cd gcc-build
+        ../configure \
+        --prefix=${CLFS}/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --target=${CLFS_TARGET} \
+        --with-local-prefix=${CLFS}/tools \
+        --disable-multilib \
+        --enable-languages=c,c++ \
+        --with-system-zlib \
+        --with-native-system-header-dir=/tools/include \
+        --disable-libssp \
+        --enable-install-libiberty \
+        --disable-libstdcxx-pch \
+        --disable-libsanitizer
+        make AS_FOR_TARGET="${AS}" \
+        LD_FOR_TARGET="${LD}"
+        make install

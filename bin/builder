@@ -7,12 +7,6 @@ import logging
 from yaml import safe_load
 
 
-def get_jinja_template(template_file):
-	with open(template_file, "r") as tempf:
-		template = jinja2.Template(tempf.read())
-		return template
-
-
 class Sourcer:
 	"""
 	This class is responsible for parsing sources.yaml and performing various actions, such as downloading all source code
@@ -87,6 +81,11 @@ class Sourcer:
 
 class Builder:
 
+	def get_jinja_template(self, template_file):
+		with open(template_file, "r") as tempf:
+			template = jinja2.Template(tempf.read())
+			return template
+
 	def parse_yaml_rule(self, package_section):
 		if not isinstance(package_section, dict):
 			raise TypeError("Found package section that is not in proper format.")
@@ -102,24 +101,28 @@ class Builder:
 		}
 
 	def __init__(self, inpath):
-		tmpl = get_jinja_template(os.path.join(inpath, "templates/cross.tmpl"))
+		self.loader = jinja2.FileSystemLoader(os.path.join(inpath, "templates"))
+		self.jinja = jinja2.Environment(loader=self.loader)
 		infile = os.path.join(inpath, "steps.yaml")
-		self.sourcer =	Sourcer(os.path.join(os.environ["CLFS"], "sources.yaml"))
+		self.sourcer = Sourcer(os.path.join(os.environ["CLFS"], "sources.yaml"))
 		with open(infile, "r") as myf:
 			for rule_name, rule in safe_load(myf.read()).items():
+				if rule_name != sys.argv[1]:
+					continue
 				if "defaults" in rule:
 					defaults = rule["defaults"].copy()
 				else:
 					defaults = {}
 
-			pkginfo_list = []
-			for package in rule["steps"]:
-				rule = self.parse_yaml_rule(package)
-				cmds = tmpl.render(rule)
-				print(cmds)
-				result = os.system(cmds)
-				if result != 0:
-					sys.exit(1)
+				tmpl = self.jinja.get_template(defaults["template"])
+				pkginfo_list = []
+				for package in rule["steps"]:
+					rule = self.parse_yaml_rule(package)
+					cmds = tmpl.render(rule)
+					print(cmds)
+					result = os.system(cmds)
+					if result != 0:
+						sys.exit(1)
 
 
 if __name__ == "__main__":
