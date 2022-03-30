@@ -1,12 +1,10 @@
 #!/bin/bash
-exec /usr/bin/env -i /bin/bash --noprofile --norc << "EOF"
+exec /usr/bin/env -i CLFS=${CLFS} /bin/bash --noprofile --norc << "EOF"
 set -e
 set -o pipefail
 set -u
 set +h
 umask 022
-export HOME=/home/drobbins
-export CLFS=$HOME/development/ffs
 install -d "${CLFS}/cross-tools"
 install -d "${CLFS}/tools"
 install -d "${CLFS}/sources"
