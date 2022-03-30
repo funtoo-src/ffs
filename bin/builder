@@ -125,7 +125,7 @@ class Builder:
 				for package in rule["steps"]:
 					rule = self.parse_yaml_rule(package)
 					cmds = tmpl.render(rule)
-					print(cmds)
+					#print(cmds)
 					result = os.system(cmds)
 					if result != 0:
 						sys.exit(1)
