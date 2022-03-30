@@ -50,7 +50,7 @@ cross_tools:
           --disable-threads \
           --disable-multilib \
           --enable-languages=c \
-          --with-mpfr-include=$(pwd)/../mpfr/src \
+          --with-mpfr-include=$(pwd)/mpfr/src \
           --with-mpfr-lib=$(pwd)/mpfr/src/.libs
         make all-gcc all-target-libgcc
         make install-gcc install-target-libgcc
@@ -90,7 +90,7 @@ cross_tools:
           --disable-multilib \
           --disable-libsanitizer \
           --with-
-          --with-mpfr-include=$(pwd)/../mpfr/src \
+          --with-mpfr-include=$(pwd)/mpfr/src \
           --with-mpfr-lib=$(pwd)/mpfr/src/.libs
         make AS_FOR_TARGET="${CLFS_TARGET}-as" \
           LD_FOR_TARGET="${CLFS_TARGET}-ld"
