@@ -1,0 +1,16 @@
+name: "ffs/funtoo"
+script:
+- >-
+  ego sync && emerge --jobs pyyaml jinja
+- export CLFS=${HOME}/ffs
+- bin/sourcer fetch
+- bin/builder cross_tools
+- bin/builder tools
+environment:
+- SHELL=/bin/bash
+- LUET_NOLOCK=true
+- LUET_YES=true
+image: funtoo/stage3
+source: https://code.funtoo.org/bitbucket/scm/core/ffs.git
+type: lxd
+directory: /
