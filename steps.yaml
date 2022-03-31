@@ -148,7 +148,7 @@ tools:
         make
         make install
     - zlib: |
-        CROSS_PREFIX=${CLFS_TARGET}- \
+        CHOST=${CLFS_TARGET} \
         ./configure \
         --prefix=${CLFS}/tools
         make
