@@ -7,7 +7,9 @@ set +h
 set -x
 umask 022
 install -d "${CLFS}/cross-tools"
+
 install -d "${CLFS}/tools"
+install -d "${CLFS}/tools/lib"
 install -d "${CLFS}/sources"
 install -d "${CLFS}/build"
 export PATH=${CLFS}/bin:${CLFS}/cross-tools/bin:/bin:/usr/bin
