@@ -1,7 +1,7 @@
 name: "ffs/ubuntu/21.10"
 script:
 - >-
-  apt-get update && apt-get -y install python3-yaml python3-jinja2 wget xz-utils make gcc g++ rsync texinfo file m4 bzip2
+  apt-get update && apt-get -y install python3-yaml python3-jinja2 wget xz-utils make gcc g++ rsync texinfo file m4 bzip2 patch
 - export CLFS=${HOME}
 - install -d ${CLFS}/sources
 - bin/sourcer fetch && bin/builder cross_tools && bin/builder tools
