@@ -20,10 +20,29 @@ cross_tools:
           --disable-werror
         make
         make install
-    - gcc,mpfr,gmp,mpc: |
-        mv $CLFS/build/mpfr-${MPFR_VERSION} $CLFS/build/gcc-${GCC_VERSION}/mpfr
-        mv $CLFS/build/gmp-${GMP_VERSION} $CLFS/build/gcc-${GCC_VERSION}/gmp
-        mv $CLFS/build/mpc-${MPC_VERSION} $CLFS/build/gcc-${GCC_VERSION}/mpc
+    - gmp: |
+        ./configure \
+          --prefix=${CLFS}/cross-tools \
+          --enable-cxx \
+          --disable-static
+        make
+        make install
+        make check
+    - mpfr: |
+        LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" ./configure \
+          --prefix=${CLFS}/cross-tools \
+          --disable-static \
+          --with-gmp=${CLFS}/cross-tools
+        make
+        make install
+    - mpc: |
+        LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" ./configure \
+          --prefix=${CLFS}/cross-tools \
+          --disable-static \
+          --with-mpfr=${CLFS}/cross-tools
+        make
+        make install
+    - gcc: |
         mkdir gcc-build && cd gcc-build
         AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
           ../configure \
@@ -50,8 +69,9 @@ cross_tools:
           --disable-threads \
           --disable-multilib \
           --enable-languages=c \
-          --with-mpfr-include=$(pwd)/mpfr/src \
-          --with-mpfr-lib=$(pwd)/mpfr/src/.libs
+          --with-mpfr=${CLFS}/cross-tools \
+          --with-gmp=${CLFS}/cross-tools \
+          --with-mpc=${CLFS}/cross-tools
         make all-gcc all-target-libgcc
         make install-gcc install-target-libgcc
     - musl: |
@@ -69,10 +89,7 @@ cross_tools:
         find -type f \
           -iname 'crt*.o' \
           -exec ln -sf ../../../tools/lib/{} "${CLFS}"/cross-tools/"${CLFS_TARGET}"/lib/{} \;
-    - gcc,mpfr,gmp,mpc: |
-        mv $CLFS/build/mpfr-${MPFR_VERSION} $CLFS/build/gcc-${GCC_VERSION}/mpfr
-        mv $CLFS/build/gmp-${GMP_VERSION} $CLFS/build/gcc-${GCC_VERSION}/gmp
-        mv $CLFS/build/mpc-${MPC_VERSION} $CLFS/build/gcc-${GCC_VERSION}/mpc
+    - gcc: |
         mkdir gcc-build && cd gcc-build
         AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
           ../configure \
@@ -89,9 +106,9 @@ cross_tools:
           --enable-languages=c,c++ \
           --disable-multilib \
           --disable-libsanitizer \
-          --with-
-          --with-mpfr-include=$(pwd)/mpfr/src \
-          --with-mpfr-lib=$(pwd)/mpfr/src/.libs
+          --with-mpfr=${CLFS}/cross-tools \
+          --with-gmp=${CLFS}/cross-tools \
+          --with-mpc=${CLFS}/cross-tools
         make AS_FOR_TARGET="${CLFS_TARGET}-as" \
           LD_FOR_TARGET="${CLFS_TARGET}-ld"
         make install
