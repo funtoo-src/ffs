@@ -4,6 +4,7 @@ set -e
 set -o pipefail
 set -u
 set +h
+set -x
 umask 022
 install -d "${CLFS}/cross-tools"
 install -d "${CLFS}/tools"
