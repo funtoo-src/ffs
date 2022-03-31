@@ -148,6 +148,7 @@ tools:
         make
         make install
     - zlib: |
+        unset CFLAGS
         CHOST=${CLFS_TARGET} \
         ./configure \
         --prefix=${CLFS}/tools
