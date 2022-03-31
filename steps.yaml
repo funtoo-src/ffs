@@ -148,7 +148,7 @@ tools:
         make
         make install
     - zlib: |
-        unset CFLAGS
+        unset CC CXX AR AS RANLIB LD STRIP
         CHOST=${CLFS_TARGET} \
         ./configure \
         --prefix=${CLFS}/tools
