@@ -46,7 +46,7 @@ sources:
           version: 0.24
           url: https://gcc.gnu.org/pub/gcc/infrastructure/isl-{version}.tar.bz2
       - zlib:
-          version: 1.2.11
+          version: 1.2.12
           url: https://zlib.net/zlib-{version}.tar.gz
       - bzip2:
           version: 1.0.8
