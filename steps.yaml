@@ -374,11 +374,18 @@ tools:
         make
         make install
     - texinfo: |
+        # trying to get configure script to tell us we are cross-compiling...
+        unset CC CXX AR AS RANLIB LD STRIP
         PERL=/usr/bin/perl \
         ./configure \
-        --prefix=${CLFS}/tools \
-        --build=${CLFS_HOST} \
-        --host=${CLFS_TARGET}
+          --prefix=${CLFS}/tools \
+          --build=${CLFS_HOST} \
+          --host=${CLFS_TARGET} \
+          --without-external-libintl-perl \
+          --without-external-Unicode-EastAsianWidth \
+          --without-external-Text-Unidecode \
+          --disable-nls \
+          --disable-perl-xs
         make
         make install
     - util-linux: |
