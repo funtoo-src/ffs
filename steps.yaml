@@ -112,7 +112,11 @@ cross_tools:
         make AS_FOR_TARGET="${CLFS_TARGET}-as" \
           LD_FOR_TARGET="${CLFS_TARGET}-ld"
         make install
-
+    - file: |
+        ./configure \
+        --prefix=${CLFS}/cross-tools
+        make
+        make install
 tools:
   defaults:
     template: tools.tmpl
