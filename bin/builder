@@ -1,9 +1,8 @@
 #!/usr/bin/python3
+import os
 import sys
 
 import jinja2
-import os
-import logging
 from yaml import safe_load
 
 
@@ -57,15 +56,6 @@ class Sourcer:
 							pkginfo["srcdir"] = pkginfo["srcdir"].format(version=pkginfo["version"])
 						self.sources[name] = pkginfo
 
-	def fetch(self):
-		os.makedirs("../sources", exist_ok=True)
-		for key, val in self.sourcer.sources.items():
-			print(f"Fetching {key}")
-			for url in val["sources"]:
-				outfile = os.path.basename(url)
-				if not os.path.exists(f"sources/{outfile}"):
-					os.system(f"( cd sources && wget -nc {url})")
-
 	def unpack(self, sources):
 		os.makedirs(os.path.join(os.environ["CLFS"], "build"), exist_ok=True)
 		first_source = None
@@ -82,6 +72,9 @@ class Sourcer:
 		else:
 			srcdir = f"{first_source['name']}-{first_source['version']}"
 		out += f"cd ${{CLFS}}/build/{srcdir}\n"
+		if "patches" in first_source:
+			for patch in first_source["patches"]:
+				out += f"cat ${{CLFS}}/patches/{patch} | patch -p1\n"
 		return out
 
 

@@ -32,7 +32,10 @@ sources:
       - patch: 2.7.6
       - sed: 4.8
       - tar: 1.34
-      - texinfo: 6.8
+      - texinfo:
+          version: 6.8
+          patches:
+            - texinfo-6.8-glibc-2.34-compat.patch
       - nano: 6.1
   non-gnu:
     packages:
