@@ -1,0 +1,56 @@
+# Values attribute is needed to use the mottainai golang engine
+# with the command:
+# $> mottainai-cli task compile <pipeline-template> -l mottainai.values -o pipeline.yaml
+values:
+
+  images2test:
+
+    - name: ubuntu-20.10
+      image: ubuntu/20.10
+      pre_scripts:
+        - >-
+          apt-get update &&
+          apt-get -y install
+          python3-yaml python3-jinja2 wget
+          xz-utils make gcc g++
+          rsync texinfo file m4 bzip2 patch
+
+    - name: funtoo-stage3
+      image: funtoo/stage3
+      pre_scripts:
+        - sleep 5
+        - >-
+          ego sync &&
+          emerge --jobs pyyaml jinja
+
+    - name: macaroni
+      image: macaroni/funtoo-minimal-devel
+      environment:
+        # Note: using : instead of = until
+        # this https://github.com/MottainaiCI/mottainai-server/commit/96fca2b3f39d4af1318d5334f4303bccc2c52a64
+        # will be tagged.
+        - LUET_NOLOCK:true
+        - LUET_YES:true
+      pre_scripts:
+        - >-
+          luet repo update &&
+          luet i
+          dev-python/pyyaml
+          dev-python/jinja
+          sys-devel/make
+          sys-devel/binutils-config
+          sys-libs/binutils-libs
+          sys-apps/texinfo
+          sys-apps/which
+          sys-devel/patch
+          sys-devel/m4
+          sys-devel/gcc-config
+          net-misc/wget &&
+          luet cleanup
+        - >-
+          /usr/bin/gcc-config 1 &&
+          source /etc/profile &&
+          eselect gcc set 1 &&
+          eselect binutils set 1
+
+# vim: filetype=yaml
