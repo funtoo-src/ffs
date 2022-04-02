@@ -57,6 +57,8 @@ values:
           dev-libs/openssl
           app-misc/ca-certificates
           sys-kernel/linux-headers
+          dev-libs/popt
+          net-misc/rsync
           net-misc/wget &&
           luet cleanup
         - >-
