@@ -1,0 +1,29 @@
+#!/bin/bash
+# Description: Script to generate the pipeline for ffs testing
+# Author: Daniele Rondina, geaaru@funtoo.org
+
+if [ -n "$DEBUG" ] ; then set -x ; fi
+
+ci_dir=$(dirname ${BASH_SOURCE[0]})/..
+mottainai_values=${ci_dir}/mottainai.values
+
+FIRE_TASK=${FIRE_TASK:-0}
+PIPELINEFILE=${PIPELINEFILE:-/tmp/ffs-pipeline.yaml}
+
+main () {
+  mottainai-cli task compile ${ci_dir}/templates/test-ffs-pipeline.yaml.tmpl \
+    -s user="$(whoami)" \
+    -l ${mottainai_values} \
+    -o ${PIPELINEFILE} || return 1
+
+  if [ "${FIRE_TASK}" = 1 ] ; then
+    mottainai-cli pipeline create --yaml ${PIPELINEFILE}
+  fi
+
+  return 0
+}
+
+main $@
+exit $?
+
+# vim: filetype=sh

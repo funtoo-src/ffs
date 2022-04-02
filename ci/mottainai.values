@@ -7,6 +7,7 @@ values:
 
     - name: ubuntu-20.10
       image: ubuntu/20.10
+      pipeline: true
       pre_scripts:
         - >-
           apt-get update &&
@@ -17,6 +18,7 @@ values:
 
     - name: funtoo-stage3
       image: funtoo/stage3
+      pipeline: true
       pre_scripts:
         - sleep 5
         - >-
@@ -25,6 +27,7 @@ values:
 
     - name: macaroni
       image: macaroni/funtoo-minimal-devel
+      pipeline: true
       environment:
         # Note: using : instead of = until
         # this https://github.com/MottainaiCI/mottainai-server/commit/96fca2b3f39d4af1318d5334f4303bccc2c52a64
@@ -38,19 +41,33 @@ values:
           dev-python/pyyaml
           dev-python/jinja
           sys-devel/make
-          sys-devel/binutils-config
+          sys-apps/baselayout
+          sys-devel-2.36/binutils
           sys-libs/binutils-libs
+          sys-devel/binutils-config
           sys-apps/texinfo
           sys-apps/which
+          sys-apps/portage
+          sys-apps/diffutils
           sys-devel/patch
           sys-devel/m4
           sys-devel/gcc-config
+          virtual/base
+          dev-libs/libpcre2
+          dev-libs/openssl
+          app-misc/ca-certificates
+          sys-kernel/linux-headers
           net-misc/wget &&
           luet cleanup
         - >-
+          eval 'mkdir -p /etc/portage || true' &&
+          echo "CHOST=\"$(uname -m)-pc-linux-gnu\"" > /etc/portage/make.conf &&
           /usr/bin/gcc-config 1 &&
           source /etc/profile &&
           eselect gcc set 1 &&
+          set -x &&
+          binutils-config "$(uname -m)-pc-linux-gnu-2.36.1" &&
+          eselect binutils list &&
           eselect binutils set 1
 
 # vim: filetype=yaml
