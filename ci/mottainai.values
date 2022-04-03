@@ -5,8 +5,8 @@ values:
 
   images2test:
 
-    - name: ubuntu-20.10
-      image: ubuntu/20.10
+    - name: ubuntu-21.10
+      image: ubuntu/21.10
       pipeline: true
       pre_scripts:
         - >-
