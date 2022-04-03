@@ -8,7 +8,7 @@ group:
 {{- range $index, $idata := .images2test }}
 {{- $forpipeline := index $idata "pipeline" }}
 {{- if $forpipeline }}
-- {{ index $idata "name" }}
+- image-{{ $index }}-{{ index $idata "name" }}
 {{- end }}
 {{- end }}
 {{- $user := .user }}
