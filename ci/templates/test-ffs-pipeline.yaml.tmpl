@@ -18,7 +18,7 @@ tasks:
   image-{{ $idx }}-{{ index $idata "name" }}:
     {{- $pre := index $idata "pre_scripts" }}
     {{- $env := index $idata "environment" }}
-    name: 'test ffs/{{ index $idata "name" }} - {{ $user }}'
+    name: 'pipeline: test ffs/{{ index $idata "name" }} - {{ $user }}'
     script:
     {{- if $pre }}
     {{- range $s := $pre }}
