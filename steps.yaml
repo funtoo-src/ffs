@@ -45,13 +45,15 @@ cross_tools:
     - gcc: |
         mkdir gcc-build && cd gcc-build
         {%- if arch == "powerpc" %}
-        echo libgcc_cv_dfp=no > config.cache
+        install -d {{target}}/libgcc
+        echo libgcc_cv_dfp=yes > {{target}}/libgcc/config.cache
         {%- endif %}
         AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
           ../configure \
           {%- if arch == "powerpc" %}
           --with-abi=elfv2 \
           --with-long-double=64 \
+        --disable-decimal-float \
           {%- endif %}
           --prefix=${CLFS}/cross-tools \
           --build=${CLFS_HOST} \
@@ -99,13 +101,15 @@ cross_tools:
     - gcc: |
         mkdir gcc-build && cd gcc-build
         {%- if arch == "powerpc" %}
-        echo libgcc_cv_dfp=no > config.cache
+        install -d {{target}}/libgcc
+        echo libgcc_cv_dfp=yes > {{target}}/libgcc/config.cache
         {%- endif %}
          AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
           ../configure \
           {%- if arch == "powerpc" %}
           --with-abi=elfv2 \
           --with-long-double=64 \
+        --disable-decimal-float \
           {%- endif %}
           --prefix=${CLFS}/cross-tools \
           --build=${CLFS_HOST} \
@@ -194,12 +198,14 @@ tools:
         sed -i 's|^RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET|& -nostdinc++|' configure
         mkdir gcc-build && cd gcc-build
         {%- if arch == "powerpc" %}
-        echo libgcc_cv_dfp=no > config.cache
+        install -d {{target}}/libgcc
+        echo libgcc_cv_dfp=yes > {{target}}/libgcc/config.cache
         {%- endif %}
          ../configure \
         {%- if arch == "powerpc" %}
         --with-abi=elfv2 \
         --with-long-double=64 \
+        --disable-decimal-float \
         {%- endif %}
         --prefix=${CLFS}/tools \
         --build=${CLFS_HOST} \
