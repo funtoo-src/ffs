@@ -1,0 +1,4 @@
+arch:
+  cflags: -m64
+  arch: powerpc
+  target: powerpc64-unknown-linux-musl
