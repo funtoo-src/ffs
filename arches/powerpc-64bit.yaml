@@ -1,9 +1,11 @@
 arch:
-  cflags: -m64
+  cflags: -m64 -mlong-double-64
   arch: powerpc
   musl_lib_arch: powerpc64
   target: powerpc64-unknown-linux-musl
   notes: |
+    https://musl.openwall.narkive.com/VSC2NlT5/powerpc-gcc-5
+    https://www.mail-archive.com/gcc-patches@gcc.gnu.org/msg249684.html
     I may be misinterpreting the MUSL information incorrectly, but in additional to enabling ELFv2 in gcc,
     it look like we need 64-bit long doubles:
 

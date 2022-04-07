@@ -4,7 +4,7 @@ cross_tools:
   steps:
     - linux: |
         make mrproper
-        make ARCH=${CLFS_ARCH} INSTALL_HDR_PATH=${CLFS}/tools headers_install
+        make ARCH={{arch}} INSTALL_HDR_PATH=${CLFS}/tools headers_install
     - binutils: |
         mkdir binutils-build && cd binutils-build
         AR=ar AS=as ../configure \
@@ -44,11 +44,14 @@ cross_tools:
         make install
     - gcc: |
         mkdir gcc-build && cd gcc-build
+        {%- if arch == "powerpc" %}
+        echo libgcc_cv_dfp=no > config.cache
+        {%- endif %}
         AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
           ../configure \
           {%- if arch == "powerpc" %}
           --with-abi=elfv2 \
-          --with-libf7=no \
+          --with-long-double=64 \
           {%- endif %}
           --prefix=${CLFS}/cross-tools \
           --build=${CLFS_HOST} \
@@ -95,11 +98,14 @@ cross_tools:
           -exec ln -sf ../../../tools/lib/{} "${CLFS}"/cross-tools/"${CLFS_TARGET}"/lib/{} \;
     - gcc: |
         mkdir gcc-build && cd gcc-build
-        AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
+        {%- if arch == "powerpc" %}
+        echo libgcc_cv_dfp=no > config.cache
+        {%- endif %}
+         AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
           ../configure \
           {%- if arch == "powerpc" %}
           --with-abi=elfv2 \
-          --with-libf7=no \
+          --with-long-double=64 \
           {%- endif %}
           --prefix=${CLFS}/cross-tools \
           --build=${CLFS_HOST} \
@@ -187,10 +193,13 @@ tools:
     - gcc: |
         sed -i 's|^RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET|& -nostdinc++|' configure
         mkdir gcc-build && cd gcc-build
-        ../configure \
+        {%- if arch == "powerpc" %}
+        echo libgcc_cv_dfp=no > config.cache
+        {%- endif %}
+         ../configure \
         {%- if arch == "powerpc" %}
         --with-abi=elfv2 \
-        --with-libf7=no \
+        --with-long-double=64 \
         {%- endif %}
         --prefix=${CLFS}/tools \
         --build=${CLFS_HOST} \

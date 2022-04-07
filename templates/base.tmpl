@@ -18,7 +18,6 @@ rm -rf "${CLFS}"/build/*
 export LC_ALL=POSIX
 export CLFS_HOST=$(echo ${MACHTYPE} | sed -e 's/-[^-]*/-cross/')
 export CLFS_TARGET="{{target}}"
-export CLFS_ARCH="{{arch}}"
 export CLFS_CFLAGS="{{cflags}}"
 export MAKEFLAGS="-j$(nproc) -l$(nproc)"
 unset CFLAGS CXXFLAGS
