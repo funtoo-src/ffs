@@ -1,4 +1,5 @@
 arch:
   cflags: -m64
   arch: powerpc
+  musl_lib_arch: powerpc64
   target: powerpc64-unknown-linux-musl
