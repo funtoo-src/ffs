@@ -1,4 +1,4 @@
-name: "ffs/funtoo"
+name: "ffs/funtoo/x86-64bit"
 script:
 - >-
   ego sync && emerge --jobs pyyaml jinja

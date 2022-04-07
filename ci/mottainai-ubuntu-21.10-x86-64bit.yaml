@@ -1,4 +1,4 @@
-name: "ffs/ubuntu/21.10"
+name: "ffs/ubuntu/21.10/x86-64bit"
 script:
 - >-
   apt-get update && apt-get -y install python3-yaml python3-jinja2 wget xz-utils make gcc g++ rsync texinfo file m4 bzip2 patch
