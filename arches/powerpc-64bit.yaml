@@ -4,18 +4,23 @@ arch:
   musl_lib_arch: powerpc64
   target: powerpc64-unknown-linux-musl
   notes: |
-    https://musl.openwall.narkive.com/VSC2NlT5/powerpc-gcc-5
-    https://www.mail-archive.com/gcc-patches@gcc.gnu.org/msg249684.html
-    I may be misinterpreting the MUSL information incorrectly, but in additional to enabling ELFv2 in gcc,
-    it look like we need 64-bit long doubles:
+    NOTE: It may be possible to drop ``-mlong-double-64`` from cflags, above. This needs testing.
+    
+    There are challenges related to building PowerPC, and PowerPC and MUSL specifically. Musl requires
+    ELFv2 and also requires a "long double" of 64-bit to be the default in the compiler toolchain. This
+    in turn requires a few extra configure flag toggles for gcc. The most helpful resource I found for
+    determining the correct flags are in the APKBUILD for gcc in Adelie Linux. Although this is for gcc
+    8.x, it seems to still work well for 11.x that we are using:: 
+    
+      https://git.adelielinux.org/adelie/packages/-/blob/master/system/gcc/APKBUILD
+    
+    Here are some other related links that I used in my research of this issue, which could provide
+    additional context on the various challenges (these should be roughly in the order of usefulness,
+    with the most useful at the top):
+    
+    * https://musl.openwall.narkive.com/VSC2NlT5/powerpc-gcc-5
+    * https://www.mail-archive.com/gcc-patches@gcc.gnu.org/msg249684.html
+    * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93157
+    * https://wiki.musl-libc.org/supported-platforms.html
 
-      https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93157
-      https://wiki.musl-libc.org/supported-platforms.html
-
-    So I found this, and am using the --with-libf7=no option with gcc for PowerPC to see if this induces
-    the correct result:
-
-      https://fp64lib.org/documentation/using-fp64lib-with-long-double/
-
-    Please note my hacks on PowerPC 64-bit need additional testing and could be totally wrong at this point.
-
+  

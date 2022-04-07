@@ -44,16 +44,12 @@ cross_tools:
         make install
     - gcc: |
         mkdir gcc-build && cd gcc-build
-        {%- if arch == "powerpc" %}
-        install -d {{target}}/libgcc
-        echo libgcc_cv_dfp=yes > {{target}}/libgcc/config.cache
-        {%- endif %}
         AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
           ../configure \
           {%- if arch == "powerpc" %}
           --with-abi=elfv2 \
-          --with-long-double=64 \
-        --disable-decimal-float \
+          --enable-secureplt \
+          --enable-decimal-float=no \
           {%- endif %}
           --prefix=${CLFS}/cross-tools \
           --build=${CLFS_HOST} \
@@ -100,16 +96,12 @@ cross_tools:
           -exec ln -sf ../../../tools/lib/{} "${CLFS}"/cross-tools/"${CLFS_TARGET}"/lib/{} \;
     - gcc: |
         mkdir gcc-build && cd gcc-build
-        {%- if arch == "powerpc" %}
-        install -d {{target}}/libgcc
-        echo libgcc_cv_dfp=yes > {{target}}/libgcc/config.cache
-        {%- endif %}
-         AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
+        AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
           ../configure \
           {%- if arch == "powerpc" %}
           --with-abi=elfv2 \
-          --with-long-double=64 \
-        --disable-decimal-float \
+          --enable-secureplt \
+          --enable-decimal-float=no \
           {%- endif %}
           --prefix=${CLFS}/cross-tools \
           --build=${CLFS_HOST} \
@@ -197,15 +189,11 @@ tools:
     - gcc: |
         sed -i 's|^RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET|& -nostdinc++|' configure
         mkdir gcc-build && cd gcc-build
-        {%- if arch == "powerpc" %}
-        install -d {{target}}/libgcc
-        echo libgcc_cv_dfp=yes > {{target}}/libgcc/config.cache
-        {%- endif %}
-         ../configure \
+        ../configure \
         {%- if arch == "powerpc" %}
         --with-abi=elfv2 \
-        --with-long-double=64 \
-        --disable-decimal-float \
+        --enable-secureplt \
+        --enable-decimal-float=no \
         {%- endif %}
         --prefix=${CLFS}/tools \
         --build=${CLFS_HOST} \
