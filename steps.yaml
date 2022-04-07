@@ -267,6 +267,7 @@ tools:
         --cache-file=config.cache
         make
         make install
+        test -x ${CLFS}/tools/bin/bash
     - bzip2: |
         sed -i \
           -e '/^all/s/ test$//' \
