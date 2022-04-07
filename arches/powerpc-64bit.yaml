@@ -3,3 +3,17 @@ arch:
   arch: powerpc
   musl_lib_arch: powerpc64
   target: powerpc64-unknown-linux-musl
+  notes: |
+    I may be misinterpreting the MUSL information incorrectly, but in additional to enabling ELFv2 in gcc,
+    it look like we need 64-bit long doubles:
+
+      https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93157
+      https://wiki.musl-libc.org/supported-platforms.html
+
+    So I found this, and am using the --with-libf7=no option with gcc for PowerPC to see if this induces
+    the correct result:
+
+      https://fp64lib.org/documentation/using-fp64lib-with-long-double/
+
+    Please note my hacks on PowerPC 64-bit need additional testing and could be totally wrong at this point.
+
