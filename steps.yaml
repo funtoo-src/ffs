@@ -97,7 +97,7 @@ cross_tools:
         make
         DESTDIR=${CLFS}/tools make install
         cd "${CLFS}"/tools/lib
-        unlink ld-musl-{{musl_lib_arch}}.so.1
+        rm -f ld-musl-{{musl_lib_arch}}.so.1
         ln -sf libc.so ld-musl-{{musl_lib_arch}}.so.1
         ls -la ld-musl-{{musl_lib_arch}}.so.1
         find -type f \
@@ -439,3 +439,6 @@ tools:
           --set-rpath /tools/lib/ {} 2>/dev/null
         find ${CLFS}/tools -iname '*.pc' \
           -exec sed -i -e "s|${CLFS}||g" {} \;
+        if [ ! -L "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1" ]; then
+          ln -sf ../tools/lib/ld-musl-{{musl_lib_arch}}.so.1 "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1"
+        fi
