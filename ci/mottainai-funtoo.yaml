@@ -1,12 +1,8 @@
 name: "ffs/funtoo"
 script:
-# Needed until the image will be migrated to dhclient template.
-- sleep 5
 - >-
-  ego sync &&
-  emerge --jobs pyyaml jinja
-- export CLFS=${HOME}
-- install -d ${CLFS}/sources
+  ego sync && emerge --jobs pyyaml jinja
+- export CLFS=${HOME}/ffs
 - bin/sourcer fetch
 - bin/builder cross_tools
 - bin/builder tools
