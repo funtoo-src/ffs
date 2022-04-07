@@ -245,7 +245,7 @@ tools:
         make
         make install
     - bash: |
-        cat > config.cache << "EOF"
+        cat > config.cache << "BASH_EOF"
         ac_cv_func_mmap_fixed_mapped=yes
         ac_cv_func_strcoll_works=yes
         ac_cv_func_working_mktime=yes
@@ -258,7 +258,7 @@ tools:
         bash_cv_under_sys_siglist=yes
         bash_cv_unusable_rtsigs=no
         gt_cv_int_divbyzero_sigfpe=yes
-        EOF
+        BASH_EOF
         ./configure \
         --prefix=${CLFS}/tools \
         --build=${CLFS_HOST} \
@@ -371,7 +371,7 @@ tools:
         make
         make install
     - tar: |
-        cat > config.cache << EOF
+        cat > config.cache << BASH_EOF
         gl_cv_func_wcwidth_works=yes
         gl_cv_func_btowc_eof=yes
         ac_cv_func_malloc_0_nonnull=yes
@@ -381,7 +381,7 @@ tools:
         gl_cv_func_mbrtowc_null_arg2=yes
         gl_cv_func_mbrtowc_retval=yes
         gl_cv_func_wcrtomb_retval=yes
-        EOF 
+        BASH_EOF
         ./configure \
         --prefix=${CLFS}/tools \
         --build=${CLFS_HOST} \
