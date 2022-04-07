@@ -2,6 +2,15 @@ cross_tools:
   defaults:
     template: base.tmpl
   steps:
+    - none: |
+        # initial setup:
+        install -d "${CLFS}/cross-tools"
+        install -d "${CLFS}/tools"
+        install -d "${CLFS}/tools/lib"
+        ln -sf lib "${CLFS}/tools/lib64"
+        # make sure it's a symlink
+        test -L "${CLFS}/tools/lib64"
+        install -d ${CLFS}/{dev,proc,run,sys}
     - linux: |
         make mrproper
         make ARCH={{arch}} INSTALL_HDR_PATH=${CLFS}/tools headers_install
@@ -421,3 +430,12 @@ tools:
         --host=${CLFS_TARGET}
         make
         make install
+    - none: |
+        find "${CLFS}"/tools -type f -exec file {} + | \
+          grep ELF | \
+          cut -d':' -f1 | \
+          xargs -I{} patchelf \
+          --set-interpreter "${DYNAMIC_LINKER#$CLFS}" \
+          --set-rpath /tools/lib/ {} 2>/dev/null
+        find ${CLFS}/tools -iname '*.pc' \
+          -exec sed -i -e "s|${CLFS}||g" {} \;

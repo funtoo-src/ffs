@@ -96,11 +96,18 @@ class Builder:
 		body_tmpl = jinja2.Environment(loader=jinja2.BaseLoader()).from_string(body)
 		# expand any arch jinja
 		body = body_tmpl.render(**self.arch)
-		out = {
-			"sources": name,
-			"unpack": self.sourcer.unpack(name),
-			"build_steps": body
-		}
+		if name != "none":
+			out = {
+				"sources": name,
+				"unpack": self.sourcer.unpack(name),
+				"build_steps": body
+			}
+		else:
+			out = {
+				"sources": "",
+				"unpack": "",
+				"build_steps": body
+			}
 		out.update(self.arch)
 		return out
 
