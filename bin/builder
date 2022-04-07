@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 import os
 import sys
-
 import jinja2
+from jinja2 import BaseLoader
 from yaml import safe_load
 
 
@@ -93,20 +93,27 @@ class Builder:
 		body = list(package_section.values())[0]
 		if not isinstance(body, str):
 			raise ValueError(f"Expecting str: {body}")
-		return {
+		body_tmpl = jinja2.Environment(loader=jinja2.BaseLoader()).from_string(body)
+		# expand any arch jinja
+		body = body_tmpl.render(**self.arch)
+		out = {
 			"sources": name,
 			"unpack": self.sourcer.unpack(name),
 			"build_steps": body
 		}
+		out.update(self.arch)
+		return out
 
 	def __init__(self, inpath):
 		self.loader = jinja2.FileSystemLoader(os.path.join(inpath, "templates"))
 		self.jinja = jinja2.Environment(loader=self.loader)
 		infile = os.path.join(inpath, "steps.yaml")
 		self.sourcer = Sourcer(os.path.join(os.environ["CLFS"], "sources.yaml"))
+		with open(os.path.join(os.environ["CLFS"], "arches", f"{sys.argv[1]}.yaml")) as myarch:
+			self.arch = safe_load(myarch.read())["arch"]
 		with open(infile, "r") as myf:
 			for rule_name, rule in safe_load(myf.read()).items():
-				if rule_name != sys.argv[1]:
+				if rule_name != sys.argv[2]:
 					continue
 				if "defaults" in rule:
 					defaults = rule["defaults"].copy()
@@ -118,7 +125,7 @@ class Builder:
 				for package in rule["steps"]:
 					rule = self.parse_yaml_rule(package)
 					cmds = tmpl.render(rule)
-					#print(cmds)
+					print(cmds)
 					result = os.system(cmds)
 					if result != 0:
 						sys.exit(1)

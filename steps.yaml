@@ -83,9 +83,9 @@ cross_tools:
         make
         DESTDIR=${CLFS}/tools make install
         cd "${CLFS}"/tools/lib
-        unlink ld-musl-aarch64.so.1
-        ln -sf libc.so ld-musl-aarch64.so.1
-        ls -la ld-musl-aarch64.so.1
+        unlink ld-musl-{{arch}}.so.1
+        ln -sf libc.so ld-musl-{{arch}}.so.1
+        ls -la ld-musl-{{arch}}.so.1
         find -type f \
           -iname 'crt*.o' \
           -exec ln -sf ../../../tools/lib/{} "${CLFS}"/cross-tools/"${CLFS_TARGET}"/lib/{} \;

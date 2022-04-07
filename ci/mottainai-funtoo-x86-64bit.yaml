@@ -4,8 +4,8 @@ script:
   ego sync && emerge --jobs pyyaml jinja
 - export CLFS=${HOME}/ffs
 - bin/sourcer fetch
-- bin/builder cross_tools
-- bin/builder tools
+- bin/builder x86-64bit cross_tools
+- bin/builder x86-64bit tools
 environment:
 - SHELL=/bin/bash
 - LUET_NOLOCK=true

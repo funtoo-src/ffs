@@ -17,9 +17,9 @@ rm -rf "${CLFS}"/build/*
 {{unpack}}
 export LC_ALL=POSIX
 export CLFS_HOST=$(echo ${MACHTYPE} | sed -e 's/-[^-]*/-cross/')
-export CLFS_TARGET="aarch64-unknown-linux-musl"
-export CLFS_ARCH="arm64"
-export CLFS_CFLAGS=""
+export CLFS_TARGET="{{target}}"
+export CLFS_ARCH="{{arch}}"
+export CLFS_CFLAGS="{{cflags}}"
 export MAKEFLAGS="-j$(nproc) -l$(nproc)"
 unset CFLAGS CXXFLAGS
 {% block env %}{% endblock %}
