@@ -135,6 +135,7 @@ class Builder:
 					print(cmds)
 					result = os.system(cmds)
 					if result != 0:
+						print(f"Error encountered -- exit code {result}")
 						sys.exit(1)
 
 
