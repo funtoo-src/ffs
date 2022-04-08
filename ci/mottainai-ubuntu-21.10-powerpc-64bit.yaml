@@ -1,0 +1,15 @@
+name: "ffs/ubuntu/21.10/powerpc-64bit"
+script:
+- >-
+  apt-get update && apt-get -y install python3-yaml python3-jinja2 wget xz-utils make gcc g++ rsync texinfo file m4 bzip2 patch
+- export CLFS=${HOME}
+- install -d ${CLFS}/sources
+- bin/sourcer fetch && bin/builder powerpc-64bit cross_tools && bin/builder powerpc-64bit tools
+environment:
+- SHELL=/bin/bash
+- LUET_NOLOCK=true
+- LUET_YES=true
+image: ubuntu/21.10
+source: https://code.funtoo.org/bitbucket/scm/core/ffs.git
+type: lxd
+directory: /
