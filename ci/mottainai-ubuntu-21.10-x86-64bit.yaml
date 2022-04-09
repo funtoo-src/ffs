@@ -1,9 +1,10 @@
 name: "ffs/ubuntu/21.10/x86-64bit"
+artefact_path: sources
+namespace: ffs-sources
 script:
 - >-
   apt-get update && apt-get -y install python3-yaml python3-jinja2 wget xz-utils make gcc g++ rsync texinfo file m4 bzip2 patch
 - export CLFS=${HOME}
-- install -d ${CLFS}/sources
 - bin/sourcer fetch && bin/builder x86-64bit cross_tools && bin/builder x86-64bit tools
 environment:
 - SHELL=/bin/bash
@@ -12,4 +13,3 @@ environment:
 image: ubuntu/21.10
 source: https://code.funtoo.org/bitbucket/scm/core/ffs.git
 type: lxd
-directory: /
