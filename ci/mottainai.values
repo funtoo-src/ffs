@@ -5,7 +5,7 @@ values:
 
   images2test:
 
-    - name: ubuntu-21.10
+    - name: ubuntu-21.10-x86-64bit
       image: ubuntu/21.10
       pipeline: true
       pre_scripts:
@@ -15,8 +15,9 @@ values:
           python3-yaml python3-jinja2 wget
           xz-utils make gcc g++
           rsync texinfo file m4 bzip2 patch
+      arch: x86_64bit
 
-    - name: funtoo-stage3
+    - name: funtoo-stage3-x86-64bit
       image: funtoo/stage3
       pipeline: true
       pre_scripts:
@@ -24,8 +25,9 @@ values:
         - >-
           ego sync &&
           emerge --jobs pyyaml jinja
+      arch: x86_64bit
 
-    - name: macaroni
+    - name: macaroni-x86-64bit
       image: macaroni/funtoo-minimal-devel
       pipeline: true
       environment:
@@ -71,5 +73,37 @@ values:
           binutils-config "$(uname -m)-pc-linux-gnu-2.36.1" &&
           eselect binutils list &&
           eselect binutils set 1
+      arch: x86_64bit
+
+    #----------------------------------
+    # ARM 64 tests tasks
+    #----------------------------------
+    - name: ubuntu-21.10-arm64
+      image: ubuntu/21.10
+      pipeline: true
+      pre_scripts:
+        - >-
+          apt-get update &&
+          apt-get -y install
+          python3-yaml python3-jinja2 wget
+          xz-utils make gcc g++
+          rsync texinfo file m4 bzip2 patch
+      arch: arm-64bit
+
+
+    #----------------------------------
+    # PowerPC tests tasks
+    #----------------------------------
+    - name: ubuntu-21.10-powerpc64
+      image: ubuntu/21.10
+      pipeline: true
+      pre_scripts:
+        - >-
+          apt-get update &&
+          apt-get -y install
+          python3-yaml python3-jinja2 wget
+          xz-utils make gcc g++
+          rsync texinfo file m4 bzip2 patch
+      arch: powerpc-64bit
 
 # vim: filetype=yaml

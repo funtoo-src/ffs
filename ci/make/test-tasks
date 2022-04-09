@@ -35,13 +35,14 @@ main () {
   image=$(echo "${imagedata}" | jq .image )
   prescripts=$(echo "${imagedata}" | jq '.pre_scripts // ""' | yq r - -P)
   envs=$(echo "${imagedata}" | jq '.environment // ""' | yq r - -P)
-  envs=$(echo "${imagedata}" | jq '.environment // ""' | yq r - -P)
+  arch=$(echo "${imagedata}" | jq '.arch // "x86_64bit"' | yq r - -P)
 
   mottainai-cli task compile ${ci_dir}/templates/test-ffs.yaml.tmpl \
-    -s task_name="test ffs/${IMAGE_NAME} - $(whoami)" \
+    -s task_name="test ffs/${IMAGE_NAME}/${arch} - $(whoami)" \
     -s image="${image}" \
     -s "pre_scripts=${prescripts}" \
     -s "envs=${envs}" \
+    -s "arch=${arch}" \
     -o ${TASKFILE} || return 1
 
   if [ "${FIRE_TASK}" = 1 ] ; then

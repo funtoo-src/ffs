@@ -18,7 +18,9 @@ tasks:
   image-{{ $idx }}-{{ index $idata "name" }}:
     {{- $pre := index $idata "pre_scripts" }}
     {{- $env := index $idata "environment" }}
-    name: 'pipeline: test ffs/{{ index $idata "name" }} - {{ $user }}'
+    {{- $arch := index $idata "arch" }}
+    name: 'pipeline: test ffs/{{ index $idata "name" }}/{{ $arch }} - {{ $user }}'
+    artefact_path: "sources"
     script:
     {{- if $pre }}
     {{- range $s := $pre }}
@@ -26,10 +28,8 @@ tasks:
     {{- end }}
     {{- end }}
     - export CLFS=${HOME}
-    - install -d ${CLFS}/sources
-    - bin/sourcer fetch
-    - bin/builder cross_tools
-    - bin/builder tools
+    - bin/builder {{ $arch }} cross_tools
+    - bin/builder {{ $arch }} tools
     environment:
     - SHELL=/bin/bash
     {{- if $env }}
@@ -38,6 +38,7 @@ tasks:
     {{- end }}
     {{- end }}
     image: {{ index $idata "image" }}
+    namespace: tarballs
     source: https://code.funtoo.org/bitbucket/scm/core/ffs.git
     type: lxd
     directory: /

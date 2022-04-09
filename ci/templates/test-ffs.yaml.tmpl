@@ -1,19 +1,22 @@
 name: "{{ .task_name }}"
+artefact_path: "sources"
 script:
 {{- if .pre_scripts }}
 {{ .pre_scripts }}
 {{- end }}
 - export CLFS=${HOME}
-- install -d ${CLFS}/sources
-- bin/sourcer fetch
-- bin/builder cross_tools
-- bin/builder tools
+#- bin/sourcer fetch
+- bin/builder ${ARCH} cross_tools
+- bin/builder ${ARCH} tools
+- eval 'rm sources/* || true'
 environment:
 - SHELL=/bin/bash
+- ARCH={{ .arch }}
 {{- if .envs }}
 {{ replaceAll .envs ":" "=" }}
 {{- end }}
 image: {{ .image }}
+namespace: tarballs
 source: https://code.funtoo.org/bitbucket/scm/core/ffs.git
 type: lxd
 directory: /
