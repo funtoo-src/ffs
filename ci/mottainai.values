@@ -15,7 +15,7 @@ values:
           python3-yaml python3-jinja2 wget
           xz-utils make gcc g++
           rsync texinfo file m4 bzip2 patch
-      arch: x86_64bit
+      arch: x86-64bit
 
     - name: funtoo-stage3-x86-64bit
       image: funtoo/stage3
@@ -25,7 +25,7 @@ values:
         - >-
           ego sync &&
           emerge --jobs pyyaml jinja
-      arch: x86_64bit
+      arch: x86-64bit
 
     - name: macaroni-x86-64bit
       image: macaroni/funtoo-minimal-devel
@@ -73,7 +73,7 @@ values:
           binutils-config "$(uname -m)-pc-linux-gnu-2.36.1" &&
           eselect binutils list &&
           eselect binutils set 1
-      arch: x86_64bit
+      arch: x86-64bit
 
     #----------------------------------
     # ARM 64 tests tasks
