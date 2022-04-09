@@ -436,11 +436,10 @@ tools:
           cut -d':' -f1 | \
           xargs -I{} patchelf \
           --set-interpreter "${DYNAMIC_LINKER#$CLFS}" \
-          --set-rpath /tools/lib/ {} 2>/dev/null
-        find ${CLFS}/tools -iname '*.pc' \
-          -exec sed -i -e "s|${CLFS}||g" {} \;
+          --set-rpath /tools/lib/ {} 2>/dev/null || exit 2
+        find ${CLFS}/tools -iname '*.pc' -exec sed -i -e "s|${CLFS}||g" {} \; || exit 3
         if [ ! -L "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1" ]; then
-          ln -sf ../tools/lib/ld-musl-{{musl_lib_arch}}.so.1 "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1"
+          ln -sf ../tools/lib/ld-musl-{{musl_lib_arch}}.so.1 "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1" || exit 4
         fi
         # avoid a non-zero exit code:
         exit 0
