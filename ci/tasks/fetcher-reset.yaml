@@ -1,0 +1,14 @@
+artefact_path: "sources"
+directory: /
+environment:
+- SHELL=/bin/bash
+image: funtoo/stage3
+name: FFS Tarballs Reset
+script:
+- sleep 5
+- ego sync && emerge --jobs pyyaml jinja
+- export CLFS=${HOME}
+- bin/sourcer fetch
+source: https://code.funtoo.org/bitbucket/scm/core/ffs.git
+type: lxd
+tag_namespace: "tarballs"
