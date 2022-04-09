@@ -30,6 +30,7 @@ tasks:
     - export CLFS=${HOME}
     - bin/builder {{ $arch }} cross_tools
     - bin/builder {{ $arch }} tools
+    - eval 'rm sources/* || true'
     environment:
     - SHELL=/bin/bash
     {{- if $env }}
