@@ -1,0 +1,5 @@
+arch:
+  cflags: ''
+  arch: riscv
+  musl_lib_arch: riscv64
+  target: riscv64-unknown-linux-musl
