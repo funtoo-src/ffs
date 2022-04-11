@@ -10,7 +10,7 @@ cross_tools:
         ln -sf lib "${CLFS}/tools/lib64"
         # make sure it's a symlink
         test -L "${CLFS}/tools/lib64"
-        install -d ${CLFS}/{dev,proc,run,sys}
+        install -d ${CLFS}/{dev,proc,run,sys,etc}
     - linux: |
         make mrproper
         make ARCH={{arch}} INSTALL_HDR_PATH=${CLFS}/tools headers_install
@@ -436,8 +436,24 @@ tools:
           cut -d':' -f1 | \
           xargs -I{} patchelf \
           --set-interpreter "${DYNAMIC_LINKER#$CLFS}" \
-          --set-rpath /tools/lib/ {} 2>/dev/null || exit 0
-        find ${CLFS}/tools -iname '*.pc' -exec sed -i -e "s|${CLFS}||g" {} \; || exit 0
+          --set-rpath /tools/lib/ {} 2>/dev/null || true
+        find ${CLFS}/tools -iname '*.pc' -exec sed -i -e "s|${CLFS}||g" {} \; || true
         if [ ! -L "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1" ]; then
           ln -sf ../tools/lib/ld-musl-{{musl_lib_arch}}.so.1 "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1"
         fi
+        cat > ${CLFS}/tools/etc/profile << "PROFILE_EOF"
+        # Funtoo from Scratch /etc/profile for login shells in the temporary environment.
+        #
+        # The following settings allow terminal-aware programs to find the terminal definitions
+        # and also allow temporary tools to be found, while also allowing 'official' tools installed
+        # in FHS-compliant paths to gradually replace these tools.
+
+        export TERMINFO=/tools/share/terminfo
+        export PATH=/bin:/usr/bin:/sbin:/usr/sbin:/tools/sbin:/tools/bin
+
+        umask 022
+
+        PROFILE_EOF
+        # set up initial shells in correct location for "#!/bin/sh" and "#!/bin/bash" scripts:
+        ln -sf ../tools/bin/bash ${CLFS}/bin/bash
+        ln -sf ../tools/bin/sh ${CLFS}/bin/sh
