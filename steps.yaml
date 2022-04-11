@@ -10,7 +10,7 @@ cross_tools:
         ln -sf lib "${CLFS}/tools/lib64"
         # make sure it's a symlink
         test -L "${CLFS}/tools/lib64"
-        install -d ${CLFS}/{dev,proc,run,sys,etc}
+        install -d ${CLFS}/{dev,proc,run,sys,etc,lib}
     - linux: |
         make mrproper
         make ARCH={{arch}} INSTALL_HDR_PATH=${CLFS}/tools headers_install
@@ -441,7 +441,7 @@ tools:
         if [ ! -L "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1" ]; then
           ln -sf ../tools/lib/ld-musl-{{musl_lib_arch}}.so.1 "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1"
         fi
-        cat > ${CLFS}/tools/etc/profile << "PROFILE_EOF"
+        cat > ${CLFS}/etc/profile << "PROFILE_EOF"
         # Funtoo from Scratch /etc/profile for login shells in the temporary environment.
         #
         # The following settings allow terminal-aware programs to find the terminal definitions
