@@ -106,4 +106,19 @@ values:
           rsync texinfo file m4 bzip2 patch
       arch: powerpc-64bit
 
+    #----------------------------------
+    # riscv-64bit tests tasks
+    #----------------------------------
+    - name: ubuntu-21.10-riscv64
+      image: ubuntu/21.10
+      pipeline: true
+      pre_scripts:
+        - >-
+          apt-get update &&
+          apt-get -y install
+          python3-yaml python3-jinja2 wget
+          xz-utils make gcc g++
+          rsync texinfo file m4 bzip2 patch
+      arch: riscv-64bit
+
 # vim: filetype=yaml
