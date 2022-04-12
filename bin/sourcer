@@ -75,7 +75,6 @@ class Sourcer:
 						self.sources[name] = pkginfo
 
 	def fetch(self):
-		os.makedirs("../sources", exist_ok=True)
 		for key, val in sourcer.sources.items():
 			print(f"Fetching {key}")
 			for url in val["sources"]:
