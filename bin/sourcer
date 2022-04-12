@@ -31,7 +31,10 @@ class Sourcer:
 
 	sources = {}
 
-	def __init__(self, infile):
+	def __init__(self, clfs_path):
+		self.clfs_path = clfs_path
+		infile = os.path.join(clfs_path, "sources.yaml")
+		os.makedirs(os.path.join(clfs_path, "sources"), exist_ok=True)
 		with open(infile, "r") as myf:
 			for top_name, src_cats in safe_load(myf.read()).items():
 				for cat_name, cat_contents in src_cats.items():
@@ -98,7 +101,7 @@ class Sourcer:
 if __name__ == "__main__":
 	if "CLFS" not in os.environ:
 		raise EnvironmentError("Please set CLFS environment variable.")
-	sourcer = Sourcer(os.path.join(os.environ["CLFS"], "sources.yaml"))
+	sourcer = Sourcer(os.environ["CLFS"])
 	args = parse_args()
 	if args.action == "unpack":
 		sources = args.sources.split(",")
