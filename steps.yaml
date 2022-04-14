@@ -3,6 +3,10 @@ cross_tools:
     template: base.tmpl
   steps:
     - none: |
+        if [ -e "${CLFS}/tools" ] || [ -e "${CLFS}/cross-tools ]; then
+          echo "Please remove ${CLFS}/tools and ${CLFS}/cross-tools before running."
+          exit 1
+        fi
         # initial setup:
         install -d "${CLFS}/cross-tools"
         install -d "${CLFS}/tools"
@@ -140,6 +144,9 @@ tools:
   defaults:
     template: tools.tmpl
   steps:
+    - none: |
+        # A local 'patchelf' command is currently required for the final cross_tools to run
+        which patchelf
     - gmp: |
         CC_FOR_BUILD=gcc \
         ./configure \
