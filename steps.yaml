@@ -3,7 +3,7 @@ cross_tools:
     template: base.tmpl
   steps:
     - none: |
-        if [ -e "${CLFS}/tools" ] || [ -e "${CLFS}/cross-tools ]; then
+        if [ -e "${CLFS}/tools" ] || [ -e "${CLFS}/cross-tools" ]; then
           echo "Please remove ${CLFS}/tools and ${CLFS}/cross-tools before running."
           exit 1
         fi
