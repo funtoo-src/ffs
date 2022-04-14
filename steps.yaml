@@ -456,4 +456,4 @@ tools:
         PROFILE_EOF
         # set up initial shells in correct location for "#!/bin/sh" and "#!/bin/bash" scripts:
         ln -sf ../tools/bin/bash ${CLFS}/bin/bash
-        ln -sf ../tools/bin/sh ${CLFS}/bin/sh
+        ln -sf ../tools/bin/bash ${CLFS}/bin/sh
