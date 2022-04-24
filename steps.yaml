@@ -443,6 +443,13 @@ tools:
         --host=${CLFS_TARGET}
         make
         make install
+    - which: |
+        ./configure \
+        --prefix=${CLFS}/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make install
     - none: |
         find "${CLFS}"/tools -type f -exec file {} + | \
           grep ELF | \

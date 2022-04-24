@@ -67,4 +67,8 @@ sources:
           version: 5.2.5
           url: https://tukaani.org/xz/xz-{version}.tar.gz
           srcdir: xz-{version}
+      - which:
+          version: 2.21
+          url: https://carlowood.github.io/which/which-{version}.tar.gz
+
 
