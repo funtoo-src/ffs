@@ -1,0 +1,17 @@
+#!/bin/bash
+exec fchroot ${CLFS} /bin/bash --login << "EOF"
+set -e
+set -o pipefail
+set -u
+set +h
+set -x
+umask 022
+export PATH=${CLFS}/bin:${CLFS}/cross-tools/bin:/bin:/usr/bin
+rm -rf "${CLFS}"/build/*
+{{unpack}}
+export LC_ALL=POSIX
+export MAKEFLAGS="-j$(nproc) -l$(nproc)"
+unset CFLAGS CXXFLAGS
+{% block env %}{% endblock %}
+{{build_steps}}
+EOF
