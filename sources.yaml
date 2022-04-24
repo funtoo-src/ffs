@@ -40,7 +40,7 @@ sources:
   non-gnu:
     packages:
       - linux:
-          version: 5.16.10
+          version: 5.17.4
           url: https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-{version}.tar.xz
       - musl:
           version: 1.2.2
