@@ -457,6 +457,7 @@ tools:
 
         export TERMINFO=/tools/share/terminfo
         export PATH=/bin:/usr/bin:/sbin:/usr/sbin:/tools/sbin:/tools/bin
+        export HOME=/
 
         umask 022
 
