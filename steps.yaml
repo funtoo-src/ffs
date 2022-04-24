@@ -284,6 +284,10 @@ tools:
         make
         make install
         test -x ${CLFS}/tools/bin/bash
+        # set up initial shells in correct location for "#!/bin/sh" and "#!/bin/bash" scripts:
+        rm -f ${CLFS}/bin/bash ${CLFS}/bin/sh || true
+        ln -sf ../tools/bin/bash ${CLFS}/bin/bash
+        ln -sf ../tools/bin/bash ${CLFS}/bin/sh
     - bzip2: |
         sed -i \
           -e '/^all/s/ test$//' \
@@ -462,6 +466,4 @@ tools:
         umask 022
 
         PROFILE_EOF
-        # set up initial shells in correct location for "#!/bin/sh" and "#!/bin/bash" scripts:
-        ln -sf ../tools/bin/bash ${CLFS}/bin/bash
-        ln -sf ../tools/bin/bash ${CLFS}/bin/sh
+
