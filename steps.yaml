@@ -490,7 +490,46 @@ fchroot:
   defaults:
     template: fchroot.tmpl
   steps:
-    - gzip: |
+    - linux: |
+        make mrproper
+        make ARCH={{arch}} headers_install
+     - musl: |
+        ./configure --prefix=/
+        make
+        make install
+    - gmp: |
+        ./configure --prefix=/usr \
+        --enable-cxx
+        make
+        make install
+    - mpfr: |
+        ./configure --prefix=/usr
+        make
+        make install
+    - mpc: |
+        ./configure --prefix=/usr
+        make
+        make install
+    - gcc: |
+        mkdir gcc-build && cd gcc-build
+        ../configure \
+          {%- if arch == "powerpc" %}
+          --with-abi=elfv2 \
+          --enable-secureplt \
+          --enable-decimal-float=no \
+          {%- endif %}
+          --prefix=/usr
+          --disable-nls \
+          --disable-static \
+          --enable-languages=c,c++ \
+          --disable-multilib \
+          --disable-libsanitizer \
+          --with-mpfr=/usr \
+          --with-gmp=/usr \
+          --with-mpc=/usr
+        make
+        make install
+     - gzip: |
         ./configure --prefix=/usr
         make
         make install
