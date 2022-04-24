@@ -15,8 +15,8 @@ cross_tools:
         # make sure it's a symlink
         test -L "${CLFS}/tools/lib64"
         # Create critical directories:
-        install -d ${CLFS}/{dev,proc,run,sys,etc,lib}
-        install -m 1777 -d ${CLFS}/tmp
+        install -d ${CLFS}/{dev,proc,run,sys,etc,lib,var}
+        install -m 1777 -d ${CLFS}/tmp ${CLFS}/var/tmp
     - linux: |
         make mrproper
         make ARCH={{arch}} INSTALL_HDR_PATH=${CLFS}/tools headers_install
