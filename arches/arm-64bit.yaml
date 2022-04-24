@@ -1,5 +1,5 @@
 arch:
   cflags: ''
   arch: arm64
-  musl_lib_arch: arm64
+  musl_lib_arch: aarch64
   target: aarch64-unknown-linux-musl
