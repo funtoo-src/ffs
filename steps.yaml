@@ -101,6 +101,16 @@ cross_tools:
           --prefix=/ \
           --target=${CLFS_TARGET}
         make
+
+        # riscv-64bit expects to find crt*.o, as well as -lgcc_s, -lc in
+        # /tools/riscv64-unknown-linux-musl/lib/. The most straightforward
+        # way to address this is to make /tools/riscv64-unknown-linux-musl/lib
+        # a symlink to /tools/lib. On riscv64, we find all these goodies
+        # installed to that path.
+          
+        install -d ${CLFS}/tools/${CLFS_TARGET}
+        ln -sf ../lib ${CLFS}/tools/${CLFS_TARGET}/lib
+          
         DESTDIR=${CLFS}/tools make install
         cd "${CLFS}"/tools/lib
         rm -f ld-musl-{{musl_lib_arch}}.so.1
