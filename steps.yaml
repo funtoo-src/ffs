@@ -107,10 +107,10 @@ cross_tools:
         # way to address this is to make /tools/riscv64-unknown-linux-musl/lib
         # a symlink to /tools/lib. On riscv64, we find all these goodies
         # installed to that path.
-          
+
         install -d ${CLFS}/tools/${CLFS_TARGET}
         ln -sf ../lib ${CLFS}/tools/${CLFS_TARGET}/lib
-          
+
         DESTDIR=${CLFS}/tools make install
         cd "${CLFS}"/tools/lib
         rm -f ld-musl-{{musl_lib_arch}}.so.1
@@ -486,3 +486,12 @@ tools:
 
         PROFILE_EOF
 
+fchroot:
+  defaults:
+    template: fchroot.tmpl
+  steps:
+    - gzip: |
+        ./configure --prefix=/usr
+        make
+        make install
+ 
