@@ -471,6 +471,7 @@ tools:
         if [ ! -L "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1" ]; then
           ln -sf ../tools/lib/ld-musl-{{musl_lib_arch}}.so.1 "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1"
         fi
+
         cat > ${CLFS}/etc/profile << "PROFILE_EOF"
         # Funtoo from Scratch /etc/profile for login shells in the temporary environment.
         #
@@ -490,6 +491,97 @@ fchroot:
   defaults:
     template: fchroot.tmpl
   steps:
+    - none: |
+
+        # We will use this part of the process to create the necessary base environment for the
+        # native build environment. This will allow these things to be wiped away, and in theory
+        # we can re-start the fchroot build to recreate these.
+
+        # The following configuration file tells musl to look for libraries in the following paths,
+        # which includes /tools/lib. This is the musl equivalent to /etc/ld.so.conf and ldconfig.
+        # Once we have built native versions of all our libraries, this file can be updated to
+        # remove the reference to /tools/lib if desired -- this is optional, as any libraries in
+        # the standard locations will be preferred over /tools/lib.
+
+        echo /lib:/usr/local/lib:/usr/lib:/tools/lib > /etc/ld-musl-{{musl_lib_arch}}.path
+
+    - rsync: |
+
+        # linux headers use rsync to install. We will compile a minimal native
+        # rsync so it is happy.
+
+        ./configure \
+        --prefix=/usr \
+        --disable-openssl \
+        --disable-xxhash \
+        --disable-zstd \
+        --disable-lz4
+        make
+        make install
+    - linux: |
+        make mrproper
+        make INSTALL_HDR_PATH=/usr headers_install
+    - musl: |
+        # Install our final musl libc.
+
+        # This build of musl is actually a big deal. Up to this point, we have been relying on a libc
+        # within /tools/lib, and we have performed the following special tricks to get this to work:
+        #
+        # 1. We have used patchelf to modify all binaries in /tools to explicitly look for the 
+        #    dynamic loader in /tools/lib.
+        #
+        # 2. We have placed a /lib/ld-musl-{{musl_lib_arch}}.so symlink in /lib to allow binaries
+        #    built within the chroot to find a dynamic loader at the proper location. It points to
+        #    the dynamic loader in /tools/lib, and is just a placeholder until we have our final
+        #    libc.
+        #
+        # After ``make install`` completes:
+        #
+        # /lib/ld-musl-{{musl_lib_arch}}.so.1 will now point to /lib/libc.so, which is our new libc.
+
+        ./configure --prefix=/
+        make
+        make install
+    - m4: |
+
+        # gmp requires a functioning m4. We can build this natively or make it part of /tools. Let's
+        # try building it natively.
+
+        ./configure --prefix=/usr
+        make
+        make install
+    - gmp: |
+        ./configure --prefix=/usr \
+        --enable-cxx
+        make
+        make install
+    - mpfr: |
+        ./configure --prefix=/usr
+        make
+        make install
+    - mpc: |
+        ./configure --prefix=/usr
+        make
+        make install
+    - gcc: |
+        mkdir gcc-build && cd gcc-build
+        ../configure \
+          {%- if arch == "powerpc" %}
+          --with-abi=elfv2 \
+          --enable-secureplt \
+          --enable-decimal-float=no \
+          {%- endif %}
+          --prefix=/usr \
+          --disable-nls \
+          --disable-static \
+          --enable-languages=c,c++ \
+          --disable-multilib \
+          --disable-libsanitizer \
+          --with-mpfr=/usr \
+          --with-gmp=/usr \
+          --with-mpc=/usr
+        make
+        make install
     - gzip: |
         ./configure --prefix=/usr
         make
