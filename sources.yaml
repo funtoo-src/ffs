@@ -60,6 +60,9 @@ sources:
       - file:
           version: 5.41
           url: http://ftp.astron.com/pub/file/file-{version}.tar.gz
+      - rsync:
+          version: 3.2.4
+          url: https://download.samba.org/pub/rsync/src/rsync-{version}.tar.gz
       - util-linux:
           version: 2.37.4
           url: https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.37/util-linux-{version}.tar.gz
