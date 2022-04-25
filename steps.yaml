@@ -492,8 +492,18 @@ fchroot:
   steps:
     - linux: |
         make mrproper
-        make ARCH={{arch}} headers_install
-     - musl: |
+        # This uses rsync!:
+        # make ARCH={{arch}} headers_install
+        # This should be converted to not use rsync:
+        # quiet_cmd_headers_install = INSTALL $(INSTALL_HDR_PATH)/include
+        # cmd_headers_install = \
+        # mkdir -p $(INSTALL_HDR_PATH); \
+        # rsync -mrl --include='*/' --include='*\.h' --exclude='*' \
+        # usr/include $(INSTALL_HDR_PATH)
+        cd usr/include
+        install -d /usr/include
+        cp -a * /usr/
+    - musl: |
         ./configure --prefix=/
         make
         make install
@@ -529,7 +539,7 @@ fchroot:
           --with-mpc=/usr
         make
         make install
-     - gzip: |
+    - gzip: |
         ./configure --prefix=/usr
         make
         make install
