@@ -29,6 +29,8 @@ sources:
       - make:
           version: 4.3
           ext: gz
+      - m4:
+          version: 1.4.19
       - patch: 2.7.6
       - sed: 4.8
       - tar: 1.34

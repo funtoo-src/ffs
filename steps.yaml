@@ -296,10 +296,6 @@ tools:
         make
         make install
         test -x ${CLFS}/tools/bin/bash
-        # set up initial shells in correct location for "#!/bin/sh" and "#!/bin/bash" scripts:
-        rm -f ${CLFS}/bin/bash ${CLFS}/bin/sh || true
-        ln -sf ../tools/bin/bash ${CLFS}/bin/bash
-        ln -sf ../tools/bin/bash ${CLFS}/bin/sh
     - bzip2: |
         sed -i \
           -e '/^all/s/ test$//' \
@@ -471,6 +467,7 @@ tools:
         if [ ! -L "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1" ]; then
           ln -sf ../tools/lib/ld-musl-{{musl_lib_arch}}.so.1 "$CLFS/lib/ld-musl-{{musl_lib_arch}}.so.1"
         fi
+
         cat > ${CLFS}/etc/profile << "PROFILE_EOF"
         # Funtoo from Scratch /etc/profile for login shells in the temporary environment.
         #
@@ -490,17 +487,47 @@ fchroot:
   defaults:
     template: fchroot.tmpl
   steps:
+    - none: |
+
+        # We will use this part of the process to create the necessary base environment for the
+        # native build environment. This will allow these things to be wiped away, and in theory
+        # we can re-start the fchroot build to recreate these.
+
+        # The following configuration file tells musl to look for libraries in the following paths,
+        # which includes /tools/lib. This is the musl equivalent to /etc/ld.so.conf and ldconfig.
+        # Once we have built native versions of all our libraries, this file can be updated to
+        # remove the reference to /tools/lib if desired -- this is optional, as any libraries in
+        # the standard locations will be preferred over /tools/lib.
+
+        echo /lib:/usr/local/lib:/usr/lib:/tools/lib > /etc/ld-musl-{{musl_lib_arch}}.path
+
     - rsync: |
+
         # linux headers use rsync to install. We will compile a minimal native
         # rsync so it is happy.
+
         ./configure --prefix=/usr --disable-openssl --disable-xxhash --disable-zstd --disable-lz4
         make
         make install
     - linux: |
         make mrproper
-        make headers_install
+        make INSTALL_HDR_PATH=/usr headers_install
     - musl: |
+
+        # This build of musl is actually a big deal, because it will replace the default musl used
+        # for new applications. This is because it will install a new /lib/libc.so as well as an
+        # ld-musl-{{musl_lib_arch}}.so.1 which points to it, replacing a temporary symlink referencing
+        # the previously-built version in /tools/lib.
+
         ./configure --prefix=/
+        make
+        make install
+    - m4: |
+
+        # gmp requires a functioning m4. We can build this natively or make it part of /tools. Let's
+        # try building it natively.
+
+        ./configure --prefix=/usr
         make
         make install
     - gmp: |
