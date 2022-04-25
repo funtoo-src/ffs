@@ -19,7 +19,7 @@ cross_tools:
         install -m 1777 -d ${CLFS}/tmp ${CLFS}/var/tmp
     - linux: |
         make mrproper
-        make ARCH={{arch}} INSTALL_HDR_PATH=${CLFS}/tools headers_install
+        make ARCH={{arch}} INSTALL_HDR_PATH=${CLFS}/usr headers_install
     - binutils: |
         mkdir binutils-build && cd binutils-build
         AR=ar AS=as ../configure \
@@ -72,7 +72,7 @@ cross_tools:
           --target=${CLFS_TARGET} \
           --with-sysroot=${CLFS} \
           --with-local-prefix=${CLFS}/tools \
-          --with-native-system-header-dir=/tools/include \
+          --with-native-system-header-dir=/usr/include \
           --disable-shared \
           --without-headers \
           --with-newlib \
@@ -134,7 +134,7 @@ cross_tools:
           --host=${CLFS_HOST} \
           --with-sysroot=${CLFS} \
           --with-local-prefix=${CLFS}/tools \
-          --with-native-system-header-dir=/tools/include \
+          --with-native-system-header-dir=/usr/include \
           --with-lib-path=${CLFS}/tools/lib \
           --disable-nls \
           --disable-static \
@@ -231,7 +231,7 @@ tools:
         --disable-multilib \
         --enable-languages=c,c++ \
         --with-system-zlib \
-        --with-native-system-header-dir=/tools/include \
+        --with-native-system-header-dir=/usr/include \
         --disable-libssp \
         --enable-install-libiberty \
         --disable-libstdcxx-pch \
