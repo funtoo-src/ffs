@@ -4,7 +4,7 @@ namespace: ffs-sources
 script:
 - sleep 5
 - >-
-  ego sync && emerge --jobs pyyaml jinja
+  ego sync && emerge --jobs pyyaml jinja patchelf
 - export CLFS=${HOME}
 - bin/sourcer fetch
 - bin/builder arm-64bit cross_tools
