@@ -630,14 +630,26 @@ fchroot:
         esac
         mkdir gcc-build && cd gcc-build
         ../configure \
+          LD=ld \
           {%- if arch == "powerpc" %}
           --with-abi=elfv2 \
           --enable-secureplt \
           --enable-version-specific-runtime-libs \
           --enable-decimal-float=no \
           {%- endif %}
+          --build=${CLFS_TARGET} \
+          --host=${CLFS_TARGET} \
+          --target=${CLFS_TARGET} \
           --prefix=/usr \
-          LD=ld \
+          --disable-libssp \
+          --disable-libmpx \
+          --disable-libmudflap \
+          --disable-libsanitizer \
+          --disable-symvers \
+          --enable-__cxa_atexit \
+          --enable-default-pie \
+          --enable-default-sse \
+          --enable-cloog-backend \
           --enable-languages=c,c++ \
           --disable-multilib \
           --disable-bootstrap \
