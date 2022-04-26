@@ -19,7 +19,7 @@ sources:
       - bash:
           version: 5.1.16
           ext: gz
-      - coreutils: 9.0
+      - coreutils: 9.1
       - diffutils: 3.8
       - findutils: 4.9.0
       - gawk: 5.1.1
@@ -53,6 +53,9 @@ sources:
       - zlib:
           version: 1.2.12
           url: https://zlib.net/zlib-{version}.tar.gz
+      - perl:
+          version: 5.34.1
+          url: https://www.cpan.org/src/5.0/perl-{version}.tar.gz
       - bzip2:
           version: 1.0.8
           url: https://www.sourceware.org/pub/bzip2/bzip2-{version}.tar.gz

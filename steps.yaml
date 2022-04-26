@@ -539,9 +539,16 @@ fchroot:
         #
         # /lib/ld-musl-{{musl_lib_arch}}.so.1 will now point to /lib/libc.so, which is our new libc.
 
-        ./configure --prefix=/
+        ./configure --prefix=/ --includedir=/usr/include --exec-prefix=/bin
         make
         make install
+    - zlib: |
+        ./configure \
+        --prefix=/usr
+        make
+        make check
+        make install
+        rm -fv /usr/lib/libz.a
     - m4: |
 
         # gmp requires a functioning m4. We can build this natively or make it part of /tools. Let's
@@ -563,23 +570,78 @@ fchroot:
         ./configure --prefix=/usr
         make
         make install
+    - coreutils: |
+        FORCE_UNSAFE_CONFIGURE=1 \
+        ./configure \
+        --prefix=/usr \
+        --enable-no-install-program=kill,uptime
+        sed -i -e 's/^man1_MANS/#man1_MANS/' Makefile
+        make
+        make install
+    - perl: |
+
+        # Perl requires coreutils to be installed at a standard location first, as perl's Cwd module uses
+        # /usr/bin/pwd so it expects it to exist in the build environment. Without /usr/bin/pwd existing,
+        # building of perl modules will fail with:
+        #
+        # Can't figure out your cwd! at /build/perl-5.34.1/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MakeMaker.pm line 238.
+        #
+
+        sh Configure -des \
+          -Dcc=gcc \
+          -Dprefix=/usr \
+          -Dvendorprefix=/usr \
+          -Dprivlib=/usr/lib/perl5/5.34/core_perl \
+          -Darchlib=/usr/lib/perl5/5.34/core_perl \
+          -Dsitelib=/usr/lib/perl5/5.34/site_perl \
+          -Dsitearch=/usr/lib/perl5/5.34/site_perl \
+          -Dvendorlib=/usr/lib/perl5/5.34/vendor_perl \
+          -Dvendorarch=/usr/lib/perl5/5.34/vendor_perl
+        make
+        make install
+    - texinfo: |
+
+        # Texinfo requires perl to build. This is the first perl dependency we see in the build so far.
+
+        ./configure --prefix=/usr
+        make
+        make install
+    - binutils: |
+        mkdir binutils-build && cd binutils-build
+        ../configure \
+          --prefix=/usr \
+          --enable-gold \
+          --enable-ld=default \
+          --enable-plugins \
+          --enable-shared \
+          --disable-werror \
+          --enable-64-bit-bfd \
+          --with-system-zlib
+        make tooldir=/usr
+        #make -k check
+        make tooldir=/usr install
+        rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes}.a
     - gcc: |
+        case $(uname -m) in
+        x86_64)
+          sed -e '/m64=/s/lib64/lib/' \
+          -i.orig gcc/config/i386/t-linux64
+          ;;
+        esac
         mkdir gcc-build && cd gcc-build
         ../configure \
           {%- if arch == "powerpc" %}
           --with-abi=elfv2 \
           --enable-secureplt \
+          --enable-version-specific-runtime-libs \
           --enable-decimal-float=no \
           {%- endif %}
           --prefix=/usr \
-          --disable-nls \
-          --disable-static \
+          LD=ld \
           --enable-languages=c,c++ \
           --disable-multilib \
-          --disable-libsanitizer \
-          --with-mpfr=/usr \
-          --with-gmp=/usr \
-          --with-mpc=/usr
+          --disable-bootstrap \
+          --with-system-zlib
         make
         make install
     - gzip: |
