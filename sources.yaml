@@ -12,20 +12,21 @@ sources:
           ext: gz
       - gcc:
           url: https://ftp.gnu.org/gnu/{name}/{name}-{version}/{name}-{version}.tar.{ext}
-          version: 11.2.0
+          version: 11.3.0
       - ncurses:
           version: 6.3
           ext: gz
       - bash:
           version: 5.1.16
           ext: gz
+      - bison: 3.8.2
       - coreutils: 9.1
       - diffutils: 3.8
       - findutils: 4.9.0
       - gawk: 5.1.1
       - gettext: 0.21
       - grep: 3.7
-      - gzip: 1.11
+      - gzip: 1.12
       - make:
           version: 4.3
           ext: gz
@@ -38,18 +39,18 @@ sources:
           version: 6.8
           patches:
             - texinfo-6.8-glibc-2.34-compat.patch
-      - nano: 6.1
+      - nano: 6.2
   non-gnu:
     packages:
       - linux:
           version: 5.17.4
           url: https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-{version}.tar.xz
       - musl:
-          version: 1.2.2
+          version: 1.2.3
           url: https://musl.libc.org/releases/musl-{version}.tar.gz
       - isl:
           version: 0.24
-          url: https://gcc.gnu.org/pub/gcc/infrastructure/isl-{version}.tar.bz2
+          url: https://libisl.sourceforge.io/isl-{version}.tar.bz2
       - zlib:
           version: 1.2.12
           url: https://zlib.net/zlib-{version}.tar.gz
@@ -69,8 +70,8 @@ sources:
           version: 3.2.4
           url: https://download.samba.org/pub/rsync/src/rsync-{version}.tar.gz
       - util-linux:
-          version: 2.37.4
-          url: https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.37/util-linux-{version}.tar.gz
+          version: 2.38
+          url: https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.38/util-linux-{version}.tar.gz
       - xz-utils:
           version: 5.2.5
           url: https://tukaani.org/xz/xz-{version}.tar.gz
