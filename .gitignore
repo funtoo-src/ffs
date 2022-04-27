@@ -2,7 +2,7 @@ build/**
 sys/**
 proc/**
 dev/**
-cross_tools/**
+cross-tools/**
 tools/**
 lib/**
 run/**
