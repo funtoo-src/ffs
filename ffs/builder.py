@@ -40,22 +40,21 @@ class Builder:
 		out.update(self.arch)
 		return out
 
-	def __init__(self, inpath):
+	def __init__(self, inpath, arch, step):
+		self.arch = arch
+		self.step = step
 		self.loader = jinja2.FileSystemLoader(os.path.join(inpath, "templates"))
 		self.jinja = jinja2.Environment(loader=self.loader)
-		infile = os.path.join(inpath, "steps.yaml")
+		infile = os.path.join(inpath, "steps", f"{step}.yaml")
 		self.sourcer = Sourcer(os.path.join(os.environ["CLFS"]))
-		with open(os.path.join(os.environ["CLFS"], "arches", f"{sys.argv[1]}.yaml")) as myarch:
+		with open(os.path.join(os.environ["CLFS"], "arches", f"{arch}.yaml")) as myarch:
 			self.arch = safe_load(myarch.read())["arch"]
 		with open(infile, "r") as myf:
 			for rule_name, rule in safe_load(myf.read()).items():
-				if rule_name != sys.argv[2]:
-					continue
 				if "defaults" in rule:
 					defaults = rule["defaults"].copy()
 				else:
 					defaults = {}
-
 				tmpl = self.jinja.get_template(defaults["template"])
 				for package in rule["steps"]:
 					rule = self.parse_yaml_rule(package)
@@ -65,6 +64,5 @@ class Builder:
 					if result != 0:
 						print(f"Error encountered -- exit code {result}")
 						sys.exit(1)
-
 
 # vim: ts=4 sw=4 noet

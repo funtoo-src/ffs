@@ -1,0 +1,154 @@
+cross_tools:
+  defaults:
+    template: base.tmpl
+  steps:
+    - none: |
+        if [ -e "${CLFS}/tools" ] || [ -e "${CLFS}/cross-tools" ]; then
+          echo "Please remove ${CLFS}/tools and ${CLFS}/cross-tools before running."
+          exit 1
+        fi
+        # initial setup:
+        install -d "${CLFS}/cross-tools"
+        install -d "${CLFS}/tools"
+        install -d "${CLFS}/tools/lib"
+        ln -sf lib "${CLFS}/tools/lib64"
+        # make sure it's a symlink
+        test -L "${CLFS}/tools/lib64"
+        # Create critical directories:
+        install -d ${CLFS}/{dev,proc,run,sys,etc,lib,var}
+        install -m 1777 -d ${CLFS}/tmp ${CLFS}/var/tmp
+    - linux: |
+        make mrproper
+        make ARCH={{arch}} INSTALL_HDR_PATH=${CLFS}/tools headers_install
+    - binutils: |
+        mkdir binutils-build && cd binutils-build
+        AR=ar AS=as ../configure \
+          --prefix=${CLFS}/cross-tools \
+          --host=${CLFS_HOST} \
+          --target=${CLFS_TARGET} \
+          --with-sysroot=${CLFS} \
+          --with-lib-path=${CLFS}/tools/lib \
+          --disable-nls \
+          --disable-static \
+          --enable-64-bit-bfd \
+          --disable-multilib \
+          --disable-werror
+        make
+        make install
+    - gmp: |
+        ./configure \
+          --prefix=${CLFS}/cross-tools \
+          --enable-cxx \
+          --disable-static
+        make
+        make install
+        make check
+    - mpfr: |
+        LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" ./configure \
+          --prefix=${CLFS}/cross-tools \
+          --disable-static \
+          --with-gmp=${CLFS}/cross-tools
+        make
+        make install
+    - mpc: |
+        LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" ./configure \
+          --prefix=${CLFS}/cross-tools \
+          --disable-static \
+          --with-mpfr=${CLFS}/cross-tools
+        make
+        make install
+    - gcc: |
+        mkdir gcc-build && cd gcc-build
+        AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
+          ../configure \
+          {%- if arch == "powerpc" %}
+          --with-abi=elfv2 \
+          --enable-secureplt \
+          --enable-decimal-float=no \
+          {%- endif %}
+          --prefix=${CLFS}/cross-tools \
+          --build=${CLFS_HOST} \
+          --host=${CLFS_HOST} \
+          --target=${CLFS_TARGET} \
+          --with-sysroot=${CLFS} \
+          --with-local-prefix=${CLFS}/tools \
+          --with-native-system-header-dir=/tools/include \
+          --disable-shared \
+          --without-headers \
+          --with-newlib \
+          --disable-decimal-float \
+          --disable-libgomp \
+          --disable-libssp \
+          --disable-libatomic \
+          --disable-libitm \
+          --disable-libsanitizer \
+          --disable-libquadmath \
+          --disable-libvtv \
+          --disable-libcilkrts \
+          --disable-libstdc++-v3 \
+          --disable-threads \
+          --disable-multilib \
+          --enable-languages=c \
+          --with-mpfr=${CLFS}/cross-tools \
+          --with-gmp=${CLFS}/cross-tools \
+          --with-mpc=${CLFS}/cross-tools
+        make all-gcc all-target-libgcc
+        make install-gcc install-target-libgcc
+    - musl: |
+        CC="${CLFS_TARGET}-gcc ${CLFS_CFLAGS}" \
+          ./configure \
+          CROSS_COMPILE=${CLFS_TARGET}- \
+          --prefix=/ \
+          --target=${CLFS_TARGET}
+        make
+
+        # riscv-64bit expects to find crt*.o, as well as -lgcc_s, -lc in
+        # /tools/riscv64-unknown-linux-musl/lib/. The most straightforward
+        # way to address this is to make /tools/riscv64-unknown-linux-musl/lib
+        # a symlink to /tools/lib. On riscv64, we find all these goodies
+        # installed to that path.
+
+        install -d ${CLFS}/tools/${CLFS_TARGET}
+        ln -sf ../lib ${CLFS}/tools/${CLFS_TARGET}/lib
+
+        DESTDIR=${CLFS}/tools make install
+        cd "${CLFS}"/tools/lib
+        rm -f ld-musl-{{musl_lib_arch}}.so.1
+        ln -sf libc.so ld-musl-{{musl_lib_arch}}.so.1
+        ls -la ld-musl-{{musl_lib_arch}}.so.1
+        find -type f \
+          -iname 'crt*.o' \
+          -exec ln -sf ../../../tools/lib/{} "${CLFS}"/cross-tools/"${CLFS_TARGET}"/lib/{} \;
+    - gcc: |
+        mkdir gcc-build && cd gcc-build
+        AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
+          ../configure \
+          {%- if arch == "powerpc" %}
+          --with-abi=elfv2 \
+          --enable-secureplt \
+          --enable-decimal-float=no \
+          {%- endif %}
+          --prefix=${CLFS}/cross-tools \
+          --build=${CLFS_HOST} \
+          --target=${CLFS_TARGET} \
+          --host=${CLFS_HOST} \
+          --with-sysroot=${CLFS} \
+          --with-local-prefix=${CLFS}/tools \
+          --with-native-system-header-dir=/tools/include \
+          --with-lib-path=${CLFS}/tools/lib \
+          --disable-nls \
+          --disable-static \
+          --enable-languages=c,c++ \
+          --disable-multilib \
+          --disable-libsanitizer \
+          --with-mpfr=${CLFS}/cross-tools \
+          --with-gmp=${CLFS}/cross-tools \
+          --with-mpc=${CLFS}/cross-tools
+        make AS_FOR_TARGET="${CLFS_TARGET}-as" \
+          LD_FOR_TARGET="${CLFS_TARGET}-ld"
+        make install
+    - file: |
+        ./configure \
+        --prefix=${CLFS}/cross-tools
+        make
+        make install

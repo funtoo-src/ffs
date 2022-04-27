@@ -12,7 +12,7 @@ from ffs.builder import Builder
 if __name__ == "__main__":
 	if "CLFS" not in os.environ:
 		raise EnvironmentError("Please set CLFS environment variable.")
-	mybuilder = Builder(os.path.join(os.environ["CLFS"]))
+	mybuilder = Builder(os.path.join(os.environ["CLFS"]), sys.argv[1], sys.argv[2])
 
 
 # vim: ts=4 sw=4 noet

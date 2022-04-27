@@ -1,0 +1,174 @@
+fchroot:
+  defaults:
+    template: fchroot.tmpl
+  steps:
+    - none: |
+
+        # We will use this part of the process to create the necessary base environment for the
+        # native build environment. This will allow these things to be wiped away, and in theory
+        # we can re-start the fchroot build to recreate these.
+
+        # The following configuration file tells musl to look for libraries in the following paths,
+        # which includes /tools/lib. This is the musl equivalent to /etc/ld.so.conf and ldconfig.
+        # Once we have built native versions of all our libraries, this file can be updated to
+        # remove the reference to /tools/lib if desired -- this is optional, as any libraries in
+        # the standard locations will be preferred over /tools/lib.
+
+        echo /lib:/usr/local/lib:/usr/lib:/tools/lib > /etc/ld-musl-{{musl_lib_arch}}.path
+
+    - rsync: |
+
+        # linux headers use rsync to install. We will compile a minimal native
+        # rsync so it is happy.
+
+        ./configure \
+        --prefix=/usr \
+        --disable-openssl \
+        --disable-xxhash \
+        --disable-zstd \
+        --disable-lz4
+        make
+        make install
+    - linux: |
+        make mrproper
+        make INSTALL_HDR_PATH=/usr headers_install
+    - musl: |
+        # Install our final musl libc.
+
+        # This build of musl is actually a big deal. Up to this point, we have been relying on a libc
+        # within /tools/lib, and we have performed the following special tricks to get this to work:
+        #
+        # 1. We have used patchelf to modify all binaries in /tools to explicitly look for the 
+        #    dynamic loader in /tools/lib.
+        #
+        # 2. We have placed a /lib/ld-musl-{{musl_lib_arch}}.so symlink in /lib to allow binaries
+        #    built within the chroot to find a dynamic loader at the proper location. It points to
+        #    the dynamic loader in /tools/lib, and is just a placeholder until we have our final
+        #    libc.
+        #
+        # After ``make install`` completes:
+        #
+        # /lib/ld-musl-{{musl_lib_arch}}.so.1 will now point to /lib/libc.so, which is our new libc.
+
+        ./configure --prefix=/ --includedir=/usr/include --exec-prefix=/bin
+        make
+        make install
+    - zlib: |
+        ./configure \
+        --prefix=/usr
+        make
+        make check
+        make install
+        rm -fv /usr/lib/libz.a
+    - m4: |
+
+        # gmp requires a functioning m4. We can build this natively or make it part of /tools. Let's
+        # try building it natively.
+
+        ./configure --prefix=/usr
+        make
+        make install
+    - gmp: |
+        ./configure --prefix=/usr \
+        --enable-cxx
+        make
+        make install
+    - mpfr: |
+        ./configure --prefix=/usr
+        make
+        make install
+    - mpc: |
+        ./configure --prefix=/usr
+        make
+        make install
+    - coreutils: |
+        FORCE_UNSAFE_CONFIGURE=1 \
+        ./configure \
+        --prefix=/usr \
+        --enable-no-install-program=kill,uptime
+        sed -i -e 's/^man1_MANS/#man1_MANS/' Makefile
+        make
+        make install
+    - perl: |
+
+        # Perl requires coreutils to be installed at a standard location first, as perl's Cwd module uses
+        # /usr/bin/pwd so it expects it to exist in the build environment. Without /usr/bin/pwd existing,
+        # building of perl modules will fail with:
+        #
+        # Can't figure out your cwd! at /build/perl-5.34.1/cpan/ExtUtils-MakeMaker/lib/ExtUtils/MakeMaker.pm line 238.
+        #
+
+        sh Configure -des \
+          -Dcc=gcc \
+          -Dprefix=/usr \
+          -Dvendorprefix=/usr \
+          -Dprivlib=/usr/lib/perl5/5.34/core_perl \
+          -Darchlib=/usr/lib/perl5/5.34/core_perl \
+          -Dsitelib=/usr/lib/perl5/5.34/site_perl \
+          -Dsitearch=/usr/lib/perl5/5.34/site_perl \
+          -Dvendorlib=/usr/lib/perl5/5.34/vendor_perl \
+          -Dvendorarch=/usr/lib/perl5/5.34/vendor_perl
+        make
+        make install
+    - texinfo: |
+
+        # Texinfo requires perl to build. This is the first perl dependency we see in the build so far.
+
+        ./configure --prefix=/usr
+        make
+        make install
+    - binutils: |
+        mkdir binutils-build && cd binutils-build
+        ../configure \
+          --prefix=/usr \
+          --enable-gold \
+          --enable-ld=default \
+          --enable-plugins \
+          --enable-shared \
+          --disable-werror \
+          --enable-64-bit-bfd \
+          --with-system-zlib
+        make tooldir=/usr
+        #make -k check
+        make tooldir=/usr install
+        rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes}.a
+    - gcc: |
+        case $(uname -m) in
+        x86_64)
+          sed -e '/m64=/s/lib64/lib/' \
+          -i.orig gcc/config/i386/t-linux64
+          ;;
+        esac
+        mkdir gcc-build && cd gcc-build
+        ../configure \
+          LD=ld \
+          {%- if arch == "powerpc" %}
+          --with-abi=elfv2 \
+          --enable-secureplt \
+          --enable-version-specific-runtime-libs \
+          --enable-decimal-float=no \
+          {%- endif %}
+          --build=${CLFS_TARGET} \
+          --host=${CLFS_TARGET} \
+          --target=${CLFS_TARGET} \
+          --prefix=/usr \
+          --disable-libssp \
+          --disable-libmpx \
+          --disable-libmudflap \
+          --disable-libsanitizer \
+          --disable-symvers \
+          --enable-__cxa_atexit \
+          --enable-default-pie \
+          --enable-default-sse \
+          --enable-cloog-backend \
+          --enable-languages=c,c++ \
+          --disable-multilib \
+          --disable-bootstrap \
+          --with-system-zlib
+        make
+        make install
+    - gzip: |
+        ./configure --prefix=/usr
+        make
+        make install
+

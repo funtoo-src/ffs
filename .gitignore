@@ -1,0 +1,11 @@
+build/**
+sys/**
+proc/**
+dev/**
+cross_tools/**
+tools/**
+lib/**
+run/**
+tmp/**
+usr/**
+var/**
