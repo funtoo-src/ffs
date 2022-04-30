@@ -117,6 +117,14 @@ fchroot:
         ./configure --prefix=/usr
         make
         make install
+    - file: |
+
+        # gcc configure script will call out to /usr/bin/file in some places, so let's make sure it's installed
+        # at its official location.
+
+        ./configure --prefix=/usr
+        make
+        make install
     - binutils: |
         mkdir binutils-build && cd binutils-build
         ../configure \
