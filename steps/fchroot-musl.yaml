@@ -135,45 +135,35 @@ fchroot:
           --enable-shared \
           --disable-werror \
           --enable-64-bit-bfd \
-          --with-system-zlib
+          --with-system-zlib \
+          --enable-secureplt
+        # ^^^ --enable-secureplt should match what is in gcc.
         make tooldir=/usr
         #make -k check
         make tooldir=/usr install
         rm -fv /usr/lib/lib{bfd,ctf,ctf-nobfd,opcodes}.a
     - gcc: |
-        case $(uname -m) in
-        x86_64)
-          sed -e '/m64=/s/lib64/lib/' \
-          -i.orig gcc/config/i386/t-linux64
-          ;;
-        esac
+        sed -i 's|^RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET|& -nostdinc++|' configure
         mkdir gcc-build && cd gcc-build
         ../configure \
-          LD=ld \
-          {%- if arch == "powerpc" %}
-          --with-abi=elfv2 \
-          --enable-secureplt \
-          --enable-version-specific-runtime-libs \
-          --enable-decimal-float=no \
-          {%- endif %}
-          --build=${CLFS_TARGET} \
-          --host=${CLFS_TARGET} \
-          --target=${CLFS_TARGET} \
-          --prefix=/usr \
-          --disable-libssp \
-          --disable-libmpx \
-          --disable-libmudflap \
-          --disable-libsanitizer \
-          --disable-symvers \
-          --enable-__cxa_atexit \
-          --enable-default-pie \
-          --enable-default-sse \
-          --enable-cloog-backend \
-          --enable-languages=c,c++ \
-          --disable-multilib \
-          --disable-bootstrap \
-          --with-system-zlib
-        make
+        {%- if arch == "powerpc" %}
+        --with-abi=elfv2 \
+        --enable-secureplt \
+        --enable-decimal-float=no \
+        {%- endif %}
+        --prefix=/usr \
+        --build=${CLFS_TARGET} \
+        --host=${CLFS_TARGET} \
+        --target=${CLFS_TARGET} \
+        --disable-multilib \
+        --enable-languages=c,c++ \
+        --with-system-zlib \
+        --disable-libssp \
+        --enable-install-libiberty \
+        --disable-libstdcxx-pch \
+        --disable-libsanitizer
+        make AS_FOR_TARGET="${CLFS_TARGET}-as" \
+        LD_FOR_TARGET="${CLFS_TARGET}-ld"
         make install
     - gzip: |
         ./configure --prefix=/usr

@@ -64,7 +64,7 @@ cross_tools:
           {%- if arch == "powerpc" %}
           --with-abi=elfv2 \
           --enable-secureplt \
-          --enable-decimal-float=no \
+          --disable-decimal-float \
           {%- endif %}
           --prefix=${CLFS}/cross-tools \
           --build=${CLFS_HOST} \
