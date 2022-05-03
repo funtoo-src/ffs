@@ -127,7 +127,9 @@ fchroot:
         make install
     - binutils: |
         mkdir binutils-build && cd binutils-build
-        ../configure \
+        AR=ar AS=as ../configure \
+          --host=${CLFS_TARGET} \
+          --target=${CLFS_TARGET} \
           --prefix=/usr \
           --enable-gold \
           --enable-ld=default \
@@ -150,6 +152,7 @@ fchroot:
         --with-abi=elfv2 \
         --enable-secureplt \
         --enable-decimal-float=no \
+        --enable-targets=all \
         {%- endif %}
         --prefix=/usr \
         --build=${CLFS_TARGET} \

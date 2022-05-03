@@ -13,6 +13,8 @@ export CLFS_TARGET={{target}}
 export LC_ALL=POSIX
 export MAKEFLAGS="-j$(nproc) -l$(nproc)"
 unset CFLAGS CXXFLAGS
+export CC="gcc {{cflags}}"
+export CXX="g++ {{cflags}}"
 {% block env %}{% endblock %}
 {{build_steps}}
 sleep 0.01

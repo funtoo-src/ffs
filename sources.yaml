@@ -13,6 +13,8 @@ sources:
       - gcc:
           url: https://ftp.gnu.org/gnu/{name}/{name}-{version}/{name}-{version}.tar.{ext}
           version: 11.3.0
+          patches:
+            - gcc-ppc64-le-disable-multilib-support.patch
       - ncurses:
           version: 6.3
           ext: gz
