@@ -13,6 +13,7 @@ sources:
       - gcc:
           url: https://ftp.gnu.org/gnu/{name}/{name}-{version}/{name}-{version}.tar.{ext}
           version: 11.3.0
+      - glibc: 2.35
       - ncurses:
           version: 6.3
           ext: gz
@@ -79,5 +80,15 @@ sources:
       - which:
           version: 2.21
           url: https://carlowood.github.io/which/which-{version}.tar.gz
-
-
+      - python:
+          version: 3.10.4
+          url: https://www.python.org/ftp/python/{version}/Python-{version}.tar.xz
+      - cmake:
+          version: 3.23.1
+          url: https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}.tar.gz
+      - libffi:
+          version: 3.4.2
+          url: https://github.com/libffi/libffi/releases/download/v{version}/libffi-{version}.tar.gz
+      - openssl:
+          version: 3.0.2
+          url: https://www.openssl.org/source/openssl-{version}.tar.gz

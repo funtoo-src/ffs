@@ -1,0 +1,5 @@
+arch:
+  cflags: ''
+  arch: arm64
+  gnu_arch: aarch64
+  target: aarch64-unknown-linux-gnu

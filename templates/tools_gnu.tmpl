@@ -1,0 +1,11 @@
+{% extends "base.tmpl" %}
+{% block env %}
+export CC="${CLFS_TARGET}-gcc ${CLFS_CFLAGS}"
+export CXX="${CLFS_TARGET}-g++ ${CLFS_CFLAGS}"
+export AR="${CLFS_TARGET}-ar"
+export AS="${CLFS_TARGET}-as"
+export RANLIB="${CLFS_TARGET}-ranlib"
+export LD="${CLFS_TARGET}-ld"
+export STRIP="${CLFS_TARGET}-strip"
+export DYNAMIC_LINKER=$(eval echo "${CLFS}/tools/lib/ld-linux-*.so.1")
+{% endblock %}

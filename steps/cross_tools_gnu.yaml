@@ -76,6 +76,7 @@ cross_tools:
           --disable-shared \
           --without-headers \
           --with-newlib \
+          --enable-initfini-array \
           --disable-decimal-float \
           --disable-libgomp \
           --disable-libssp \
@@ -88,37 +89,32 @@ cross_tools:
           --disable-libstdcxx \
           --disable-threads \
           --disable-multilib \
-          --enable-languages=c \
+          --enable-languages=c,c++ \
           --with-mpfr=${CLFS}/cross-tools \
           --with-gmp=${CLFS}/cross-tools \
           --with-mpc=${CLFS}/cross-tools
         make all-gcc all-target-libgcc
         make install-gcc install-target-libgcc
-    - musl: |
-        CC="${CLFS_TARGET}-gcc ${CLFS_CFLAGS}" \
-          ./configure \
-          CROSS_COMPILE=${CLFS_TARGET}- \
-          --prefix=/ \
-          --target=${CLFS_TARGET}
+    - glibc: |
+        mkdir glibc-build && cd glibc-build
+        ../configure \
+          --prefix=/tools \
+          --build=${CLFS_HOST} \
+          --host=${CLFS_TARGET} \
+          --disable-profile \
+          --enable-stack-protector=strong \
+          --with-binutils=${CLFS}/cross-tools/bin \
+          --with-headers=${CLFS}/tools/include
         make
-
-        # riscv-64bit expects to find crt*.o, as well as -lgcc_s, -lc in
-        # /tools/riscv64-unknown-linux-musl/lib/. The most straightforward
-        # way to address this is to make /tools/riscv64-unknown-linux-musl/lib
-        # a symlink to /tools/lib. On riscv64, we find all these goodies
-        # installed to that path.
+        make DESTDIR=${CLFS} install
 
         install -d ${CLFS}/tools/${CLFS_TARGET}
         ln -sf ../lib ${CLFS}/tools/${CLFS_TARGET}/lib
-
-        DESTDIR=${CLFS}/tools make install
-        cd "${CLFS}"/tools/lib
-        rm -f ld-musl-{{musl_lib_arch}}.so.1
-        ln -sf libc.so ld-musl-{{musl_lib_arch}}.so.1
-        ls -la ld-musl-{{musl_lib_arch}}.so.1
-        find -type f \
+        sed '/RTLDLIST=/s@/tools@@g' -i ${CLFS}/tools/bin/ldd
+        cd "${CLFS}"/tools
+        find lib -type f \
           -iname 'crt*.o' \
-          -exec ln -sf ../../../tools/lib/{} "${CLFS}"/cross-tools/"${CLFS_TARGET}"/lib/{} \;
+          -exec ln -sf ../../../tools/{} "${CLFS}"/cross-tools/"${CLFS_TARGET}"/{} \;
     - gcc: |
         mkdir gcc-build && cd gcc-build
         AR=ar LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" \
@@ -146,9 +142,4 @@ cross_tools:
           --with-mpc=${CLFS}/cross-tools
         make AS_FOR_TARGET="${CLFS_TARGET}-as" \
           LD_FOR_TARGET="${CLFS_TARGET}-ld"
-        make install
-    - file: |
-        ./configure \
-        --prefix=${CLFS}/cross-tools
-        make
         make install
