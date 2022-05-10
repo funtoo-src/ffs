@@ -12,7 +12,7 @@ sources:
           ext: gz
       - gcc:
           url: https://ftp.gnu.org/gnu/{name}/{name}-{version}/{name}-{version}.tar.{ext}
-          version: 11.3.0
+          version: 12.1.0
       - glibc: 2.35
       - ncurses:
           version: 6.3
