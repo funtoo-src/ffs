@@ -13,6 +13,8 @@ sources:
       - gcc:
           url: https://ftp.gnu.org/gnu/{name}/{name}-{version}/{name}-{version}.tar.{ext}
           version: 12.1.0
+          patches:
+            - gcc-12-calloc.patch
       - glibc: 2.35
       - ncurses:
           version: 6.3
