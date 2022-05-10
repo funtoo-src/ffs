@@ -30,7 +30,8 @@ def parse_args():
 
 if __name__ == "__main__":
 	if "CLFS" not in os.environ:
-		raise EnvironmentError("Please set CLFS environment variable.")
+		print("CLFS not found in environment; using current working directory.")
+		os.environ["CLFS"] = os.getcwd()
 	sourcer = Sourcer(os.environ["CLFS"])
 	args = parse_args()
 	if args.action == "unpack":
