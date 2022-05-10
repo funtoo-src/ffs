@@ -11,8 +11,9 @@ from ffs.builder import Builder
 
 if __name__ == "__main__":
 	if "CLFS" not in os.environ:
-		raise EnvironmentError("Please set CLFS environment variable.")
-	mybuilder = Builder(os.path.join(os.environ["CLFS"]), sys.argv[1], sys.argv[2])
+		print("CLFS not found in environment; using current working directory.")
+		os.environ["CLFS"] = os.getcwd()
+	mybuilder = Builder(os.path.join(os.environ["CLFS"]), build=sys.argv[1], arch=sys.argv[2], steps=sys.argv[3])
 
 
 # vim: ts=4 sw=4 noet

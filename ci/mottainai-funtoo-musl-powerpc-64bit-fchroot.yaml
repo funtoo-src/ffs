@@ -5,11 +5,10 @@ script:
 - sleep 5
 - >-
   ego sync && emerge --jobs pyyaml jinja patchelf
-- export CLFS=${HOME}
 - bin/sourcer fetch
-- bin/builder powerpc-64bit cross_tools
-- bin/builder powerpc-64bit tools
-- bin/builder powerpc-64bit fchroot
+- bin/builder musl powerpc-64bit cross_tools
+- bin/builder musl powerpc-64bit tools
+- bin/builder musl powerpc-64bit fchroot
 environment:
 - SHELL=/bin/bash
 - LUET_NOLOCK=true
