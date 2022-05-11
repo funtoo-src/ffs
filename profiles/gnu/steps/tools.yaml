@@ -303,13 +303,13 @@ tools:
         make
         make install
     - none: |
-        find "${CLFS}"/tools -type f -exec file {} + | \
-          grep ELF | \
-          cut -d':' -f1 | \
-          xargs -I{} patchelf \
-          --set-interpreter "${DYNAMIC_LINKER#$CLFS}" \
-          --set-rpath /tools/lib/ {} 2>/dev/null || true
-        find ${CLFS}/tools -iname '*.pc' -exec sed -i -e "s|${CLFS}||g" {} \; || true
+        #find "${CLFS}"/tools -type f -exec file {} + | \
+        #  grep ELF | \
+        #  cut -d':' -f1 | \
+        #  xargs -I{} patchelf \
+        #  --set-interpreter "${DYNAMIC_LINKER#$CLFS}" \
+        #  --set-rpath /tools/lib/ {} 2>/dev/null || true
+        #find ${CLFS}/tools -iname '*.pc' -exec sed -i -e "s|${CLFS}||g" {} \; || true
         if [ ! -L "$CLFS/lib/ld-linux-{{gnu_arch}}.so.1" ]; then
           ln -sf ../tools/lib/ld-linux-{{gnu_arch}}.so.1 "$CLFS/lib/ld-linux-{{gnu_arch}}.so.1"
         fi
@@ -323,6 +323,7 @@ tools:
 
         export TERMINFO=/tools/share/terminfo
         export PATH=/bin:/usr/bin:/sbin:/usr/sbin:/tools/sbin:/tools/bin
+        export LD_LIBRARY_PATH=/tools/lib
         export HOME=/
 
         umask 022
