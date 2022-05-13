@@ -5,40 +5,54 @@ tools:
     - none: |
         # A local 'patchelf' command is currently required for the final cross_tools to run
         which patchelf
+    - m4: |
+        ./configure \
+        --prefix=/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
     - gmp: |
         CC_FOR_BUILD=gcc \
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --enable-cxx
         make
-        make install
+        make DESTDIR=${CLFS} install
     - mpfr: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
         make
-        make install
+        make DESTDIR=${CLFS} install
     - mpc: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
         make
-        make install
+        make DESTDIR=${CLFS} install
     - zlib: |
         unset CC CXX AR AS RANLIB LD STRIP
         CHOST=${CLFS_TARGET} \
         ./configure \
-        --prefix=${CLFS}/tools
+        --prefix=/tools
         make
-        make install
+        make DESTDIR=${CLFS} install
+    - bison: |
+        ./configure \
+        --prefix=/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
     - binutils: |
         mkdir binutils-build && cd binutils-build
         ../configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --target=${CLFS_TARGET} \
@@ -52,7 +66,7 @@ tools:
         --with-system-zlib \
         --enable-threads
         make
-        make install
+        make DESTDIR=${CLFS} install
     - gcc: |
         sed -i 's|^RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET|& -nostdinc++|' configure
         mkdir gcc-build && cd gcc-build
@@ -62,7 +76,7 @@ tools:
         --enable-secureplt \
         --enable-decimal-float=no \
         {%- endif %}
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --target=${CLFS_TARGET} \
@@ -79,12 +93,12 @@ tools:
         --disable-libsanitizer
         make AS_FOR_TARGET="${AS}" \
         LD_FOR_TARGET="${LD}"
-        make install
+        make DESTDIR=${CLFS} install
     - ncurses: |
         sed -i -e "s/INSTALL_OPT_S=\\\"-s/& --strip-program=${STRIP}/" configure
         mkdir ncurses-build && cd ncurses-build
         ../configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --with-shared \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
@@ -93,13 +107,13 @@ tools:
         --enable-overwrite \
         --with-build-cc=gcc \
         --enable-overwrite \
-        --with-default-terminfo-dir=${CLFS}/tools/share/terminfo \
+        --with-default-terminfo-dir=/tools/share/terminfo \
         --with-termlib
         make
-        make install
+        make DESTDIR=${CLFS} install
         cd .. && mkdir ncursesw-build && cd ncursesw-build
         ../configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --with-shared \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
@@ -108,11 +122,11 @@ tools:
         --enable-overwrite \
         --with-build-cc=gcc \
         --enable-widec \
-        --includedir=${CLFS}/tools/include/ncursesw \
-        --with-default-terminfo-dir=${CLFS}/tools/share/terminfo \
+        --includedir=/tools/include/ncursesw \
+        --with-default-terminfo-dir=/tools/share/terminfo \
         --with-termlib
         make
-        make install
+        make DESTDIR=${CLFS} install
     - bash: |
         cat > config.cache << "BASH_EOF"
         ac_cv_func_mmap_fixed_mapped=yes
@@ -129,13 +143,13 @@ tools:
         gt_cv_int_divbyzero_sigfpe=yes
         BASH_EOF
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --without-bash-malloc \
         --cache-file=config.cache
         make
-        make install
+        make DESTDIR=${CLFS} install
         test -x ${CLFS}/tools/bin/bash
         # set up initial shells in correct location for "#!/bin/sh" and "#!/bin/bash" scripts:
         rm -f ${CLFS}/bin/bash ${CLFS}/bin/sh || true
@@ -150,100 +164,100 @@ tools:
         make PREFIX=${CLFS}/tools install
     - check: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --disable-subunit
         make
-        make install
+        make DESTDIR=${CLFS} install
     - coreutils: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --enable-install-program=hostname \
         --cache-file=config.cache
         sed -i -e 's/^man1_MANS/#man1_MANS/' Makefile
         make
-        make install
+        make DESTDIR=${CLFS} install
     - diffutils: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
         make
-        make install
+        make DESTDIR=${CLFS} install
     - file: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --with-pic=yes
         make
-        make install
+        make DESTDIR=${CLFS} install
     - findutils: |
         echo "gl_cv_func_wcwidth_works=yes" > config.cache
         echo "ac_cv_func_fnmatch_gnu=yes" >> config.cache
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --cache-file=config.cache
         make
-        make install
+        make DESTDIR=${CLFS} install
     - gawk: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
         make
-        make install
-#    - gettext: |
-#        ./configure \
-#        --prefix=${CLFS}/tools \
-#        --build=${CLFS_HOST} \
-#        --host=${CLFS_TARGET} \
-#        --without-emacs \
-#        --disable-threads \
-#        --disable-shared
-#        make
-#        make install
+        make DESTDIR=${CLFS} install
+    - gettext: |
+        ./configure \
+        --prefix=/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --without-emacs \
+        --disable-threads \
+        --disable-shared
+        make
+        make DESTDIR=${CLFS} install
     - grep: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
         make
-        make install
+        make DESTDIR=${CLFS} install
     - gzip: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
         make
-        make install
+        make DESTDIR=${CLFS} install
     - make: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --without-guile
         make
-        make install
+        make DESTDIR=${CLFS} install
     - patch: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
         make
-        make install
+        make DESTDIR=${CLFS} install
     - sed: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
         make
-        make install
+        make DESTDIR=${CLFS} install
     - tar: |
         cat > config.cache << BASH_EOF
         gl_cv_func_wcwidth_works=yes
@@ -257,12 +271,19 @@ tools:
         gl_cv_func_wcrtomb_retval=yes
         BASH_EOF
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --cache-file=config.cache
         make
-        make install
+        make DESTDIR=${CLFS} install
+    - texinfo: |
+        ./configure \
+        --prefix=/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
     - util-linux: |
         NCURSESW6_CONFIG=" " \
         NCURSES6_CONFIG=" " \
@@ -270,38 +291,51 @@ tools:
         NCURSES5_CONFIG=" " \
         LDFLAGS="-ltinfow" \
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --disable-bash-completion \
         --disable-makeinstall-chown \
         --disable-makeinstall-setuid \
         --disable-nologin \
+        --without-systemd \
+        --disable-pylibmount \
         --without-python
         make
-        make install
+        make DESTDIR=${CLFS} install
     - nano: |
         LDFLAGS="-ltinfow" \
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
         make
-        make install
+        make DESTDIR=${CLFS} install
     - xz-utils: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
         make
-        make install
+        make DESTDIR=${CLFS} install
     - which: |
         ./configure \
-        --prefix=${CLFS}/tools \
+        --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
         make
-        make install
+        make DESTDIR=${CLFS} install
+    - rsync: |
+        ./configure \
+        --prefix=/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --disable-openssl \
+        --disable-xxhash \
+        --disable-zstd \
+        --disable-lz4
+        make
+        make DESTDIR=${CLFS} install
     - none: |
         #find "${CLFS}"/tools -type f -exec file {} + | \
         #  grep ELF | \
@@ -323,7 +357,7 @@ tools:
 
         export TERMINFO=/tools/share/terminfo
         export PATH=/bin:/usr/bin:/sbin:/usr/sbin:/tools/sbin:/tools/bin
-        export LD_LIBRARY_PATH=/tools/lib
+        export LD_LIBRARY_PATH=/lib:/usr/lib:/tools/lib
         export HOME=/
 
         umask 022

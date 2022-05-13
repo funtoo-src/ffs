@@ -41,8 +41,8 @@ cross_tools:
           --enable-cxx \
           --disable-static
         make
-        make install
         make check
+        make install
     - mpfr: |
         LDFLAGS="-Wl,-rpath,${CLFS}/cross-tools/lib" ./configure \
           --prefix=${CLFS}/cross-tools \
