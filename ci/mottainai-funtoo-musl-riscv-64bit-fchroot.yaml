@@ -1,0 +1,19 @@
+name: "ffs/funtoo/riscv-64bit/fchroot"
+artefact_path: sources
+namespace: ffs-sources
+script:
+- sleep 5
+- >-
+  ego sync && emerge --jobs pyyaml jinja patchelf
+- bin/sourcer fetch
+- bin/builder musl riscv-64bit cross_tools
+- bin/builder musl riscv-64bit tools
+- bin/builder musl riscv-64bit fchroot
+environment:
+- SHELL=/bin/bash
+- LUET_NOLOCK=true
+- LUET_YES=true
+image: funtoo/bootstrap-builder
+source: https://code.funtoo.org/bitbucket/scm/core/ffs.git
+type: lxd
+directory: /
