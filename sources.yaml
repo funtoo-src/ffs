@@ -85,6 +85,7 @@ sources:
       - python:
           version: 3.10.4
           url: https://www.python.org/ftp/python/{version}/Python-{version}.tar.xz
+          srcdir: Python-{version}
       - cmake:
           version: 3.23.1
           url: https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}.tar.gz

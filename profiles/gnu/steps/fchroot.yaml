@@ -5,6 +5,11 @@ fchroot:
     - linux: |
         make mrproper
         make INSTALL_HDR_PATH=/usr headers_install
+    - m4: |
+        ./configure \
+        --prefix=/usr
+        make
+        make install
     - perl: |
         ln -sf ../tools/bin/pwd /bin
         sh Configure -des \
@@ -24,6 +29,7 @@ fchroot:
         ../configure \
         --prefix=/usr \
         --enable-stack-protector=strong \
-        --with-headers=/usr/include
+        --with-headers=/usr/include \
+        libc_cv_slibdir=/lib
         make
         make install

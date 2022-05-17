@@ -16,19 +16,6 @@ fchroot:
 
         echo /lib:/usr/local/lib:/usr/lib:/tools/lib > /etc/ld-musl-{{musl_lib_arch}}.path
 
-    - rsync: |
-
-        # linux headers use rsync to install. We will compile a minimal native
-        # rsync so it is happy.
-
-        ./configure \
-        --prefix=/usr \
-        --disable-openssl \
-        --disable-xxhash \
-        --disable-zstd \
-        --disable-lz4
-        make
-        make install
     - linux: |
         make mrproper
         make INSTALL_HDR_PATH=/usr headers_install
@@ -53,18 +40,7 @@ fchroot:
         ./configure --prefix=/ --includedir=/usr/include --exec-prefix=/bin
         make
         make install
-    - zlib: |
-        ./configure \
-        --prefix=/usr
-        make
-        make check
-        make install
-        rm -fv /usr/lib/libz.a
     - m4: |
-
-        # gmp requires a functioning m4. We can build this natively or make it part of /tools. Let's
-        # try building it natively.
-
         ./configure --prefix=/usr
         make
         make install
@@ -79,6 +55,20 @@ fchroot:
         make install
     - mpc: |
         ./configure --prefix=/usr
+        make
+        make install
+    - zlib: |
+        ./configure \
+        --prefix=/usr
+        make
+        make check
+        make install
+        rm -fv /usr/lib/libz.a
+    - gettext: |
+        ./configure \
+        --prefix=/usr \
+        --without-emacs \
+        --disable-shared
         make
         make install
     - coreutils: |
@@ -179,4 +169,10 @@ fchroot:
         ./configure --prefix=/usr
         make
         make install
-
+    - python: |
+        ./configure \
+        --prefix=/tools \
+        --enable-shared \
+        --without-ensurepip
+        make
+        make install

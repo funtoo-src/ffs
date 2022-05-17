@@ -1,10 +1,7 @@
 tools:
   defaults:
-    template: tools_gnu.tmpl
+    template: tools.tmpl
   steps:
-    - none: |
-        # A local 'patchelf' command is currently required for the final cross_tools to run
-        which patchelf
     - m4: |
         ./configure \
         --prefix=/tools \
@@ -40,6 +37,15 @@ tools:
         CHOST=${CLFS_TARGET} \
         ./configure \
         --prefix=/tools
+        make
+        make DESTDIR=${CLFS} install
+    - gettext: |
+        ./configure \
+        --prefix=/tools \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --without-emacs \
+        --disable-shared
         make
         make DESTDIR=${CLFS} install
     - bison: |
@@ -212,16 +218,6 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
-    - gettext: |
-        ./configure \
-        --prefix=/tools \
-        --build=${CLFS_HOST} \
-        --host=${CLFS_TARGET} \
-        --without-emacs \
-        --disable-threads \
-        --disable-shared
-        make
-        make DESTDIR=${CLFS} install
     - grep: |
         ./configure \
         --prefix=/tools \
@@ -337,16 +333,7 @@ tools:
         make
         make DESTDIR=${CLFS} install
     - none: |
-        #find "${CLFS}"/tools -type f -exec file {} + | \
-        #  grep ELF | \
-        #  cut -d':' -f1 | \
-        #  xargs -I{} patchelf \
-        #  --set-interpreter "${DYNAMIC_LINKER#$CLFS}" \
-        #  --set-rpath /tools/lib/ {} 2>/dev/null || true
-        #find ${CLFS}/tools -iname '*.pc' -exec sed -i -e "s|${CLFS}||g" {} \; || true
-        if [ ! -L "$CLFS/lib/ld-linux-{{gnu_arch}}.so.1" ]; then
-          ln -sf ../tools/lib/ld-linux-{{gnu_arch}}.so.1 "$CLFS/lib/ld-linux-{{gnu_arch}}.so.1"
-        fi
+        ln -sf ../tools/lib/ld-linux-{{gnu_arch}}.so.1 "$CLFS/lib/ld-linux-{{gnu_arch}}.so.1"
 
         cat > ${CLFS}/etc/profile << "PROFILE_EOF"
         # Funtoo from Scratch /etc/profile for login shells in the temporary environment.
