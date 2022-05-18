@@ -1,0 +1,6 @@
+#!/bin/bash
+export TEST_NAME="mate"
+export EGO_PROFILE_FLAVOR=desktop
+export EGO_PROFILE_MIX_INS="gfxcard-nouveau gfxcard-intel"
+export EMERGE_PACKAGES="mate-base/mate"
+../bin/image-create ${TEST_NAME}-test

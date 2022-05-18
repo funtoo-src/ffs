@@ -1,0 +1,6 @@
+#!/bin/bash
+export TEST_NAME="sandro"
+export EGO_PROFILE_FLAVOR=desktop
+export EGO_PROFILE_MIX_INS="gfxcard-nvidia media-pro xfce mediaformat-video-extra mediaformat-audio-extra mediaformat-gfx-extra kde-plasma-5"
+export EMERGE_PACKAGES="plasma-meta xfce4-meta mpv gimp kdenlive"
+../bin/image-create

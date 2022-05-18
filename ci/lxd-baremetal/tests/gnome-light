@@ -1,0 +1,6 @@
+#!/bin/bash
+export TEST_NAME="gnome-light"
+export EGO_PROFILE_FLAVOR=desktop
+export EGO_PROFILE_MIX_INS="gnome gfxcard-nouveau"
+export EMERGE_PACKAGES="gnome-light libreoffice"
+../bin/image-create

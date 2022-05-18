@@ -1,0 +1,6 @@
+#!/bin/bash
+export TEST_NAME="${0##*/}"
+export EGO_PROFILE_FLAVOR=desktop
+export EGO_PROFILE_MIX_INS="gnome gfxcard-nouveau"
+export EMERGE_PACKAGES="gnome"
+../bin/image-create

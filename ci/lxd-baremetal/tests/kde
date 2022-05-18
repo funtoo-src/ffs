@@ -1,0 +1,7 @@
+#!/bin/bash
+export TEST_NAME="kde"
+export EGO_PROFILE_FLAVOR=desktop
+export EGO_PROFILE_MIX_INS="kde-plasma-5"
+export EMERGE_PACKAGES="plasma-meta"
+../bin/image-create kde-14-image-base
+

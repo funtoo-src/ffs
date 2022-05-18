@@ -1,0 +1,6 @@
+#!/bin/bash
+export TEST_NAME="gnome"
+export EGO_PROFILE_FLAVOR=desktop
+export EGO_PROFILE_MIX_INS="gnome gfxcard-nouveau gfxcard-intel"
+export EMERGE_PACKAGES="gnome gimp"
+../bin/image-create gnome-test

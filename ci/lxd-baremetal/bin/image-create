@@ -1,0 +1,106 @@
+#!/bin/bash
+export LXD_INTERFACE=${LXD_INTERFACE:-eth0}
+export EMERGE_JOBS=${EMERGE_JOBS:-10}
+export TEST_MODE=${TEST_MODE:-emerge}
+if [ -n "$MAKEOPTS" ]; then
+	export MAKEOPTS
+fi
+FSROOT="$( cd "$(dirname "$0")" && cd ../tests/fsroot && pwd -P )"
+EXEC_NAME="$(basename "$0")"
+if [ -z "$TEST_NAME" ]; then
+	echo "TEST_NAME not specified, please specify in the test."
+	exit 1
+fi
+if [ -z "$SOURCE_IMAGE" ]; then
+	echo "Please define a source image to use in SOURCE_IMAGE."
+	exit 1
+elif ! lxc image info $SOURCE_IMAGE >/dev/null 2>&1; then
+	echo "Source image $SOURCE_IMAGE does not exist. Exiting."
+fi
+
+CNAME=${TEST_NAME}-test
+# clean up previous instance if it exists...
+if lxc info $CNAME >/dev/null 2>&1; then
+	lxc stop --force $CNAME > /dev/null 2>&1
+	lxc delete $CNAME > /dev/null 2>&1
+fi
+
+die() {
+	echo $*
+	exit 1
+}
+
+network_test() {
+	foo="$(lxc exec $CNAME -- ifconfig ${LXD_INTERFACE} | grep 'inet 10.')"
+	if [ -n "$foo" ]; then
+		echo "yes"
+	else
+		echo "no"
+	fi
+}
+
+echo Running lxc launch $SOURCE_IMAGE $CNAME $LXD_LAUNCH_EXTRA_ARGS...
+lxc launch $SOURCE_IMAGE $CNAME $LXD_LAUNCH_EXTRA_ARGS || die "launch fail"
+lxc exec $CNAME -- sh -c "cat > /etc/conf.d/netif.${LXD_INTERFACE}" << EOF
+template="dhcpcd"
+EOF
+lxc exec $CNAME -- sh -c "[ ! -e /etc/init.d/netif.${LXD_INTERFACE} ] && cd /etc/init.d && ln -s netif.tmpl netif.${LXD_INTERFACE}"
+lxc exec $CNAME rc-update add netif.${LXD_INTERFACE} default || die "${LXD_INTERFACE} fail 2"
+#lxc exec $CNAME -- sh -c "eselect python set --python3 python3.7" || die "eselect fail"
+lxc restart --force $CNAME || die "restart fail"
+echo -n "Waiting for network."
+while [ "$(network_test)" != "yes" ]; do
+	echo -n "."
+done
+local_ssh_keys="$(ls $HOME/.ssh/id*.pub)"
+if [ -n "$local_ssh_keys" ]; then
+	lxc exec $CNAME -- sh -c "install -d /root/.ssh"
+	lxc exec $CNAME -- sh -c "cat > /root/.ssh/config" << EOF
+Host *
+    StrictHostKeyChecking no
+EOF
+lxc exec $CNAME -- rm -f /etc/portage/make.conf || die "make.conf cleanup fail"
+	for key in $local_ssh_keys; do
+		echo "Installing ssh key $key"
+		lxc exec $CNAME -- sh -c "echo \"$(cat $key)\" >> /root/.ssh/authorized_keys"
+	done
+	lxc exec $CNAME "chmod -R go-rwx /root/.ssh"
+	if [ -d "$FSROOT/$TEST_NAME" ]; then
+		IPV4="$(lxc list -c4 "^${CNAME}$" --format csv | awk '{ print $1 }')"
+		rsync_count=0
+		while [ "$rsync_count" -lt 12 ]; do
+			rsync -ave "ssh -o StrictHostKeyChecking=no" $FSROOT/$TEST_NAME/ root@${IPV4}:/
+			if [ $? -ne 0 ]; then
+				echo "There was some error rsyncing the fsroot over."
+				rsync_count=$(( $rsync_count + 1 ))
+				sleep 1
+			else
+				echo "Completed syncing fsroot."
+				break
+			fi
+		done
+		if [ "$rsync_count" -eq 12 ]; then
+			exit 1
+		fi
+	else
+		echo "File system root $FSROOT/$TEST_NAME doesn't exist."
+	fi
+fi
+lxc exec $CNAME ego sync || die "sync fail"
+lxc exec $CNAME -- emerge -uDN @world --jobs=$EMERGE_JOBS || die "pre-update fail"
+if [ -n "$EGO_PROFILE_FLAVOR" ]; then
+	lxc exec $CNAME epro flavor $EGO_PROFILE_FLAVOR || die "flavor fail"
+fi
+if [ -n "$EGO_PROFILE_MIX_INS" ]; then
+	lxc exec $CNAME epro mix-in $EGO_PROFILE_MIX_INS || die "mix-in fail"
+fi
+
+if [ "$TEST_MODE" == "emerge" ]; then
+	if [ -n "$EMERGE_PACKAGES" ]; then
+		lxc exec $CNAME -- emerge -uDN --jobs=$EMERGE_JOBS $EMERGE_PACKAGES || die "emerge packages fail"
+	fi
+	lxc exec $CNAME -- emerge @preserved-rebuild --jobs=$EMERGE_JOBS --backtrack=100 || die "rebuild fail"
+elif [ "$TEST_MODE" == "runtest" ]; then
+	lxc exec $CNAME -- chmod +x $TEST_RUN_EXEC || die "Could not make test executable."
+	lxc exec $CNAME -- $TEST_RUN_EXEC
+fi

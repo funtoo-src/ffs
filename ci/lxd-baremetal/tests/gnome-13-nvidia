@@ -1,0 +1,7 @@
+#!/bin/bash
+export TEST_NAME=$(basename $0)
+echo $TEST_NAME
+export EGO_PROFILE_FLAVOR=desktop
+export EGO_PROFILE_MIX_INS="gnome"
+export EMERGE_PACKAGES="nvidia-drivers gnome gimp libreoffice"
+../bin/image-create

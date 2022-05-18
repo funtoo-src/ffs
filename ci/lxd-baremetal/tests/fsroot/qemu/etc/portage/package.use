@@ -1,0 +1,5 @@
+app-emulation/qemu static-user
+dev-libs/glib static-libs
+sys-apps/attr static-libs
+sys-libs/zlib static-libs
+dev-libs/libpcre static-libs

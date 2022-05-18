@@ -1,0 +1,4 @@
+#!/bin/bash
+export TEST_NAME="nginx"
+export EMERGE_PACKAGES="nginx"
+../bin/image-create $TEST_NAME-test

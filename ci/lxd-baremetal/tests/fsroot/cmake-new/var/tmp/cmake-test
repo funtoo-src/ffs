@@ -1,0 +1,14 @@
+#!/bin/sh
+cd /var/git/meta-repo/kits/core-kit
+patch -p0 < /var/tmp/cmake-utils.eclass.patch || exit 1
+echo "Patch applied successfully."
+for x in $(cat /var/tmp/cmake-list.txt); do
+	catpkg=${x#*/}
+	emerge --jobs=4 -v $catpkg
+	result=$?
+	if [ $result -eq 0 ]; then
+		echo "PASS $catpkg" >> /var/tmp/cmake-results.txt
+	else
+		echo "FAIL $catpkg" >> /var/tmp/cmake-results.txt
+	fi
+done

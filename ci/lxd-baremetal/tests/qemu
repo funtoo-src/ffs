@@ -1,0 +1,4 @@
+#!/bin/bash
+export TEST_NAME="qemu"
+export EMERGE_PACKAGES="app-emulation/qemu"
+../bin/image-create qemu-test
