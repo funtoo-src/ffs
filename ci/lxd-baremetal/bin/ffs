@@ -1,8 +1,7 @@
 #!/bin/bash
 REPOPATH="$( git rev-parse --show-toplevel )"
-ffs_build=$1
-ffs_arch=$2
-echo "Building Funtoo from Scratch arch $ffs_arch build $ffs_build in container $container_name"
+export ffs_build=$1
+export ffs_arch=$2
 export SOURCE_IMAGE="funtoo-fchroot"
 export EMERGE_PACKAGES="fchroot pyyaml jinja"
 export TEST_NAME="ffs-${USER}-${ffs_arch}-${ffs_build}"
@@ -15,6 +14,8 @@ if ! lxc image info $SOURCE_IMAGE >/dev/null 2>&1; then
 	echo "Source image $SOURCE_IMAGE does not exist. Exiting."
 fi
 CNAME=${TEST_NAME}-test
+echo "Building Funtoo from Scratch arch $ffs_arch build $ffs_build in container $CNAME"
+echo "This script will use the current branch and local uncommmitted changes in your working ffs repo."
 # clean up previous instance if it exists...
 if lxc info $CNAME >/dev/null 2>&1; then
 	lxc stop --force $CNAME > /dev/null 2>&1
@@ -61,23 +62,27 @@ fi
 
 # pack up current git repo and any local changes, push into container:
 
-cat > $REPOPATH/env.sh << EOF
+rm -rf /var/tmp/ffs-repo /var/tmp/ffs-repo.tar.gz /var/tmp/ffs.patch
+# grab all local changes and all uncommitted (staged) files:
+( cd $REPOPATH; git diff HEAD > /var/tmp/ffs.patch )
+
+( cd /var/tmp; git clone $REPOPATH /var/tmp/ffs-repo )
+
+# pass local calling parameters to inside of container:
+cat > /var/tmp/ffs-repo/env.sh << EOF
 export ffs_arch=$ffs_arch
 export ffs_build=$ffs_build
 EOF
 
-rm -rf /var/tmp/ffs-repo /var/tmp/ffs-repo.tar.gz /var/tmp/ffs.patch
-( cd $REPOPATH; git diff > /var/tmp/ffs.patch )
-( cd /var/tmp; git clone $REPOPATH /var/tmp/ffs-repo )
 if [ -e /var/tmp/ffs.patch ]; then
 	( cd /var/tmp/ffs-repo; cat /var/tmp/ffs.patch | patch -p1 )
 fi
-tar czvf /var/tmp/ffs-repo.tar.gz ffs-repo -C /var/tmp || die
+tar czvf /var/tmp/ffs-repo.tar.gz -C /var/tmp ffs-repo || die
 lxc file push /var/tmp/ffs-repo.tar.gz $CNAME/var/tmp/ || die "no pushy"
 
 # unpack repo --
 lxc exec $CNAME -- tar xvf /var/tmp/ffs-repo.tar.gz || die "unpack fail"
-lxc exec $CNAME -- /var/tmp/ffs-repo/ci/lxd-baremetal/run.sh
+lxc exec $CNAME -- /root/ffs-repo/ci/lxd-baremetal/run.sh
 if [ $? -ne 0 ]; then
 	echo "Test failure."
 	exit 1
