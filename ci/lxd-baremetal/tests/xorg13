@@ -1,5 +1,0 @@
-#!/bin/bash
-export TEST_NAME="xorg13"
-export EGO_PROFILE_FLAVOR=desktop
-export EMERGE_PACKAGES="xorg-server"
-../bin/image-create

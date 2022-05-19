@@ -1,6 +1,0 @@
-#!/bin/bash
-export TEST_NAME="${0##*/}"
-export EGO_PROFILE_FLAVOR=core
-export EGO_PROFILE_MIX_INS="selinux"
-export EMERGE_PACKAGES="selinux-base selinux-base-policy postfix"
-../bin/image-create

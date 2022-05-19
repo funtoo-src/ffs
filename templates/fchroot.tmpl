@@ -1,5 +1,11 @@
 #!/bin/bash
-exec sudo fchroot ${CLFS} /bin/bash --login << "EOF"
+if [ "$UID" != "0" ]; then
+	# if not root, expect sudo to grant us access to fchroot:
+	sudo_exe=sudo
+else
+	sudo_exe=""
+fi
+exec $sudo_exe fchroot ${CLFS} /bin/bash --login << "EOF"
 export CLFS=/
 set -e
 set -o pipefail

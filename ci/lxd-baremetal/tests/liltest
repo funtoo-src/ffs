@@ -1,4 +1,0 @@
-#!/bin/bash
-export LXD_LAUNCH_EXTRA_ARGS=""
-export BASE_IMAGE=funtoo
-source ../bin/image-create test-base

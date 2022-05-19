@@ -1,6 +1,0 @@
-#!/bin/bash
-export TEST_NAME="${0##*/}"
-export TEST_MODE="runtest"
-export EGO_PROFILE_FLAVOR=desktop
-export TEST_RUN_EXEC=/var/tmp/cmake-test
-../bin/image-create

@@ -1,6 +1,0 @@
-#!/bin/bash
-export TEST_NAME="xfce"
-export EGO_PROFILE_FLAVOR=desktop
-export EGO_PROFILE_MIX_INS="gfxcard-nouveau gfxcard-intel"
-export EMERGE_PACKAGES="xfce-base/xfce4-meta"
-../bin/image-create ${TEST_NAME}-test
