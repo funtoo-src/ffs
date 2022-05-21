@@ -1,0 +1,11 @@
+--- a/setup.py	2022-01-23 18:35:09.674272780 -0300
++++ b/setup.py	2022-01-23 18:37:22.038430398 -0300
+@@ -828,7 +828,7 @@
+             ["$logrotatedir", ["cnf/logrotate.d/elog-save-summary"]],
+             [
+                 "$portage_confdir",
+-                ["cnf/make.conf.example", "cnf/make.globals", "cnf/repos.conf"],
++                ["cnf/make.conf.example", "cnf/make.globals"],
+             ],
+             ["$portage_setsdir", ["cnf/sets/portage.conf"]],
+             ["$docdir", ["NEWS", "RELEASE-NOTES"]],

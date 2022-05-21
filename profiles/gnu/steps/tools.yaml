@@ -62,6 +62,7 @@ tools:
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --target=${CLFS_TARGET} \
+        --with-sysroot=${CLFS} \
         --with-lib-path=${CLFS}/tools/lib \
         --disable-nls \
         --enable-shared \
@@ -314,6 +315,9 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+    - zstd: |
+        make
+        make prefix=/tools DESTDIR=${CLFS} install
     - which: |
         ./configure \
         --prefix=/tools \

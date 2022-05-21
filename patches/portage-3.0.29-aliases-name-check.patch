@@ -1,0 +1,29 @@
+--- a/lib/portage/repository/config.py	2022-01-24 13:38:50.267071351 -0300
++++ b/lib/portage/repository/config.py	2022-01-24 13:45:22.487396571 -0300
+@@ -897,16 +897,17 @@
+                         continue
+ 
+                     if repo.name != repo_name:
+-                        writemsg_level(
+-                            "!!! %s\n"
+-                            % _(
+-                                "Section '%s' in repos.conf has name different "
+-                                "from repository name '%s' set inside repository"
++                        if repo_name not in repo.aliases:
++                            writemsg_level(
++                                "!!! %s\n"
++                                % _(
++                                    "Section '%s' in repos.conf has name different "
++                                    "from repository name '%s' set inside repository"
++                                )
++                                % (repo_name, repo.name),
++                                level=logging.ERROR,
++                                noiselevel=-1,
+                             )
+-                            % (repo_name, repo.name),
+-                            level=logging.ERROR,
+-                            noiselevel=-1,
+-                        )
+                         del prepos[repo_name]
+                         continue
+ 

@@ -5,16 +5,42 @@ fchroot:
     - linux: |
         make mrproper
         make INSTALL_HDR_PATH=/usr headers_install
-    - m4: |
-        ./configure \
-        --prefix=/usr
-        make
-        make install
     - perl: |
         ln -sf ../tools/bin/pwd /bin
         sh Configure -des \
           -Dcc=gcc \
           -Dprefix=/tools
+        make
+        make install
+    - openssl: |
+        install -d /usr/bin
+        ln -sf ../../tools/bin/env /usr/bin
+        ./config --prefix=/tools \
+        --openssldir=/etc/ssl \
+        --libdir=lib \
+        shared \
+        zlib-dynamic
+        make
+        make install
+    - wget: |
+        ./configure \
+        --prefix=/tools \
+        --sysconfdir=/etc \
+        --with-ssl=openssl \
+        --with-libssl-prefix=/tools
+        make
+        make install
+    - curl: |
+        ./configure \
+        --prefix=/tools \
+        --with-openssl \
+        --disable-static
+        make
+        make install
+    - libffi: |
+        ./configure \
+        --prefix=/tools \
+        --disable-static
         make
         make install
     - python: |
@@ -24,12 +50,34 @@ fchroot:
         --without-ensurepip
         make
         make install
-    - glibc: |
-        mkdir glibc-build && cd glibc-build
-        ../configure \
-        --prefix=/usr \
-        --enable-stack-protector=strong \
-        --with-headers=/usr/include \
-        libc_cv_slibdir=/lib
+    - git: |
+        ./configure --prefix=/tools
         make
         make install
+    - none: |
+        cat > /etc/passwd << "PASSWD_EOF"
+        root:x:0:0:root:/root:/bin/bash
+        portage:x:250:250:portage:/var/tmp/portage:/tools/bin/false
+        PASSWD_EOF
+        cat > /etc/group << "GROUP_EOF"
+        root:x:0:root
+        portage::250:portage
+        GROUP_EOF
+        export GIT_SSL_NO_VERIFY=true
+    - portage: |
+        python3 setup.py build
+        python3 setup.py install
+    - ego: |
+        install -d /usr/share/ego
+        cp -r modules* python /usr/share/ego/
+        rm /usr/share/ego/modules*/upgrade*
+        rm -rf /usr/share/ego/python/test
+        chmod +x /usr/share/ego/modules/*.ego
+        cp ego /tools/bin/
+        ln -sf ego /tools/bin/epro
+        ln -sf ego /tools/bin/edoc
+        cat > /etc/ego.conf << "EOF"
+        [global]
+        release = 1.4
+        EOF
+        ego sync

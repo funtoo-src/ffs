@@ -43,11 +43,17 @@ sources:
           patches:
             - texinfo-6.8-glibc-2.34-compat.patch
       - nano: 6.2
+      - wget:
+          version: 1.21.3
+          ext: gz
   non-gnu:
     packages:
       - linux:
           version: 5.17.4
           url: https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-{version}.tar.xz
+      - git:
+          version: 2.36.1
+          url: https://cdn.kernel.org/pub/software/scm/git/git-{version}.tar.xz
       - musl:
           version: 1.2.3
           url: https://musl.libc.org/releases/musl-{version}.tar.gz
@@ -79,6 +85,9 @@ sources:
           version: 5.2.5
           url: https://tukaani.org/xz/xz-{version}.tar.gz
           srcdir: xz-{version}
+      - zstd:
+          version: 1.5.2
+          url: https://github.com/facebook/zstd/releases/download/v{version}/zstd-{version}.tar.gz
       - which:
           version: 2.21
           url: https://carlowood.github.io/which/which-{version}.tar.gz
@@ -92,6 +101,28 @@ sources:
       - libffi:
           version: 3.4.2
           url: https://github.com/libffi/libffi/releases/download/v{version}/libffi-{version}.tar.gz
+      - curl:
+          version: 7.83.1
+          url: https://github.com/curl/curl/releases/download/curl-7_83_1/curl-{version}.tar.bz2
       - openssl:
           version: 3.0.2
           url: https://www.openssl.org/source/openssl-{version}.tar.gz
+      - portage:
+          version: 3.0.30
+          url: https://gitweb.gentoo.org/proj/portage.git/snapshot/portage-{version}.tar.bz2
+          patches:
+            - portage-3.0.29-remove-gentoo-repos-conf.patch
+            - portage-2.3.68-change-global-paths.patch
+            - portage-2.3.41-ebuild-nodie.patch
+            - portage-3.0.29-set-backtracking-to-6.patch
+            - portage-3.0.29-enhanced-metadata.patch
+            - portage-2.3.78-static-libs-belong-where-I-put-them.patch
+            - portage-3.0.29-module-rebuild.patch
+            - portage-3.0.29-add-repodir-variable.patch
+            - portage-3.0.29-allow-matches-in-package-updates.patch
+            - portage-3.0.29-track-and-deny-keywords-r1.patch
+            - portage-3.0.29-aliases-name-check.patch
+            - portage-3.0.30-revert-default-enable-soname-dependencies.patch
+      - ego:
+          version: 2.8.6
+          url: https://github.com/funtoo/ego/archive/refs/tags/{version}.tar.gz
