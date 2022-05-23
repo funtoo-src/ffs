@@ -107,6 +107,9 @@ sources:
       - openssl:
           version: 3.0.2
           url: https://www.openssl.org/source/openssl-{version}.tar.gz
+      - pax-utils:
+          version: 1.3.4
+          url: https://gitweb.gentoo.org/proj/pax-utils.git/snapshot/pax-utils-{version}.tar.bz2
       - portage:
           version: 3.0.30
           url: https://gitweb.gentoo.org/proj/portage.git/snapshot/portage-{version}.tar.bz2

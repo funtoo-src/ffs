@@ -54,6 +54,10 @@ fchroot:
         ./configure --prefix=/tools
         make
         make install
+    - pax-utils: |
+        sed '/MPAGES/d' -i Makefile
+        make CC=gcc PV=${PAX_UTILS_VERSION}
+        make CC=gcc PV=${PAX_UTILS_VERSION} install
     - none: |
         cat > /etc/passwd << "PASSWD_EOF"
         root:x:0:0:root:/root:/bin/bash
@@ -63,11 +67,27 @@ fchroot:
         root:x:0:root
         portage::250:portage
         GROUP_EOF
-        export GIT_SSL_NO_VERIFY=true
     - portage: |
         python3 setup.py build
         python3 setup.py install
+        rm -f /usr/share/portage/config/repos.conf
+        install -d /etc/portage
+        cat > /etc/portage/make.conf << "MKCF_EOF"
+        FEATURES="-pid-sandbox"
+        ROOTPATH="/tools/sbin:/tools/bin"
+        FETCHCOMMAND="wget --no-check-certificate -t 3 -T 60 --passive-ftp -O \"\${DISTDIR}/\${FILE}\" \"\${URI}\""
+        RESUMECOMMAND="wget --no-check-certificate -c -t 3 -T 60 --passive-ftp -O \"\${DISTDIR}/\${FILE}\" \"\${URI}\""
+        MKCF_EOF
+        ln -sf portage/make.conf /etc/make.conf
+        install -d /etc/portage/make.profile
+        cat > /etc/portage/make.profile/parent << "MKP_EOF"
+        core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}
+        core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}/subarch/{{ego_subarch}}
+        core-kit:funtoo/1.0/linux-gnu/build/current
+        core-kit:funtoo/1.0/linux-gnu/flavor/core
+        MKP_EOF
     - ego: |
+        export GIT_SSL_NO_VERIFY=true
         install -d /usr/share/ego
         cp -r modules* python /usr/share/ego/
         rm /usr/share/ego/modules*/upgrade*
@@ -76,8 +96,8 @@ fchroot:
         cp ego /tools/bin/
         ln -sf ego /tools/bin/epro
         ln -sf ego /tools/bin/edoc
-        cat > /etc/ego.conf << "EOF"
+        cat > /etc/ego.conf << "EGO_EOF"
         [global]
         release = 1.4
-        EOF
+        EGO_EOF
         ego sync
