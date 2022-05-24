@@ -5,6 +5,7 @@ fchroot:
     - linux: |
         make mrproper
         make INSTALL_HDR_PATH=/usr headers_install
+        install -d /var/db/pkg/sys-kernel/linux-headers-${LINUX_VERSION}
     - perl: |
         ln -sf ../tools/bin/pwd /bin
         sh Configure -des \
@@ -12,6 +13,25 @@ fchroot:
           -Dprefix=/tools
         make
         make install
+        install -d /var/db/pkg/dev-lang/perl-${PERL_VERSION}
+    - autoconf: |
+        ./configure \
+        --prefix=/tools
+        make
+        make install
+        install -d /var/db/pkg/sys-devel/autoconf-${AUTOCONF_VERSION}
+    - automake: |
+        ./configure \
+        --prefix=/tools
+        make
+        make install
+        install -d /var/db/pkg/sys-devel/automake-${AUTOMAKE_VERSION}
+    - libtool: |
+        ./configure \
+        --prefix=/tools
+        make
+        make install
+        install -d /var/db/pkg/sys-devel/libtool-${LIBTOOL_VERSION}
     - openssl: |
         install -d /usr/bin
         ln -sf ../../tools/bin/env /usr/bin
@@ -22,6 +42,7 @@ fchroot:
         zlib-dynamic
         make
         make install
+        install -d /var/db/pkg/dev-libs/openssl-${OPENSSL_VERSION}
     - wget: |
         ./configure \
         --prefix=/tools \
@@ -30,6 +51,7 @@ fchroot:
         --with-libssl-prefix=/tools
         make
         make install
+        install -d /var/db/pkg/net-misc/wget-${WGET_VERSION}
     - curl: |
         ./configure \
         --prefix=/tools \
@@ -37,12 +59,14 @@ fchroot:
         --disable-static
         make
         make install
+        install -d /var/db/pkg/net-misc/curl-${CURL_VERSION}
     - libffi: |
         ./configure \
         --prefix=/tools \
         --disable-static
         make
         make install
+        install -d /var/db/pkg/dev-libs/libffi-${LIBFFI_VERSION}
     - python: |
         ./configure \
         --prefix=/tools \
@@ -50,14 +74,25 @@ fchroot:
         --without-ensurepip
         make
         make install
+        install -d /var/db/pkg/dev-lang/python-${PYTHON_VERSION}
     - git: |
         ./configure --prefix=/tools
         make
         make install
+        install -d /var/db/pkg/dev-vcs/git-${GIT_VERSION}
     - pax-utils: |
         sed '/MPAGES/d' -i Makefile
         make CC=gcc PV=${PAX_UTILS_VERSION}
         make CC=gcc PV=${PAX_UTILS_VERSION} install
+        install -d /var/db/pkg/app-misc/pax-utils-${PAX_UTILS_VERSION}
+    - sandbox: |
+        autoreconf -i -f
+        ./configure \
+        --prefix=/tools
+        make
+        make install
+        ln -fs ../../tools/bin/sandbox /usr/bin/sandbox
+        install -d /var/db/pkg/sys-apps/sandbox-${SANDBOX_VERSION}
     - none: |
         cat > /etc/passwd << "PASSWD_EOF"
         root:x:0:0:root:/root:/bin/bash
@@ -86,6 +121,7 @@ fchroot:
         core-kit:funtoo/1.0/linux-gnu/build/current
         core-kit:funtoo/1.0/linux-gnu/flavor/core
         MKP_EOF
+        install -d /var/db/pkg/sys-apps/portage-${PORTAGE_VERSION}
     - ego: |
         export GIT_SSL_NO_VERIFY=true
         install -d /usr/share/ego
@@ -100,4 +136,5 @@ fchroot:
         [global]
         release = 1.4
         EGO_EOF
+        install -d /var/db/pkg/app-admin/ego-${EGO_VERSION}
         ego sync

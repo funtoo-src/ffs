@@ -9,6 +9,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-devel/m4-${M4_VERSION}
     - gmp: |
         CC_FOR_BUILD=gcc \
         ./configure \
@@ -18,6 +19,7 @@ tools:
         --enable-cxx
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/dev-libs/gmp-${GMP_VERSION}
     - mpfr: |
         ./configure \
         --prefix=/tools \
@@ -25,6 +27,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/dev-libs/mpfr-${MPFR_VERSION}
     - mpc: |
         ./configure \
         --prefix=/tools \
@@ -32,6 +35,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/dev-libs/mpc-${MPC_VERSION}
     - zlib: |
         unset CC CXX AR AS RANLIB LD STRIP
         CHOST=${CLFS_TARGET} \
@@ -39,6 +43,7 @@ tools:
         --prefix=/tools
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-libs/zlib-${ZLIB_VERSION}
     - gettext: |
         ./configure \
         --prefix=/tools \
@@ -48,6 +53,7 @@ tools:
         --disable-shared
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-devel/gettext-${GETTEXT_VERSION}
     - bison: |
         ./configure \
         --prefix=/tools \
@@ -55,6 +61,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-devel/bison-${BISON_VERSION}
     - binutils: |
         mkdir binutils-build && cd binutils-build
         ../configure \
@@ -74,6 +81,7 @@ tools:
         --enable-threads
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-devel/binutils-${BINUTILS_VERSION}
     - gcc: |
         sed -i 's|^RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET|& -nostdinc++|' configure
         mkdir gcc-build && cd gcc-build
@@ -101,6 +109,7 @@ tools:
         make AS_FOR_TARGET="${AS}" \
         LD_FOR_TARGET="${LD}"
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-devel/gcc-${GCC_VERSION}
     - ncurses: |
         sed -i -e "s/INSTALL_OPT_S=\\\"-s/& --strip-program=${STRIP}/" configure
         mkdir ncurses-build && cd ncurses-build
@@ -134,6 +143,7 @@ tools:
         --with-termlib
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-libs/ncurses-${NCURSES_VERSION}
     - bash: |
         cat > config.cache << "BASH_EOF"
         ac_cv_func_mmap_fixed_mapped=yes
@@ -162,6 +172,7 @@ tools:
         rm -f ${CLFS}/bin/bash ${CLFS}/bin/sh || true
         ln -sf ../tools/bin/bash ${CLFS}/bin/bash
         ln -sf ../tools/bin/bash ${CLFS}/bin/sh
+        install -d ${CLFS}/var/db/pkg/app-shells/bash-${BASH_VERSION}
     - bzip2: |
         sed -i \
           -e '/^all/s/ test$//' \
@@ -169,6 +180,7 @@ tools:
         Makefile
         make CC="${CC}" AR="${AR}" RANLIB="${RANLIB}"
         make PREFIX=${CLFS}/tools install
+        install -d ${CLFS}/var/db/pkg/app-arch/bzip2-${BZIP2_VERSION}
     - check: |
         ./configure \
         --prefix=/tools \
@@ -177,6 +189,7 @@ tools:
         --disable-subunit
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/dev-libs/check-${CHECK_VERSION}
     - coreutils: |
         ./configure \
         --prefix=/tools \
@@ -187,6 +200,7 @@ tools:
         sed -i -e 's/^man1_MANS/#man1_MANS/' Makefile
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-apps/coreutils-${COREUTILS_VERSION}
     - diffutils: |
         ./configure \
         --prefix=/tools \
@@ -194,6 +208,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-apps/diffutils-${DIFFUTILS_VERSION}
     - file: |
         ./configure \
         --prefix=/tools \
@@ -202,6 +217,7 @@ tools:
         --with-pic=yes
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-apps/file-${FILE_VERSION}
     - findutils: |
         echo "gl_cv_func_wcwidth_works=yes" > config.cache
         echo "ac_cv_func_fnmatch_gnu=yes" >> config.cache
@@ -212,6 +228,7 @@ tools:
         --cache-file=config.cache
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-apps/findutils-${FINDUTILS_VERSION}
     - gawk: |
         ./configure \
         --prefix=/tools \
@@ -219,6 +236,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-apps/gawk-${GAWK_VERSION}
     - grep: |
         ./configure \
         --prefix=/tools \
@@ -226,6 +244,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-apps/grep-${GREP_VERSION}
     - gzip: |
         ./configure \
         --prefix=/tools \
@@ -233,6 +252,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/app-arch/gzip-${GZIP_VERSION}
     - make: |
         ./configure \
         --prefix=/tools \
@@ -241,6 +261,7 @@ tools:
         --without-guile
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-devel/make-${MAKE_VERSION}
     - patch: |
         ./configure \
         --prefix=/tools \
@@ -248,6 +269,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-devel/patch-${PATCH_VERSION}
     - sed: |
         ./configure \
         --prefix=/tools \
@@ -255,6 +277,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-apps/sed-${SED_VERSION}
     - tar: |
         cat > config.cache << BASH_EOF
         gl_cv_func_wcwidth_works=yes
@@ -274,6 +297,7 @@ tools:
         --cache-file=config.cache
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/app-arch/tar-${TAR_VERSION}
     - texinfo: |
         ./configure \
         --prefix=/tools \
@@ -281,6 +305,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-apps/texinfo-${TEXINFO_VERSION}
     - util-linux: |
         NCURSESW6_CONFIG=" " \
         NCURSES6_CONFIG=" " \
@@ -300,6 +325,7 @@ tools:
         --without-python
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-apps/util-linux-${UTIL_LINUX_VERSION}
     - nano: |
         LDFLAGS="-ltinfow" \
         ./configure \
@@ -308,6 +334,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/app-editors/nano-${NANO_VERSION}
     - xz-utils: |
         ./configure \
         --prefix=/tools \
@@ -315,9 +342,11 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/app-arch/xz-utils-${XZ_UTILS_VERSION}
     - zstd: |
         make
         make prefix=/tools DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/app-arch/zstd-${ZSTD_VERSION}
     - which: |
         ./configure \
         --prefix=/tools \
@@ -325,6 +354,7 @@ tools:
         --host=${CLFS_TARGET}
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/sys-apps/which-${WHICH_VERSION}
     - rsync: |
         ./configure \
         --prefix=/tools \
@@ -336,6 +366,7 @@ tools:
         --disable-lz4
         make
         make DESTDIR=${CLFS} install
+        install -d ${CLFS}/var/db/pkg/net-misc/rsync-${RSYNC_VERSION}
     - none: |
         ln -sf ../tools/lib/ld-linux-{{gnu_arch}}.so.1 "$CLFS/lib/ld-linux-{{gnu_arch}}.so.1"
 
