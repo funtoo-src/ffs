@@ -2,6 +2,9 @@ tools:
   defaults:
     template: tools.tmpl
   steps:
+    - none: |
+        # Cleanup /bin symlinks from previous runs
+        rm -f ${CLFS}/bin/bash ${CLFS}/bin/sh
     - m4: |
         ./configure \
         --prefix=/tools \
@@ -11,7 +14,6 @@ tools:
         make DESTDIR=${CLFS} install
         install -d ${CLFS}/var/db/pkg/sys-devel/m4-${M4_VERSION}
     - gmp: |
-        CC_FOR_BUILD=gcc \
         ./configure \
         --prefix=/tools \
         --build=${CLFS_HOST} \
@@ -49,6 +51,7 @@ tools:
         --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
+        --disable-threads \
         --without-emacs \
         --disable-shared
         make
@@ -70,7 +73,7 @@ tools:
         --host=${CLFS_TARGET} \
         --target=${CLFS_TARGET} \
         --with-sysroot=${CLFS} \
-        --with-lib-path=${CLFS}/tools/lib \
+        --enable-ld=default \
         --disable-nls \
         --enable-shared \
         --enable-64-bit-bfd \
@@ -97,15 +100,18 @@ tools:
         --target=${CLFS_TARGET} \
         CC_FOR_TARGET="${CLFS_TARGET}-gcc" \
         --with-build-sysroot=${CLFS} \
-        --with-local-prefix=${CLFS}/tools \
         --disable-multilib \
         --enable-languages=c,c++ \
         --with-system-zlib \
         --with-native-system-header-dir=/tools/include \
         --disable-libssp \
+        --enable-initfini-array \
         --enable-install-libiberty \
         --disable-libstdcxx-pch \
-        --disable-libsanitizer
+        --disable-libsanitizer \
+        --with-mpfr=${CLFS}/tools \
+        --with-gmp=${CLFS}/tools \
+        --with-mpc=${CLFS}/tools
         make AS_FOR_TARGET="${AS}" \
         LD_FOR_TARGET="${LD}"
         make DESTDIR=${CLFS} install
@@ -163,6 +169,8 @@ tools:
         --prefix=/tools \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
+        --disable-profiling \
+        --with-curses \
         --without-bash-malloc \
         --cache-file=config.cache
         make
@@ -319,8 +327,15 @@ tools:
         --disable-bash-completion \
         --disable-makeinstall-chown \
         --disable-makeinstall-setuid \
+        --disable-chfn-chsh \
+        --disable-login \
+        --disable-newgrp \
         --disable-nologin \
+        --disable-hardlink \
+        --disable-raw \
+        --disable-vipw \
         --without-systemd \
+        --without-systemdsystemunitdir \
         --disable-pylibmount \
         --without-python
         make

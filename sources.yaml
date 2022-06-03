@@ -4,10 +4,13 @@ sources:
       url: https://ftp.gnu.org/gnu/{name}/{name}-{version}.tar.{ext}
       ext: xz
     packages:
-      - autoconf: 2.71
-      - automake: 1.16.5
+      - autoconf: 2.69
+      - automake: 1.16.1
       - libtool: 2.4.6
-      - binutils: 2.38
+      - binutils:
+          version: 2.36.1
+          patches:
+            - binutils-2.36.1-opcodes-rpath.patch
       - mpfr: 4.1.0
       - gmp: 6.2.1
       - mpc:
@@ -15,26 +18,31 @@ sources:
           ext: gz
       - gcc:
           url: https://ftp.gnu.org/gnu/{name}/{name}-{version}/{name}-{version}.tar.{ext}
-          version: 12.1.0
-          patches:
-            - gcc-12-calloc.patch
-      - glibc: 2.35
+          version: 9.2.0
+#          patches:
+#            - gcc-12-calloc.patch
+      - glibc: 2.29
       - ncurses:
           version: 6.3
           ext: gz
       - bash:
-          version: 5.1.16
+          version: 5.0
           ext: gz
-      - bison: 3.8.2
+      - bison: 3.4.1
       - coreutils: 9.1
-      - diffutils: 3.8
-      - findutils: 4.9.0
-      - gawk: 5.1.1
+      - diffutils: 3.7
+      - findutils: 4.8.0
+      - gawk: 5.1.0
       - gettext: 0.21
-      - grep: 3.7
-      - gzip: 1.12
+      - grep: 3.6
+      - gzip: "1.10"
       - make:
-          version: 4.3
+          version: 4.2.1
+          patches:
+            - make-4.2.1-perl526.patch
+            - make-4.2.1-glob-v2.patch
+            - make-4.2.1-glob-internals.patch
+            - make-4.2.1-pselect-non-blocking.patch
           ext: gz
       - m4:
           version: 1.4.19
@@ -42,38 +50,35 @@ sources:
       - sed: 4.8
       - tar: 1.34
       - texinfo:
-          version: 6.8
-          patches:
-            - texinfo-6.8-glibc-2.34-compat.patch
-      - nano: 6.2
+          version: 6.7
+#          patches:
+#            - texinfo-6.8-glibc-2.34-compat.patch
+      - nano: 6.3
       - wget:
           version: 1.21.3
           ext: gz
   non-gnu:
     packages:
       - linux:
-          version: 5.17.4
-          url: https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-{version}.tar.xz
+          version: 4.19
+          url: https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-{version}.tar.xz
       - git:
           version: 2.36.1
           url: https://cdn.kernel.org/pub/software/scm/git/git-{version}.tar.xz
       - musl:
           version: 1.2.3
           url: https://musl.libc.org/releases/musl-{version}.tar.gz
-      - isl:
-          version: 0.24
-          url: https://libisl.sourceforge.io/isl-{version}.tar.bz2
       - zlib:
           version: 1.2.12
           url: https://zlib.net/zlib-{version}.tar.gz
       - perl:
-          version: 5.34.1
+          version: 5.32.0
           url: https://www.cpan.org/src/5.0/perl-{version}.tar.gz
       - bzip2:
           version: 1.0.8
           url: https://www.sourceware.org/pub/bzip2/bzip2-{version}.tar.gz
       - check:
-          version: 0.15.2
+          version: 0.12.0
           url: https://github.com/libcheck/check/releases/download/{version}/check-{version}.tar.gz
       - file:
           version: 5.41
@@ -82,10 +87,10 @@ sources:
           version: 3.2.4
           url: https://download.samba.org/pub/rsync/src/rsync-{version}.tar.gz
       - util-linux:
-          version: 2.38
-          url: https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.38/util-linux-{version}.tar.gz
+          version: 2.36.2
+          url: https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-{version}.tar.gz
       - xz-utils:
-          version: 5.2.5
+          version: 5.2.4
           url: https://tukaani.org/xz/xz-{version}.tar.gz
           srcdir: xz-{version}
       - zstd:
@@ -95,26 +100,26 @@ sources:
           version: 2.21
           url: https://carlowood.github.io/which/which-{version}.tar.gz
       - python:
-          version: 3.10.4
+          version: 3.7.10
           url: https://www.python.org/ftp/python/{version}/Python-{version}.tar.xz
           srcdir: Python-{version}
       - cmake:
-          version: 3.23.1
+          version: 3.19.7
           url: https://github.com/Kitware/CMake/releases/download/v{version}/cmake-{version}.tar.gz
       - libffi:
-          version: 3.4.2
+          version: 3.3-rc0
           url: https://github.com/libffi/libffi/releases/download/v{version}/libffi-{version}.tar.gz
       - curl:
           version: 7.83.1
           url: https://github.com/curl/curl/releases/download/curl-7_83_1/curl-{version}.tar.bz2
       - openssl:
-          version: 3.0.2
+          version: 1.1.1n
           url: https://www.openssl.org/source/openssl-{version}.tar.gz
       - pax-utils:
-          version: 1.3.4
+          version: 1.2.4
           url: https://gitweb.gentoo.org/proj/pax-utils.git/snapshot/pax-utils-{version}.tar.bz2
       - sandbox:
-          version: 3.1
+          version: 2.24
           url: https://gitweb.gentoo.org/proj/sandbox.git/snapshot/sandbox-{version}.tar.bz2
       - portage:
           version: 3.0.30

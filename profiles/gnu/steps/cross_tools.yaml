@@ -28,6 +28,8 @@ cross_tools:
           --target=${CLFS_TARGET} \
           --with-sysroot=${CLFS} \
           --with-lib-path=${CLFS}/tools/lib \
+          --enable-gold=yes \
+          --enable-ld=default \
           --disable-nls \
           --disable-static \
           --enable-64-bit-bfd \
@@ -71,7 +73,6 @@ cross_tools:
           --host=${CLFS_HOST} \
           --target=${CLFS_TARGET} \
           --with-sysroot=${CLFS} \
-          --with-local-prefix=${CLFS}/tools \
           --with-native-system-header-dir=/tools/include \
           --disable-shared \
           --without-headers \
@@ -129,7 +130,6 @@ cross_tools:
           --target=${CLFS_TARGET} \
           --host=${CLFS_HOST} \
           --with-sysroot=${CLFS} \
-          --with-local-prefix=${CLFS}/tools \
           --with-native-system-header-dir=/tools/include \
           --with-lib-path=${CLFS}/tools/lib \
           --disable-nls \
