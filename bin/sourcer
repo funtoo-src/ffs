@@ -11,6 +11,7 @@ if os.path.exists(gitpath):
 from ffs.common import Sourcer
 
 CLI_CONFIG = {
+	"build": {"positional": True},
 	"action": {"positional": True},
 	"sources": {"positional": True, "nargs": "?"}
 }
@@ -32,8 +33,8 @@ if __name__ == "__main__":
 	if "CLFS" not in os.environ:
 		print("CLFS not found in environment; using current working directory.")
 		os.environ["CLFS"] = os.getcwd()
-	sourcer = Sourcer(os.environ["CLFS"])
 	args = parse_args()
+	sourcer = Sourcer(args.build, os.environ["CLFS"])
 	if args.action == "unpack":
 		sources = args.sources.split(",")
 		sourcer.unpack(sources)

@@ -12,9 +12,10 @@ class Sourcer:
 
 	sources = {}
 
-	def __init__(self, clfs_path):
+	def __init__(self, build, clfs_path):
 		self.clfs_path = clfs_path
-		infile = os.path.join(clfs_path, "sources.yaml")
+		self.build = build
+		infile = os.path.join(clfs_path, "profiles", build, "sources.yaml")
 		os.makedirs(os.path.join(clfs_path, "sources"), exist_ok=True)
 		with open(infile, "r") as myf:
 			for top_name, src_cats in safe_load(myf.read()).items():
