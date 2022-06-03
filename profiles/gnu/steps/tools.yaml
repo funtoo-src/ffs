@@ -83,6 +83,7 @@ tools:
         --with-system-zlib \
         --enable-threads
         make
+        make DESTDIR=${CLFS} install-bfd
         make DESTDIR=${CLFS} install
         install -d ${CLFS}/var/db/pkg/sys-devel/binutils-${BINUTILS_VERSION}
     - gcc: |
