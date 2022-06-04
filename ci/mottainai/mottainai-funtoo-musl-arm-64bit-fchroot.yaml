@@ -5,7 +5,7 @@ script:
 - sleep 5
 - >-
   ego sync && emerge --jobs pyyaml jinja patchelf
-- bin/sourcer fetch
+- bin/sourcer musl fetch
 - bin/builder musl arm-64bit cross_tools
 - bin/builder musl arm-64bit tools
 - bin/builder musl arm-64bit fchroot

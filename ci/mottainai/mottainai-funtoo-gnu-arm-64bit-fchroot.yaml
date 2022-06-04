@@ -1,14 +1,14 @@
-name: "ffs/funtoo/powerpc-64bit/fchroot"
+name: "ffs/funtoo/gnu/arm-64bit/fchroot"
 artefact_path: sources
 namespace: ffs-sources
 script:
 - sleep 5
 - >-
   ego sync && emerge --jobs pyyaml jinja patchelf
-- bin/sourcer musl fetch
-- bin/builder musl powerpc-64bit cross_tools
-- bin/builder musl powerpc-64bit tools
-- bin/builder musl powerpc-64bit fchroot
+- bin/sourcer gnu fetch
+- bin/builder gnu arm-64bit cross_tools
+- bin/builder gnu arm-64bit tools
+- bin/builder gnu arm-64bit fchroot
 environment:
 - SHELL=/bin/bash
 - LUET_NOLOCK=true

@@ -6,7 +6,7 @@ set -o pipefail
 set -u
 set +h
 set -x
-bin/sourcer fetch
+bin/sourcer $ffs_build fetch
 bin/builder $ffs_build $ffs_arch cross_tools
 bin/builder $ffs_build $ffs_arch tools
 bin/builder $ffs_build $ffs_arch fchroot

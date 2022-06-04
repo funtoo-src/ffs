@@ -4,7 +4,7 @@ namespace: ffs-sources
 script:
 - >-
   apt-get update && apt-get -y install python3-yaml python3-jinja2 wget xz-utils make gcc g++ rsync texinfo file m4 bzip2 patch
-- bin/sourcer fetch
+- bin/sourcer musl fetch
 - bin/builder musl powerpc-64bit cross_tools
 - bin/builder musl powerpc-64bit tools
 environment:
