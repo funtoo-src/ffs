@@ -19,7 +19,7 @@ fchroot:
         ego sync
     - none: |
         export PYTHON_ABIS="$(portageq envvar PYTHON_ABIS)"
-        export FEATURES="$FEATURES nodoc noman noinfo"
+        export FEATURES="-pid-sandbox nodoc noman noinfo"
         export ROOT=/tmp/stage1root
         # create symlink to real meta-repo to allow ego to pick up profiles inside ROOT...
         install -m 0755 -o 250 -g 250 -d $ROOT/var/git
