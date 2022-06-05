@@ -26,6 +26,18 @@ cross_tools:
     - linux: |
         make mrproper
         make ARCH={{arch}} INSTALL_HDR_PATH=${CLFS}/tools headers_install
+    - automake: |
+        ./configure \
+          --prefix=${CLFS}/cross-tools
+        make
+        make install
+    - pkgconf: |
+        ./configure \
+          --prefix=${CLFS}/cross-tools
+          make
+          make install
+          ln -s pkgconf ${CLFS}/cross-tools/bin/pkg-config
+
     - binutils: |
         mkdir binutils-build && cd binutils-build
         AR=ar AS=as ../configure \
