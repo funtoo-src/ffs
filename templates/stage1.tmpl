@@ -6,6 +6,8 @@ else
 	sudo_exe=""
 fi
 exec $sudo_exe fchroot ${CLFS} /bin/bash --login << "EOF"
+# CLFS is still needed for sources unpacking:
+export CLFS=/
 set -e
 set -o pipefail
 set -u
