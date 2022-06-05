@@ -1,0 +1,24 @@
+#!/bin/bash
+if [ "$UID" != "0" ]; then
+	# if not root, expect sudo to grant us access to fchroot:
+	sudo_exe=sudo
+else
+	sudo_exe=""
+fi
+exec $sudo_exe fchroot ${CLFS} /bin/bash --login << "EOF"
+set -e
+set -o pipefail
+set -u
+set +h
+set -x
+umask 022
+export GIT_SSL_NO_VERIFY=true
+rm -rf /build/*
+{{unpack}}
+export LC_ALL=POSIX
+export MAKEOPTS="-j$(nproc) -l$(nproc)"
+unset CFLAGS CXXFLAGS
+{% block env %}{% endblock %}
+{{build_steps}}
+sleep 0.01
+EOF

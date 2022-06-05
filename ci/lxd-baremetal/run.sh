@@ -10,4 +10,4 @@ bin/sourcer $ffs_build fetch
 bin/builder $ffs_build $ffs_arch cross_tools
 bin/builder $ffs_build $ffs_arch tools
 bin/builder $ffs_build $ffs_arch fchroot
-
+bin/builder $ffs_build $ffs_arch stage1

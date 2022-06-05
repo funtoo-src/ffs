@@ -122,19 +122,4 @@ fchroot:
         core-kit:funtoo/1.0/linux-gnu/flavor/core
         MKP_EOF
         install -d /var/db/pkg/sys-apps/portage-${PORTAGE_VERSION}
-    - ego: |
-        export GIT_SSL_NO_VERIFY=true
-        install -d /usr/share/ego
-        cp -r modules* python /usr/share/ego/
-        rm /usr/share/ego/modules*/upgrade*
-        rm -rf /usr/share/ego/python/test
-        chmod +x /usr/share/ego/modules/*.ego
-        cp ego /tools/bin/
-        ln -sf ego /tools/bin/epro
-        ln -sf ego /tools/bin/edoc
-        cat > /etc/ego.conf << "EGO_EOF"
-        [global]
-        release = 1.4
-        EGO_EOF
-        install -d /var/db/pkg/app-admin/ego-${EGO_VERSION}
-        ego sync
+
