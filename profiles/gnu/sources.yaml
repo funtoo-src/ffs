@@ -5,7 +5,7 @@ sources:
       ext: xz
     packages:
       - autoconf: 2.69
-      - automake: 1.16.1
+      - automake: 1.15.1
       - libtool: 2.4.6
       - binutils:
           version: 2.36.1
@@ -19,8 +19,6 @@ sources:
       - gcc:
           url: https://ftp.gnu.org/gnu/{name}/{name}-{version}/{name}-{version}.tar.{ext}
           version: 9.2.0
-#          patches:
-#            - gcc-12-calloc.patch
       - glibc: 2.29
       - ncurses:
           version: 6.3
@@ -49,10 +47,7 @@ sources:
       - patch: 2.7.6
       - sed: 4.8
       - tar: 1.34
-      - texinfo:
-          version: 6.7
-#          patches:
-#            - texinfo-6.8-glibc-2.34-compat.patch
+      - texinfo: 6.7
       - nano: 6.3
       - wget:
           version: 1.21.3
@@ -99,6 +94,9 @@ sources:
       - which:
           version: 2.21
           url: https://carlowood.github.io/which/which-{version}.tar.gz
+      - pkgconf:
+          version: 1.5.4
+          url: https://distfiles.dereferenced.org/pkgconf/pkgconf-{version}.tar.xz
       - python:
           version: 3.7.10
           url: https://www.python.org/ftp/python/{version}/Python-{version}.tar.xz
