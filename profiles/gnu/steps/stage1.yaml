@@ -25,9 +25,12 @@ fchroot:
         install -m 0755 -o 250 -g 250 -d $ROOT/var/git
         ln -s /var/git/meta-repo $ROOT/var/git/meta-repo
         ego profile mix-in +stage1
+        # fix a circular dep
+        install -d /var/db/pkg/sys-apps/openrc-9999
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
-        emerge --nodeps --noreplace --oneshot \
+        emerge --noreplace --oneshot \
+          --rebuild-exclude="sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" \
           app-arch/bzip2 \
           app-arch/gzip \
           app-arch/tar \
