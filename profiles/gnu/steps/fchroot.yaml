@@ -74,6 +74,20 @@ fchroot:
         --without-ensurepip
         make
         make install
+        install -d /usr/lib/python-exec/python${PYTHON_VERSION%.*}
+        ln -sf python${PYTHON_VERSION%.*}m /tools/bin/python${PYTHON_VERSION%.*}
+        ln -sf python${PYTHON_VERSION%.*}m-config /tools/bin/python${PYTHON_VERSION%.*}-config
+        ln -sf /tools/bin/python${PYTHON_VERSION%.*}m /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python${PYTHON_VERSION%%.*}
+        ln -sf python${PYTHON_VERSION%%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python
+        cat > /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python${PYTHON_VERSION%%.*}-config << "PYTHON_EOF"
+        #!/bin/sh
+        exec "python${PYTHON_VERSION%%.*}-config" "\${@}"
+        PYTHON_EOF
+        chmod +x /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python${PYTHON_VERSION%%.*}-config
+        ln -sf python${PYTHON_VERSION%%.*}-config /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python-config
+        ln -sf /tools/bin/2to3-${PYTHON_VERSION%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/2to3
+        ln -sf /tools/bin/pydoc${PYTHON_VERSION%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/pydoc
+        ln -sf /tools/bin/pyvenv-${PYTHON_VERSION%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/pyvenv
         install -d /var/db/pkg/dev-lang/python-${PYTHON_VERSION}
     - git: |
         ./configure --prefix=/tools
