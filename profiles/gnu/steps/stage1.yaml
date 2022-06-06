@@ -27,7 +27,7 @@ fchroot:
         ego profile mix-in +stage1
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
-        emerge --noreplace --oneshot \
+        emerge --nodeps --noreplace --oneshot \
           app-arch/bzip2 \
           app-arch/gzip \
           app-arch/tar \
