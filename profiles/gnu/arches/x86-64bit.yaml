@@ -1,0 +1,7 @@
+arch:
+  cflags: ''
+  arch: amd64
+  gnu_arch: x86_64
+  target: x86_64-unknown-linux-gnu
+  ego_arch: x86-64bit
+  ego_subarch: generic_64
