@@ -61,15 +61,17 @@ if [ -n "$EMERGE_PACKAGES" ]; then
 fi
 
 # pack up current git repo and any local changes, push into container:
-
-rm -rf /var/tmp/ffs-repo /var/tmp/ffs-repo.tar.gz /var/tmp/ffs.patch
+install -m 0777 -d /var/tmp/ffs
+export tmp_path=/var/tmp/ffs/$$
+install -m 0755 -d $tmp_path
+rm -rf $tmp_path/ffs-repo $tmp_path/ffs-repo.tar.gz $tmp_path/ffs.patch
 # grab all local changes and all uncommitted (staged) files:
 ( cd $REPOPATH; git diff HEAD > /var/tmp/ffs.patch )
 
 ( cd /var/tmp; git clone $REPOPATH /var/tmp/ffs-repo )
 
 # pass local calling parameters to inside of container:
-cat > /var/tmp/ffs-repo/env.sh << EOF
+cat > $tmp_path/ffs-repo/env.sh << EOF
 export ffs_arch=$ffs_arch
 export ffs_build=$ffs_build
 EOF
