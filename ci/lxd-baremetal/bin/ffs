@@ -36,8 +36,25 @@ network_test() {
 	fi
 }
 export LXD_LAUNCH_EXTRA_ARGS="-p default -n lxdbr0"
-echo Running lxc launch $SOURCE_IMAGE $CNAME $LXD_LAUNCH_EXTRA_ARGS...
-lxc launch $SOURCE_IMAGE $CNAME $LXD_LAUNCH_EXTRA_ARGS || die "launch fail"
+cur_step=""
+create="$SOURCE_IMAGE"
+for step in fchroot tools cross_tools; do
+	if [ -n "$(lxc image list -cl -f csv | grep $CNAME-$step)" ]; then
+		echo -n "A snapshot image exists for step $step:"
+		echo
+		lxc image list $CNAME-$step
+		echo
+		echo -n  "Would you like to resume from this point? Y/n: > "
+		read resume
+		if [ "$resume" = "Y" ] || [ "$resume" = "y" ] || [ -z "$resume" ]; then
+			create=$CNAME-$step
+			cur_step=$step
+		fi
+	fi
+done
+
+echo Running lxc launch $create $CNAME $LXD_LAUNCH_EXTRA_ARGS...
+lxc launch $create $CNAME $LXD_LAUNCH_EXTRA_ARGS || die "launch fail"
 lxc exec $CNAME -- sh -c "cat > /etc/conf.d/netif.${LXD_INTERFACE}" << EOF
 template="dhcpcd"
 EOF
@@ -85,11 +102,34 @@ lxc exec $CNAME chmod -f 644 /var/tmp/ffs-repo.tar.gz
 lxc exec $CNAME chmod -f 644 /var/tmp/ffs.patch
 # unpack repo --
 lxc exec $CNAME -- tar xvf /var/tmp/ffs-repo.tar.gz || die "unpack fail"
-lxc exec $CNAME -- /root/ffs-repo/ci/lxd-baremetal/run.sh
-if [ $? -ne 0 ]; then
-	echo "Test failure."
-	exit 1
+if [ "$ffs_build" == "gnu" ]; then
+	last_step="stage1"
 else
-	echo "Test PASS."
-	exit 0
+	last_step="fchroot"
 fi
+if [ -z "$cur_step" ]; then
+	do_steps="cross_tools tools fchroot stage1"
+elif [ "$cur_step" = "cross_tools" ]; then
+	do_steps="tools fchroot stage1"
+elif [ "$cur_step" = "fchroot" ]; then
+	do_steps="stage1"
+fi
+for step in $do_steps; do
+	lxc exec $CNAME -- /root/ffs-repo/ci/lxd-baremetal/run.sh $step
+	if [ $? -ne 0 ]; then
+		echo "Test failure: step $step failed."
+		exit 1
+	else
+		if [ "$step" != "$last_step" ]; then
+			echo "Creating snapshot of $CNAME for step $step..."
+			lxc snapshot --reuse $CNAME $step
+			echo "Creating image from snapshot..."
+			lxc publish $CNAME/$step --alias $CNAME-$step
+		fi
+	fi
+	if [ "$step" == "$last_step" ]; then
+		break
+	fi
+done
+echo "Test PASS."
+exit 0
