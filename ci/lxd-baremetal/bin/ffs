@@ -66,9 +66,9 @@ export tmp_path=/var/tmp/ffs/$$
 install -m 0755 -d $tmp_path
 rm -rf $tmp_path/ffs-repo $tmp_path/ffs-repo.tar.gz $tmp_path/ffs.patch
 # grab all local changes and all uncommitted (staged) files:
-( cd $REPOPATH; git diff HEAD > /var/tmp/ffs.patch )
+( cd $REPOPATH; git diff HEAD > $tmp_path/ffs.patch )
 
-( cd /var/tmp; git clone $REPOPATH /var/tmp/ffs-repo )
+( cd $tmp_path; git clone $REPOPATH $tmp_path/ffs-repo )
 
 # pass local calling parameters to inside of container:
 cat > $tmp_path/ffs-repo/env.sh << EOF
@@ -76,12 +76,13 @@ export ffs_arch=$ffs_arch
 export ffs_build=$ffs_build
 EOF
 
-if [ -e /var/tmp/ffs.patch ]; then
-	( cd /var/tmp/ffs-repo; cat /var/tmp/ffs.patch | patch -p1 )
+if [ -e $tmp_path/ffs.patch ]; then
+	( cd $tmp_path/ffs-repo; cat $tmp_path/ffs.patch | patch -p1 )
 fi
-tar czvf /var/tmp/ffs-repo.tar.gz -C /var/tmp ffs-repo || die
-lxc file push /var/tmp/ffs-repo.tar.gz $CNAME/var/tmp/ || die "no pushy"
-
+tar czvf $tmp_path/ffs-repo.tar.gz -C $tmp_path ffs-repo || die
+lxc file push $tmp_path/ffs-repo.tar.gz $CNAME/var/tmp/ || die "no pushy"
+lxc exec $CNAME chmod -f 644 /var/tmp/ffs-repo.tar.gz
+lxc exec $CNAME chmod -f 644 /var/tmp/ffs.patch
 # unpack repo --
 lxc exec $CNAME -- tar xvf /var/tmp/ffs-repo.tar.gz || die "unpack fail"
 lxc exec $CNAME -- /root/ffs-repo/ci/lxd-baremetal/run.sh
