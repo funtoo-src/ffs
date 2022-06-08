@@ -6,38 +6,51 @@ fchroot:
         make mrproper
         make INSTALL_HDR_PATH=/usr headers_install
         install -d /var/db/pkg/sys-kernel/linux-headers-${LINUX_VERSION}
+    - pkgconf: |
+        ./configure \
+        --prefix=/usr
+        make
+        make install
+        ln -sf pkgconf /usr/bin/pkg-config
+        install -d /var/db/pkg/dev-util/pkgconf-${PKGCONF_VERSION}
     - perl: |
-        ln -sf ../tools/bin/pwd /bin
         sh Configure -des \
           -Dcc=gcc \
-          -Dprefix=/tools
+          -Dprefix=/usr \
+          -Dsiteprefix=/usr/local \
+          -Dvendorprefix=/usr \
+          -Dscriptdir=/usr/bin \
+          -Dprivlib=/usr/lib/perl5/${PERL_VERSION} \
+          -Dsitelib=/usr/local/lib/perl5/${PERL_VERSION} \
+          -Dvendorlib=/usr/lib/perl5/vendor_perl/${PERL_VERSION} \
+          -Dlocincpth=/usr/include \
+          -Dglibpth="/lib /usr/lib" \
+          -Dmyhostname='localhost'
         make
         make install
         install -d /var/db/pkg/dev-lang/perl-${PERL_VERSION}
     - autoconf: |
         ./configure \
-        --prefix=/tools
+        --prefix=/usr
         make
         make install
         install -d /var/db/pkg/sys-devel/autoconf-${AUTOCONF_VERSION}
     - automake: |
         ./configure \
-        --prefix=/tools
+        --prefix=/usr
         make
         make install
         install -d /var/db/pkg/sys-devel/automake-${AUTOMAKE_VERSION}
     - libtool: |
         ./configure \
-        --prefix=/tools
+        --prefix=/usr \
+        --disable-ltdl-install
         make
         make install
         install -d /var/db/pkg/sys-devel/libtool-${LIBTOOL_VERSION}
     - openssl: |
-        install -d /usr/bin
-        ln -sf ../../tools/bin/env /usr/bin
-        ./config --prefix=/tools \
+        ./config --prefix=/usr \
         --openssldir=/etc/ssl \
-        --libdir=lib \
         shared \
         zlib-dynamic
         make
@@ -45,16 +58,20 @@ fchroot:
         install -d /var/db/pkg/dev-libs/openssl-${OPENSSL_VERSION}
     - wget: |
         ./configure \
-        --prefix=/tools \
-        --sysconfdir=/etc \
-        --with-ssl=openssl \
-        --with-libssl-prefix=/tools
+        ac_cv_libunistring=no \
+        --prefix=/usr \
+        --disable-assert \
+        --disable-pcre \
+        --disable-rpath \
+        --without-included-libunistring \
+        --without-libunistring-prefix \
+        --with-ssl=openssl
         make
         make install
         install -d /var/db/pkg/net-misc/wget-${WGET_VERSION}
     - curl: |
         ./configure \
-        --prefix=/tools \
+        --prefix=/usr \
         --with-openssl \
         --disable-static
         make
@@ -62,22 +79,27 @@ fchroot:
         install -d /var/db/pkg/net-misc/curl-${CURL_VERSION}
     - libffi: |
         ./configure \
-        --prefix=/tools \
+        --prefix=/usr \
+        --includedir=/usr/lib/libffi-${LIBFFI_VERSION/-/_}/include \
+        --disable-multi-os-directory \
         --disable-static
         make
         make install
         install -d /var/db/pkg/dev-libs/libffi-${LIBFFI_VERSION/-/_}
     - python: |
         ./configure \
-        --prefix=/tools \
+        --prefix=/usr \
         --enable-shared \
+        --infodir=/usr/share/info \
+        --mandir=/usr/share/man \
+        --with-computed-gotos \
+        --with-libc= \
+        --enable-loadable-sqlite-extensions \
         --without-ensurepip
         make
         make install
         install -d /usr/lib/python-exec/python${PYTHON_VERSION%.*}
-        ln -sf python${PYTHON_VERSION%.*}m /tools/bin/python${PYTHON_VERSION%.*}
-        ln -sf python${PYTHON_VERSION%.*}m-config /tools/bin/python${PYTHON_VERSION%.*}-config
-        ln -sf /tools/bin/python${PYTHON_VERSION%.*}m /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python${PYTHON_VERSION%%.*}
+        ln -sf /usr/bin/python${PYTHON_VERSION%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python${PYTHON_VERSION%%.*}
         ln -sf python${PYTHON_VERSION%%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python
         cat > /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python${PYTHON_VERSION%%.*}-config << "PYTHON_EOF"
         #!/bin/sh
@@ -90,7 +112,9 @@ fchroot:
         ln -sf /tools/bin/pyvenv-${PYTHON_VERSION%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/pyvenv
         install -d /var/db/pkg/dev-lang/python-${PYTHON_VERSION}
     - git: |
-        ./configure --prefix=/tools
+        ./configure \
+        --prefix=/usr \
+        --sysconfdir=/etc
         make
         make install
         install -d /var/db/pkg/dev-vcs/git-${GIT_VERSION}
@@ -102,15 +126,14 @@ fchroot:
     - sandbox: |
         autoreconf -i -f
         ./configure \
-        --prefix=/tools
+        --prefix=/usr
         make
         make install
-        ln -fs ../../tools/bin/sandbox /usr/bin/sandbox
         install -d /var/db/pkg/sys-apps/sandbox-${SANDBOX_VERSION}
     - none: |
         cat > /etc/passwd << "PASSWD_EOF"
         root:x:0:0:root:/root:/bin/bash
-        portage:x:250:250:portage:/var/tmp/portage:/tools/bin/false
+        portage:x:250:250:portage:/var/tmp/portage:/bin/false
         PASSWD_EOF
         cat > /etc/group << "GROUP_EOF"
         root:x:0:root
@@ -123,7 +146,6 @@ fchroot:
         install -d /etc/portage
         cat > /etc/portage/make.conf << "MKCF_EOF"
         FEATURES="-pid-sandbox"
-        ROOTPATH="/tools/sbin:/tools/bin"
         FETCHCOMMAND="wget --no-check-certificate -t 3 -T 60 --passive-ftp -O \"\${DISTDIR}/\${FILE}\" \"\${URI}\""
         RESUMECOMMAND="wget --no-check-certificate -c -t 3 -T 60 --passive-ftp -O \"\${DISTDIR}/\${FILE}\" \"\${URI}\""
         MKCF_EOF

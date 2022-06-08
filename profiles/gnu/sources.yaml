@@ -18,13 +18,13 @@ sources:
           ext: gz
       - gcc:
           url: https://ftp.gnu.org/gnu/{name}/{name}-{version}/{name}-{version}.tar.{ext}
-          version: 9.2.0
-      - glibc: 2.29
+          version: 11.2.0
+      - glibc: 2.33
       - ncurses:
           version: 6.3
           ext: gz
       - bash:
-          version: 5.0
+          version: 5.1.16
           ext: gz
       - bison: 3.4.1
       - coreutils: 9.1
@@ -82,10 +82,10 @@ sources:
           version: 3.2.4
           url: https://download.samba.org/pub/rsync/src/rsync-{version}.tar.gz
       - util-linux:
-          version: 2.36.2
-          url: https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-{version}.tar.gz
+          version: 2.38
+          url: https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.38/util-linux-{version}.tar.gz
       - xz-utils:
-          version: 5.2.4
+          version: 5.2.5
           url: https://tukaani.org/xz/xz-{version}.tar.gz
           srcdir: xz-{version}
       - zstd:
@@ -98,7 +98,7 @@ sources:
           version: 1.5.4
           url: https://distfiles.dereferenced.org/pkgconf/pkgconf-{version}.tar.xz
       - python:
-          version: 3.7.10
+          version: 3.9.13
           url: https://www.python.org/ftp/python/{version}/Python-{version}.tar.xz
           srcdir: Python-{version}
       - cmake:

@@ -8,12 +8,12 @@ fchroot:
         rm /usr/share/ego/modules*/upgrade*
         rm -rf /usr/share/ego/python/test
         chmod +x /usr/share/ego/modules/*.ego
-        cp ego /tools/bin/
-        ln -sf ego /tools/bin/epro
-        ln -sf ego /tools/bin/edoc
+        cp ego /usr/bin/
+        ln -sf ego /usr/bin/epro
+        ln -sf ego /usr/bin/edoc
         cat > /etc/ego.conf << "EGO_EOF"
         [global]
-        release = 1.4
+        release = next
         EGO_EOF
         install -d /var/db/pkg/app-admin/ego-${EGO_VERSION}
         ego sync
@@ -23,11 +23,15 @@ fchroot:
         export ROOT=/tmp/stage1root
         # create symlink to real meta-repo to allow ego to pick up profiles inside ROOT...
         install -m 0755 -o 250 -g 250 -d $ROOT/var/git
+        install -d ${ROOT}/etc
         ln -sf /var/git/meta-repo $ROOT/var/git/
         ln -sf /etc/portage ${ROOT}/etc/
         ego profile mix-in +stage1
         # fix a circular dep
         install -d /var/db/pkg/sys-apps/openrc-9999
+        # fix a required USE flag
+        install -d /etc/portage/package.use
+        echo "dev-libs/libxml2 python" > /etc/portage/package.use/libxml2
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
         emerge --noreplace --oneshot \
