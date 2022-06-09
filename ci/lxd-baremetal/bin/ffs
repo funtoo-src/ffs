@@ -91,7 +91,6 @@ rm -rf $tmp_path/ffs-repo $tmp_path/ffs-repo.tar.gz $tmp_path/ffs.patch
 cat > $tmp_path/ffs-repo/env.sh << EOF
 export ffs_arch=$ffs_arch
 export ffs_build=$ffs_build
-export step=$step
 EOF
 
 if [ -e $tmp_path/ffs.patch ]; then

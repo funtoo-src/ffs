@@ -34,7 +34,7 @@ fchroot:
         echo "dev-libs/libxml2 python" > /etc/portage/package.use/libxml2
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
-        emerge --noreplace --oneshot \
+        emerge -u --noreplace --oneshot \
           --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" \
           app-arch/bzip2 \
           app-arch/gzip \
