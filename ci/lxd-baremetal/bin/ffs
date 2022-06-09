@@ -49,6 +49,7 @@ for step in fchroot tools cross_tools; do
 		if [ "$resume" = "Y" ] || [ "$resume" = "y" ] || [ -z "$resume" ]; then
 			create=$CNAME-$step
 			cur_step=$step
+			break
 		fi
 	fi
 done
