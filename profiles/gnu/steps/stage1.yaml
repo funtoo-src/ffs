@@ -46,7 +46,6 @@ fchroot:
           sys-devel/autoconf \
           sys-devel/automake \
           sys-devel/libtool \
-          sys-apps/baselayout \
           sys-apps/coreutils \
           sys-apps/diffutils \
           sys-apps/file \
