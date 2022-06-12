@@ -92,7 +92,7 @@ fchroot:
         export BOOTSTRAP_RAP=yes
         emerge -u --noreplace --oneshot --onlydeps --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
 
-        attempts=0
+        attempts=1
         success=0
         while [ "$attempts" -lt 4 ]; do
           for pkg in $TO_BUILD; do
@@ -104,14 +104,16 @@ fchroot:
             emerge -u --noreplace --oneshot --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $pkg
             if [ $? -eq 0 ]; then
               success=1
+              break
             fi
-            attempts=$(( $attempts + 1 ))
           done
           if [ "$success" -eq 1 ]; then
             echo "BUILD SUCCESS AFTER $attempts ATTEMPTS"
             break
           fi
+          attempts=$(( $attempts + 1 ))
         done
+        echo "BUILD SCRIPT COMPLETE"
         exit $success
         EOF
         chmod +x /var/tmp/build.sh
