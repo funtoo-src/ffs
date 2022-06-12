@@ -43,77 +43,77 @@ fchroot:
         echo "dev-libs/libxml2 python" > /etc/portage/package.use/libxml2
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
-cat > /var/tmp/build.sh << 'EOF'
-#!/bin/bash
+        cat > /var/tmp/build.sh << 'EOF'
+        #!/bin/bash
 
-# We put this in a separate file so we can have different error handling. Main script aborts on any
-# failed command.
+        # We put this in a separate file so we can have different error handling. Main script aborts on any
+        # failed command.
 
-TO_BUILD="
-  app-arch/bzip2
-  app-arch/gzip
-  app-arch/tar
-  app-arch/xz-utils
-  app-shells/bash
-  net-misc/rsync
-  net-misc/wget
-  sys-devel/autoconf
-  sys-devel/automake
-  sys-devel/libtool
-  sys-apps/coreutils
-  sys-apps/diffutils
-  sys-apps/file
-  sys-apps/findutils
-  sys-apps/gawk
-  sys-apps/grep
-  sys-apps/less
-  sys-apps/net-tools
-  sys-apps/sed
-  sys-apps/texinfo
-  sys-devel/binutils
-  sys-devel/bison
-  sys-devel/flex
-  sys-devel/gcc
-  sys-devel/gettext
-  sys-devel/gnuconfig
-  sys-devel/make
-  sys-devel/patch
-  sys-libs/pam
-  virtual/editor
-  virtual/libc
-  virtual/os-headers
-  virtual/package-manager
-  sys-apps/openrc"
+        TO_BUILD="
+          app-arch/bzip2
+          app-arch/gzip
+          app-arch/tar
+          app-arch/xz-utils
+          app-shells/bash
+          net-misc/rsync
+          net-misc/wget
+          sys-devel/autoconf
+          sys-devel/automake
+          sys-devel/libtool
+          sys-apps/coreutils
+          sys-apps/diffutils
+          sys-apps/file
+          sys-apps/findutils
+          sys-apps/gawk
+          sys-apps/grep
+          sys-apps/less
+          sys-apps/net-tools
+          sys-apps/sed
+          sys-apps/texinfo
+          sys-devel/binutils
+          sys-devel/bison
+          sys-devel/flex
+          sys-devel/gcc
+          sys-devel/gettext
+          sys-devel/gnuconfig
+          sys-devel/make
+          sys-devel/patch
+          sys-libs/pam
+          virtual/editor
+          virtual/libc
+          virtual/os-headers
+          virtual/package-manager
+          sys-apps/openrc"
 
-ldconfig
-/usr/sbin/env-update
-source /etc/profile
+        ldconfig
+        /usr/sbin/env-update
+        source /etc/profile
 
-export BOOTSTRAP_RAP=yes
-emerge -u --noreplace --oneshot --onlydeps --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
+        export BOOTSTRAP_RAP=yes
+        emerge -u --noreplace --oneshot --onlydeps --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
 
-attempts=0
-success=0
-while [ "$attempts" -lt 4 ]; do
-  for pkg in $TO_BUILD; do
+        attempts=0
+        success=0
+        while [ "$attempts" -lt 4 ]; do
+          for pkg in $TO_BUILD; do
 
-    ldconfig
-    /usr/sbin/env-update
-    source /etc/profile
+            ldconfig
+            /usr/sbin/env-update
+            source /etc/profile
 
-    emerge -u --noreplace --oneshot --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $pkg
-    if [ $? -eq 0 ]; then
-      success=1
-    fi
-    attempts=$(( $attempts + 1 ))
-  done
-  if [ "$success" -eq 1 ]; then
-    echo "BUILD SUCCESS AFTER $attempts ATTEMPTS"
-    break
-  fi
-done
-exit $success
-EOF
+            emerge -u --noreplace --oneshot --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $pkg
+            if [ $? -eq 0 ]; then
+              success=1
+            fi
+            attempts=$(( $attempts + 1 ))
+          done
+          if [ "$success" -eq 1 ]; then
+            echo "BUILD SUCCESS AFTER $attempts ATTEMPTS"
+            break
+          fi
+        done
+        exit $success
+        EOF
         chmod +x /var/tmp/build.sh
         /var/tmp/build.sh
         gcc-config 1
