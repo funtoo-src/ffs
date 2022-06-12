@@ -89,6 +89,7 @@ ldconfig
 /usr/sbin/env-update
 source /etc/profile
 
+export BOOTSTRAP_RAP=yes
 emerge -u --noreplace --oneshot --onlydeps --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
 
 attempts=0
