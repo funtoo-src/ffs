@@ -43,7 +43,7 @@ fchroot:
         echo "dev-libs/libxml2 python" > /etc/portage/package.use/libxml2
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
-        cat > /var/tmp/build.sh << 'EOF'
+        cat > /var/tmp/build.sh << 'BUILD_EOF'
         #!/bin/bash
 
         # We put this in a separate file so we can have different error handling. Main script aborts on any
@@ -92,32 +92,43 @@ fchroot:
         export BOOTSTRAP_RAP=yes
         emerge -u --noreplace --oneshot --onlydeps --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
 
-        attempts=1
+        fails=0
         success=0
-        while [ "$attempts" -lt 4 ]; do
+        catpkg_fails=0
+        catpkg_fails_list=""
+        while true; do
           for pkg in $TO_BUILD; do
 
             ldconfig
             /usr/sbin/env-update
             source /etc/profile
 
-            emerge -u --noreplace --oneshot --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $pkg
-            if [ $? -eq 0 ]; then
-              success=1
-              break
+            attempt=1
+            while [ $attempt -lt 4 ]; do
+                success=no
+                emerge -u --noreplace --oneshot --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $pkg
+                if [ $? -ne 0 ]; then
+                    fails=$(( $fails + 1 ))
+                    attempt=$(( $attempt + 1 ))
+                else
+                    success=yes
+                    break
+                fi
+            done
+            if [ "$success" == "no" ]; then
+                catpkg_fails=$(( $catpkg_fails + 1 ))
+                catpkg_fails="$catpkg_fails $pkg"
             fi
-          done
-          if [ "$success" -eq 1 ]; then
-            echo "BUILD SUCCESS AFTER $attempts ATTEMPTS"
-            break
-          fi
-          attempts=$(( $attempts + 1 ))
         done
-        echo "BUILD SCRIPT COMPLETE"
-        exit $success
-        EOF
+        if [ "$catpkg_fails" -eq 0 ]; then
+            echo "Build script completed successfully!"
+        else
+            echo "Build script FAIILURE."
+            echo "$catpkg_fails packages failed to merge: $catpkg_fails_list"
+        fi
+        exit $catpkg_fails
+        BUILD_EOF
         chmod +x /var/tmp/build.sh
         /var/tmp/build.sh
         gcc-config 1
         ego profile mix-in -stage1
-
