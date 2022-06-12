@@ -93,9 +93,9 @@ fchroot:
         
         attempts=0
         while [ $attempts -lt 3 ]; do
-            emerge -u --noreplace --oneshot --onlydeps --rebuild-exclude --jobs=3 "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
+            emerge -u --noreplace --oneshot --onlydeps --jobs=3 --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
             if [ $? -ne 0 ]; then
-                $attempts=$(( $attempts + 1 ))
+                attempts=$(( $attempts + 1 ))
             else
                 break
             fi
@@ -118,7 +118,7 @@ fchroot:
             attempt=1
             while [ $attempt -lt 4 ]; do
                 success=no
-                emerge -u --noreplace --oneshot --rebuild-exclude --jobs=3 "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $pkg
+                emerge -u --noreplace --oneshot --jobs=3 --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $pkg
                 if [ $? -ne 0 ]; then
                     fails=$(( $fails + 1 ))
                     attempt=$(( $attempt + 1 ))
