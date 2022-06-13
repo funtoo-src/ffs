@@ -19,8 +19,6 @@ rm -rf /build/*
 {{unpack}}
 export LC_ALL=POSIX
 export MAKEOPTS="-j$(nproc) -l$(nproc)"
-unset CFLAGS CXXFLAGS
-{% block env %}{% endblock %}
 {{build_steps}}
 sleep 0.01
 EOF
