@@ -10,12 +10,12 @@ cross_tools:
         # initial setup:
         install -d "${CLFS}/cross-tools"
         install -d "${CLFS}/lib"
-        install -d "${CLFS}/usr/lib"
+        install -d "${CLFS}/usr/lib64"
         ln -sf lib "${CLFS}/lib64"
-        ln -sf lib "${CLFS}/usr/lib64"
+        ln -sf lib64 "${CLFS}/usr/lib"
         # make sure it's a symlink
         test -L "${CLFS}/lib64"
-        test -L "${CLFS}/usr/lib64"
+        test -L "${CLFS}/usr/lib"
         # Create critical directories:
         install -d ${CLFS}/{dev,proc,run,sys,etc,var}
         install -m 1777 -d ${CLFS}/tmp ${CLFS}/var/tmp
