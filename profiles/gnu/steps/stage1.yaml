@@ -89,8 +89,11 @@ fchroot:
         /usr/sbin/env-update
         source /etc/profile
 
+        # Needed for glibc:
         export BOOTSTRAP_RAP=yes
-        
+        # Needed for zlib:
+        export CC=gcc
+
         attempts=0
         while [ $attempts -lt 3 ]; do
             emerge -u --noreplace --oneshot --onlydeps --jobs=3 --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
@@ -101,7 +104,7 @@ fchroot:
             fi
         done
         if [ $attempts -eq 3 ]; then
-            echo "Intitial deps merge failed.
+            echo "Initial deps merge failed.
             exit 1
         fi
         fails=0
@@ -133,9 +136,9 @@ fchroot:
             fi
         done
         if [ "$catpkg_fails" -eq 0 ]; then
-            echo "Build script completed successfully!"
+            echo "Build script completed successfully"
         else
-            echo "Build script FAIILURE."
+            echo "Build script FAILURE."
             echo "$catpkg_fails packages failed to merge: $catpkg_fails_list"
         fi
         exit $catpkg_fails
