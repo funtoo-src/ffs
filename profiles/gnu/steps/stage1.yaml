@@ -93,7 +93,8 @@ fchroot:
         export BOOTSTRAP_RAP=yes
 
         attempts=0
-        while [ $attempts -lt 3 ]; do
+        max_attempts=5
+        while [ $attempts -lt $max_attempts ]; do
             emerge -u --noreplace --oneshot --onlydeps --jobs=3 --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
             if [ $? -ne 0 ]; then
                 attempts=$(( $attempts + 1 ))
@@ -101,8 +102,8 @@ fchroot:
                 break
             fi
         done
-        if [ $attempts -eq 3 ]; then
-            echo "Initial deps merge failed.
+        if [ $attempts -eq $max_attempts ]; then
+            echo "Initial deps merge failed."
             exit 1
         fi
         fails=0
