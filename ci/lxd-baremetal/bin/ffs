@@ -44,12 +44,14 @@ for step in fchroot tools cross_tools; do
 		echo
 		lxc image list $CNAME-$step
 		echo
-		echo -n  "Would you like to resume from this point? Y/n: > "
+		echo -n  "Would you like to resume from this point (d=delete)? Y/n/d: > "
 		read resume
 		if [ "$resume" = "Y" ] || [ "$resume" = "y" ] || [ -z "$resume" ]; then
 			create=$CNAME-$step
 			cur_step=$step
 			break
+		elif [ "$resume" = "d" ]; then
+		  lxc image delete $CNAME-$step
 		fi
 	fi
 done
