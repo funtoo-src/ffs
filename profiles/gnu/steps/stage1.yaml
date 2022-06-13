@@ -18,6 +18,84 @@ fchroot:
         install -d /var/db/pkg/app-admin/ego-${EGO_VERSION}
         ego sync
     - none: |
+        cat > /etc/profile << 'PROFILE_EOF'
+        # This is necessary to ensure that "env-updates" run by portage don't wipe out any LDPATH setting.
+        # This causes linking problems for elfutils and rhash if it happens:
+        # /etc/profile: login shell setup
+        #
+        # That this file is used by any Bourne-shell derivative to setup the
+        # environment for login shells.
+        #
+
+        # Load environment settings from profile.env, which is created by
+        # env-update from the files in /etc/env.d
+        if [ -e /etc/profile.env ] ; then
+            . /etc/profile.env
+        fi
+
+        # You should override these in your ~/.bashrc (or equivalent) for per-user
+        # settings. For system defaults, you can add a new file in /etc/profile.d/.
+
+        export PATH=${PATH:-/usr/sbin:/usr/bin:/sbin:/bin}
+        export EDITOR=${EDITOR:-/bin/nano}
+        export PAGER=${PAGER:-/usr/bin/less}
+
+        # 077 would be more secure, but 022 is generally quite realistic
+        umask 022
+
+        unset ROOTPATH
+
+        # process *.sh files in /etc/profile.d
+        for sh in /etc/profile.d/*.sh ; do
+            [ -r "$sh" ] && . "$sh"
+        done
+        unset sh
+        if [ -n "${BASH_VERSION-}" ] ; then
+            # Newer bash ebuilds include /etc/bash/bashrc which will setup PS1
+            # including color.  We leave out color here because not all
+            # terminals support it.
+            if [ -f /etc/bash/bashrc ] ; then
+                # Bash login shells run only /etc/profile
+                # Bash non-login shells run only /etc/bash/bashrc
+                # Since we want to run /etc/bash/bashrc regardless, we source it 
+                # from here.  It is unfortunate that there is no way to do 
+                # this *after* the user's .bash_profile runs (without putting 
+                # it in the user's dot-files), but it shouldn't make any 
+                # difference.
+                . /etc/bash/bashrc
+            else
+                PS1='\u@\h \w \$ '
+            fi
+        else
+            # Setup a bland default prompt.  Since this prompt should be useable
+            # on color and non-color terminals, as well as shells that don't
+            # understand sequences such as \h, don't put anything special in it.
+            PS1="${USER:-$(whoami 2>/dev/null)}@$(uname -n 2>/dev/null) \$ "
+        fi
+        PROFILE_EOF
+
+        install -d /etc/env.d
+
+        cat > /etc/env.d/50baselayout << 'LD_EOF'
+        # /etc/env.d/50baselayout
+        PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin"
+        ROOTPATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/bin"
+        MANPATH="/usr/local/share/man:/usr/share/man"
+        INFOPATH="/usr/share/info"
+        CONFIG_PROTECT_MASK="/etc/gentoo-release"
+        LDPATH='/lib:/usr/lib:/usr/local/lib'
+        LD_EOF
+
+        cat > /etc/env.d/00basic << 'BASIC_EOF'
+        LANG="en_US.UTF-8"
+        LC_COLLATE="POSIX"
+        BASIC_EOF
+
+        source /etc/profile
+        /usr/sbin/env-update
+        test -e /etc/ld.so.conf
+        test -e /etc/ld.so.cache
+
         export PYTHON_ABIS="$(portageq envvar PYTHON_ABIS)"
         export FEATURES="-pid-sandbox nodoc noman noinfo"
         export ROOT=/tmp/stage1root
@@ -43,6 +121,7 @@ fchroot:
         echo "dev-libs/libxml2 python" > /etc/portage/package.use/libxml2
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
+
         cat > /var/tmp/build.sh << 'BUILD_EOF'
         #!/bin/bash
 
@@ -88,13 +167,8 @@ fchroot:
         attempts=0
         max_attempts=5
         while [ $attempts -lt $max_attempts ]; do
-            ldconfig
-            /usr/sbin/env-update
-            source /etc/profile
             # Needed for glibc:
             export BOOTSTRAP_RAP=yes
-            # No clue why this is not being set:
-            export LD_LIBRARY_PATH=/lib:/usr/lib
 
             emerge -u --noreplace --oneshot --onlydeps --jobs=3 --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
             if [ $? -ne 0 ]; then
@@ -114,13 +188,8 @@ fchroot:
         while true; do
           for pkg in $TO_BUILD; do
 
-            ldconfig
-            /usr/sbin/env-update
-            source /etc/profile
             # Needed for glibc:
             export BOOTSTRAP_RAP=yes
-            # No clue why this is not being set:
-            export LD_LIBRARY_PATH=/lib:/usr/lib
 
             attempt=1
             while [ $attempt -lt 4 ]; do
