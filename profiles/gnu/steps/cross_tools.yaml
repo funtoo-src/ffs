@@ -157,3 +157,12 @@ cross_tools:
         make AS_FOR_TARGET="${CLFS_TARGET}-as" \
           LD_FOR_TARGET="${CLFS_TARGET}-ld"
         make install
+    - file: |
+        # to cross-compile file, you need to have a matching native
+        # version. This is the native version. See FL-10023.
+        ./configure \
+        --prefix=${CLFS}/cross_tools \
+        --with-pic=yes
+        make
+        make install
+
