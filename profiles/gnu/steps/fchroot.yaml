@@ -188,5 +188,5 @@ fchroot:
         # fix a required USE flag
         install -d /etc/portage/package.use
         echo "dev-libs/libxml2 python" > /etc/portage/package.use/libxml2
-        emerge --oneshot python glibc
+        #emerge --oneshot python glibc
 

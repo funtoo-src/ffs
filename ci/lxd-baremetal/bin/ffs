@@ -39,19 +39,17 @@ export LXD_LAUNCH_EXTRA_ARGS="-p default -n lxdbr0"
 cur_step=""
 create="$SOURCE_IMAGE"
 for step in fchroot tools cross_tools; do
-	if [ -n "$(lxc image list -cl -f csv | grep $CNAME-$step)" ]; then
-		echo -n "A snapshot image exists for step $step:"
-		echo
-		lxc image list $CNAME-$step
+	if [ -n "$(zfs list -t snapshot -H | cut -f1 | grep containers/${CNAME}@snapshot-${step})" ]; then
+		echo -n "A snapshot exists for step $step:"
 		echo
 		echo -n  "Would you like to resume from this point (d=delete)? Y/n/d: > "
 		read resume
 		if [ "$resume" = "Y" ] || [ "$resume" = "y" ] || [ -z "$resume" ]; then
-			create=$CNAME-$step
+			create=$CNAME/$step
 			cur_step=$step
 			break
 		elif [ "$resume" = "d" ]; then
-		  lxc image delete $CNAME-$step
+		  lxc delete $CNAME/$step
 		fi
 	fi
 done
@@ -125,9 +123,7 @@ for step in $do_steps; do
 	else
 		if [ "$step" != "$last_step" ]; then
 			echo "Creating snapshot of $CNAME for step $step..."
-			lxc snapshot --reuse $CNAME $step
-			echo "Creating image from snapshot..."
-			lxc publish $CNAME/$step --alias $CNAME-$step
+			lxc snapshot --reuse $CNAME ${step}
 		fi
 	fi
 	if [ "$step" == "$last_step" ]; then
