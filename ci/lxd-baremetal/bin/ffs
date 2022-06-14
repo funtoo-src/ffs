@@ -55,6 +55,27 @@ for step in fchroot tools cross_tools; do
 		fi
 	fi
 done
+if [ "$ffs_build" == "gnu" ]; then
+	last_step="stage1"
+else
+	last_step="fchroot"
+fi
+if [ -z "$cur_step" ]; then
+	do_steps="cross_tools tools fchroot stage1"
+elif [ "$cur_step" = "cross_tools" ]; then
+	do_steps="tools fchroot stage1"
+elif [ "$cur_step" = "tools" ]; then
+	do_steps="fchroot stage1"
+elif [ "$cur_step" = "fchroot" ]; then
+	do_steps="stage1"
+fi
+if [ -z "$do_steps" ]; then
+	echo "Error -- no steps to perform!"
+	exit 1
+fi
+echo
+echo "I will perform the following steps: $do_steps (last step $last_step)"
+echo
 
 echo Running lxc launch $create $CNAME $LXD_LAUNCH_EXTRA_ARGS...
 lxc launch $create $CNAME $LXD_LAUNCH_EXTRA_ARGS || die "launch fail"
@@ -105,18 +126,6 @@ lxc exec $CNAME chmod -f 644 /var/tmp/ffs-repo.tar.gz
 lxc exec $CNAME chmod -f 644 /var/tmp/ffs.patch
 # unpack repo --
 lxc exec $CNAME -- tar xvf /var/tmp/ffs-repo.tar.gz || die "unpack fail"
-if [ "$ffs_build" == "gnu" ]; then
-	last_step="stage1"
-else
-	last_step="fchroot"
-fi
-if [ -z "$cur_step" ]; then
-	do_steps="cross_tools tools fchroot stage1"
-elif [ "$cur_step" = "cross_tools" ]; then
-	do_steps="tools fchroot stage1"
-elif [ "$cur_step" = "fchroot" ]; then
-	do_steps="stage1"
-fi
 for step in $do_steps; do
 	lxc exec $CNAME -- /root/ffs-repo/ci/lxd-baremetal/run.sh $step
 	if [ $? -ne 0 ]; then
