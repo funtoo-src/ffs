@@ -46,11 +46,9 @@ tools:
         unset CC CXX AR AS RANLIB LD STRIP
         CHOST=${CLFS_TARGET} \
         ./configure \
-        --prefix=/usr \
-        --libdir=/usr/lib
+        --prefix=/usr
         make
         make DESTDIR=${CLFS} install
-        rm -f ${CLFS}/usr/lib/lib{z,minizip}.{a,la}
         install -d ${CLFS}/var/db/pkg/sys-libs/zlib-${ZLIB_VERSION}
     - gettext: |
         ./configure \
