@@ -22,7 +22,7 @@ fchroot:
         /usr/sbin/env-update
         /sbin/ldconfig
         source /etc/profile
-
+        export CONFIG_PROTECT="-*"
         export PYTHON_ABIS="$(portageq envvar PYTHON_ABIS)"
         export FEATURES="-pid-sandbox nodoc noman noinfo"
         export ROOT=/tmp/stage1root

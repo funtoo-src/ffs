@@ -127,7 +127,7 @@ for step in $do_steps; do
 			echo "Creating snapshot of $CNAME for step $step..."
 			lxc snapshot --reuse $CNAME $step
 			echo "Creating image from snapshot..."
-			lxc publish $CNAME/$step --alias $CNAME-$step
+			lxc publish $CNAME/$step --alias $CNAME-$step --compression pigz
 		fi
 	fi
 	if [ "$step" == "$last_step" ]; then

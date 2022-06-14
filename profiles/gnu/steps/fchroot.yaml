@@ -179,6 +179,8 @@ fchroot:
         # work around an issue where split-usr is being unset.
         export USE="split-usr"
         ego profile mix-in +stage1
+        # This allows all files in /etc/ to be directly overwritten.
+        export CONFIG_PROTECT="-*"
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
         /sbin/ldconfig

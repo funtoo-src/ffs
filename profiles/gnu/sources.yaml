@@ -76,7 +76,7 @@ sources:
           version: 0.12.0
           url: https://github.com/libcheck/check/releases/download/{version}/check-{version}.tar.gz
       - file:
-          version: 5.41
+          version: 5.42
           url: http://ftp.astron.com/pub/file/file-{version}.tar.gz
       - rsync:
           version: 3.2.4
