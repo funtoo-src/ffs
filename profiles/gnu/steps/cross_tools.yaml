@@ -161,7 +161,7 @@ cross_tools:
         # to cross-compile file, you need to have a matching native
         # version. This is the native version. See FL-10023.
         ./configure \
-        --prefix=${CLFS}/cross_tools \
+        --prefix=${CLFS}/cross-tools \
         --with-pic=yes
         make
         make install
