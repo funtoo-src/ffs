@@ -38,6 +38,12 @@ fchroot:
           ( cd /usr/bin; ln -s gcc cc )
         fi
 
+        # If ncurses is built with libtinfo (i.e. USE="tinfo"), then libtinfo will exist, and bash will
+        # currently automatically link against it even if we tell it to just use ncurses (see FL-10034).
+        # So, if libtinfo is on this filesystem, then we want ncurses with USE="tinfo" on the stage1root.
+        # For now, I think I will address this by syncing with funtoo norms and ensuring ncurses is
+        # built with libtinfo disabled.
+
         # The pre-built util-linux doesn't install libmount, which is required by glib. If we don't merge 
         # util-linux officially, glib will think libmount is installed but glib meson configure will fail
         # when the lib isn't found:

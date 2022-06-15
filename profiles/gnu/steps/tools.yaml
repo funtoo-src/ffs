@@ -151,7 +151,9 @@ tools:
         --enable-widec \
         --includedir=/usr/include/ncursesw \
         --with-default-terminfo-dir=/usr/share/terminfo \
-        --with-termlib
+        --without-termlib
+        # Note: As per FL-10034, --without-termlib must match default on Funtoo, so that things
+        #       like bash don't try linking against it and then expect ncurses[tinfo] on stage1.
         make
         make DESTDIR=${CLFS} install
         install -d ${CLFS}/var/db/pkg/sys-libs/ncurses-${NCURSES_VERSION}
