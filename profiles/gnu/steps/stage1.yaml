@@ -68,12 +68,6 @@ fchroot:
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
 
-        cat > /var/tmp/build.sh << 'BUILD_EOF'
-        #!/bin/bash
-
-        # We put this in a separate file so we can have different error handling. Main script aborts on any
-        # failed command.
-
         TO_BUILD="
           app-arch/bzip2
           app-arch/gzip
@@ -110,52 +104,6 @@ fchroot:
           virtual/package-manager
           sys-apps/openrc"
 
-        attempts=0
-        max_attempts=10
-        while [ $attempts -lt $max_attempts ]; do
-            emerge -u --noreplace --oneshot --onlydeps --jobs=3 --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
-            if [ $? -ne 0 ]; then
-                attempts=$(( $attempts + 1 ))
-            else
-                break
-            fi
-        done
-        if [ $attempts -eq $max_attempts ]; then
-            echo "Initial deps merge failed."
-            exit 1
-        fi
-        fails=0
-        success=0
-        catpkg_fails=0
-        catpkg_fails_list=""
-        while true; do
-          for pkg in $TO_BUILD; do
-            attempt=1
-            while [ $attempt -lt 4 ]; do
-                success=no
-                emerge -u --noreplace --oneshot --jobs=3 --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $pkg
-                if [ $? -ne 0 ]; then
-                    fails=$(( $fails + 1 ))
-                    attempt=$(( $attempt + 1 ))
-                else
-                    success=yes
-                    break
-                fi
-            done
-            if [ "$success" == "no" ]; then
-                catpkg_fails=$(( $catpkg_fails + 1 ))
-                catpkg_fails="$catpkg_fails $pkg"
-            fi
-        done
-        if [ "$catpkg_fails" -eq 0 ]; then
-            echo "Build script completed successfully"
-        else
-            echo "Build script FAILURE."
-            echo "$catpkg_fails packages failed to merge: $catpkg_fails_list"
-        fi
-        exit $catpkg_fails
-        BUILD_EOF
-        chmod +x /var/tmp/build.sh
-        /var/tmp/build.sh
+        emerge -u --noreplace --oneshot --onlydeps --jobs=3 $TO_BUILD
         gcc-config 1
         ego profile mix-in -stage1
