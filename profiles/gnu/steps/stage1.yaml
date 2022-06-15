@@ -25,10 +25,27 @@ fchroot:
         export CONFIG_PROTECT="-*"
         export PYTHON_ABIS="$(portageq envvar PYTHON_ABIS)"
         export FEATURES="-pid-sandbox nodoc noman noinfo"
+
+        # remove to prevent binutils mistakenly linking against this, which is non-PIC and won't work.
+        rm -f /usr/lib/libiberty.a
+        emerge --jobs=3 binutils
+
+        # since we don't have gcc-config running, which manages and sets up typical symlinks that ebuilds
+        # expect to find for certain things, we need to make sure this one is created manually. Without this,
+        # rust can't link and dev-python/cryptography fails to build.
+
+        if [ ! -e /usr/bin/cc ]; then
+          ( cd /usr/bin; ln -s gcc cc )
+        fi
+
+        # The pre-built util-linux doesn't install libmount, which is required by glib. If we don't merge 
+        # util-linux officially, glib will think libmount is installed but glib meson configure will fail
+        # when the lib isn't found:
+
+        emerge --jobs=3 util-linux
+
         export ROOT=/tmp/stage1root
         rm -rf $ROOT
-        # work around an issue where split-usr is being unset.
-        export USE="split-usr"
         install -m 0755 -d $ROOT/usr/bin
         install -m 0755 -d $ROOT/bin
         # also fix a lib issue -- did I miss some steps from metro?
@@ -94,11 +111,8 @@ fchroot:
           sys-apps/openrc"
 
         attempts=0
-        max_attempts=5
+        max_attempts=10
         while [ $attempts -lt $max_attempts ]; do
-            # Needed for glibc:
-            export BOOTSTRAP_RAP=yes
-
             emerge -u --noreplace --oneshot --onlydeps --jobs=3 --rebuild-exclude "sys-apps/openrc sys-libs/glibc net-misc/curl sys-devel/gcc" $TO_BUILD
             if [ $? -ne 0 ]; then
                 attempts=$(( $attempts + 1 ))
@@ -116,10 +130,6 @@ fchroot:
         catpkg_fails_list=""
         while true; do
           for pkg in $TO_BUILD; do
-
-            # Needed for glibc:
-            export BOOTSTRAP_RAP=yes
-
             attempt=1
             while [ $attempt -lt 4 ]; do
                 success=no

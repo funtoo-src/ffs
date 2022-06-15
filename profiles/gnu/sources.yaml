@@ -7,10 +7,7 @@ sources:
       - autoconf: 2.69
       - automake: 1.15.1
       - libtool: 2.4.6
-      - binutils:
-          version: 2.36.1
-          patches:
-            - binutils-2.36.1-opcodes-rpath.patch
+      - binutils: 2.38
       - mpfr: 4.1.0
       - gmp: 6.2.1
       - mpc:

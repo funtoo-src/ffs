@@ -176,13 +176,11 @@ fchroot:
     - none: |
         export FEATURES="-pid-sandbox nodoc noman noinfo"
         export CONFIG_PROTECT="-* /etc/ego.conf"
-        # work around an issue where split-usr is being unset.
-        export USE="split-usr"
         ego profile mix-in +stage1
         # This allows all files in /etc/ to be directly overwritten.
         export CONFIG_PROTECT="-*"
-        # It's important to merge baselayout first so it can set perms on key dirs
-        emerge --nodeps baselayout
+        # This will ensure base files for env-update are in place. -build since fs already exists.
+        USE="-build" emerge --nodeps baselayout
         /sbin/ldconfig
         /usr/sbin/env-update
         test -e /etc/ld.so.conf
