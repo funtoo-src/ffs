@@ -6,16 +6,13 @@ else
 	sudo_exe=""
 fi
 exec $sudo_exe fchroot ${CLFS} /bin/bash --login << "EOF"
-# CLFS is still needed for sources unpacking:
 source /etc/profile
-export CLFS=/
 set -e
 set -o pipefail
 set -u
 set +h
 set -x
 umask 022
-export GIT_SSL_NO_VERIFY=true
 rm -rf /build/*
 {{unpack}}
 export LC_ALL=POSIX

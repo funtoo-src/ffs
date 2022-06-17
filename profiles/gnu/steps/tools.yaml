@@ -138,7 +138,7 @@ tools:
         --without-termlib
         # Note: As per FL-10034, --without-termlib must match default on Funtoo, so that things
         #       like bash don't try linking against it and then expect ncurses[tinfo] on stage1.
-         make
+        make
         make DESTDIR=${CLFS} install
         cd .. && mkdir ncursesw-build && cd ncursesw-build
         ../configure \
@@ -309,7 +309,7 @@ tools:
         install -d ${CLFS}/var/db/pkg/sys-apps/sed-${SED_VERSION}
     - tar: |
         #--bindir=/bin \
-        cat > config.cache << BASH_EOF
+        cat > config.cache << "BASH_EOF"
         gl_cv_func_wcwidth_works=yes
         gl_cv_func_btowc_eof=yes
         ac_cv_func_malloc_0_nonnull=yes

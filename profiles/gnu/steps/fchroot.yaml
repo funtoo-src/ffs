@@ -34,20 +34,17 @@ fchroot:
         --prefix=/usr
         make
         make install
-        install -d /var/db/pkg/sys-devel/autoconf-${AUTOCONF_VERSION}
     - automake: |
         ./configure \
         --prefix=/usr
         make
         make install
-        install -d /var/db/pkg/sys-devel/automake-${AUTOMAKE_VERSION}
     - libtool: |
         ./configure \
         --prefix=/usr \
         --disable-ltdl-install
         make
         make install
-        install -d /var/db/pkg/sys-devel/libtool-${LIBTOOL_VERSION}
     - openssl: |
         ./config --prefix=/usr \
         --openssldir=/etc/ssl \
@@ -183,10 +180,36 @@ fchroot:
         USE="-build" emerge --nodeps baselayout
         /sbin/ldconfig
         /usr/sbin/env-update
+        source /etc/profile
         test -e /etc/ld.so.conf
         test -e /etc/ld.so.cache
         # fix a required USE flag
         install -d /etc/portage/package.use
         echo "dev-libs/libxml2 python" > /etc/portage/package.use/libxml2
-        #emerge --oneshot python glibc
+
+        # remove to prevent binutils mistakenly linking against this, which is non-PIC and won't work.
+        rm -f /usr/lib/libiberty.a
+        emerge --jobs=3 binutils
+
+        # since we don't have gcc-config running, which manages and sets up typical symlinks that ebuilds
+        # expect to find for certain things, we need to make sure this one is created manually. Without this,
+        # rust can't link and dev-python/cryptography fails to build.
+
+        if [ ! -e /usr/bin/cc ]; then
+          ( cd /usr/bin; ln -s gcc cc )
+        fi
+
+        # If ncurses is built with libtinfo (i.e. USE="tinfo"), then libtinfo will exist, and bash will
+        # currently automatically link against it even if we tell it to just use ncurses (see FL-10034).
+        # So, if libtinfo is on this filesystem, then we want ncurses with USE="tinfo" on the stage1root.
+        # For now, I think I will address this by syncing with funtoo norms and ensuring ncurses is
+        # built with libtinfo disabled.
+
+        # The pre-built util-linux doesn't install libmount, which is required by glib. If we don't merge~
+        # util-linux officially, glib will think libmount is installed but glib meson configure will fail
+        # when the lib isn't found:
+
+        emerge --jobs=3 util-linux
+        emerge --jobs=3 bash gcc
+        gcc-config 1
 
