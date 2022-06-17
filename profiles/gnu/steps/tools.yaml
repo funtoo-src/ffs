@@ -135,8 +135,10 @@ tools:
         --with-build-cc=gcc \
         --enable-overwrite \
         --with-default-terminfo-dir=/usr/share/terminfo \
-        --with-termlib
-        make
+        --without-termlib
+        # Note: As per FL-10034, --without-termlib must match default on Funtoo, so that things
+        #       like bash don't try linking against it and then expect ncurses[tinfo] on stage1.
+         make
         make DESTDIR=${CLFS} install
         cd .. && mkdir ncursesw-build && cd ncursesw-build
         ../configure \
@@ -337,11 +339,12 @@ tools:
         make DESTDIR=${CLFS} install
         install -d ${CLFS}/var/db/pkg/sys-apps/texinfo-${TEXINFO_VERSION}
     - util-linux: |
+        # This must be disabled as per FL-10034.
+        # LDFLAGS="-ltinfow"
         NCURSESW6_CONFIG=" " \
         NCURSES6_CONFIG=" " \
         NCURSESW5_CONFIG=" " \
         NCURSES5_CONFIG=" " \
-        LDFLAGS="-ltinfow" \
         ./configure \
         --prefix=/usr \
         --build=${CLFS_HOST} \
@@ -369,7 +372,8 @@ tools:
         make DESTDIR=${CLFS} install
         install -d ${CLFS}/var/db/pkg/sys-apps/util-linux-${UTIL_LINUX_VERSION}
     - nano: |
-        LDFLAGS="-ltinfow" \
+        # This must be disabled as per FL-10034.
+        # LDFLAGS="-ltinfow"
         ./configure \
         --prefix=/usr \
         --build=${CLFS_HOST} \
