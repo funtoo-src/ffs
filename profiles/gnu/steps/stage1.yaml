@@ -111,5 +111,4 @@ fchroot:
           sys-apps/openrc"
 
         emerge -u --noreplace --oneshot --onlydeps --jobs=3 $TO_BUILD
-        gcc-config 1
         ego profile mix-in -stage1
