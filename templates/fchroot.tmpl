@@ -16,6 +16,7 @@ umask 022
 rm -rf /build/*
 {{unpack}}
 export CLFS_TARGET={{target}}
+export BOOTSTRAP_RAP="yes"
 export LC_ALL=POSIX
 export MAKEFLAGS="-j$(nproc) -l$(nproc)"
 unset CFLAGS CXXFLAGS
