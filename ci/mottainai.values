@@ -5,8 +5,8 @@ values:
 
   images2test:
 
-    - name: ubuntu-21.10-x86-64bit
-      image: ubuntu/21.10
+    - name: ubuntu-22.04-x86-64bit
+      image: ubuntu/22.04
       pipeline: true
       pre_scripts:
         - >-
@@ -78,8 +78,8 @@ values:
     #----------------------------------
     # ARM 64 tests tasks
     #----------------------------------
-    - name: ubuntu-21.10-arm64
-      image: ubuntu/21.10
+    - name: ubuntu-22.04-arm64
+      image: ubuntu/22.04
       pipeline: true
       pre_scripts:
         - >-
@@ -94,8 +94,8 @@ values:
     #----------------------------------
     # PowerPC tests tasks
     #----------------------------------
-    - name: ubuntu-21.10-powerpc64
-      image: ubuntu/21.10
+    - name: ubuntu-22.04-powerpc64
+      image: ubuntu/22.04
       pipeline: true
       pre_scripts:
         - >-
@@ -109,8 +109,8 @@ values:
     #----------------------------------
     # riscv-64bit tests tasks
     #----------------------------------
-    - name: ubuntu-21.10-riscv64
-      image: ubuntu/21.10
+    - name: ubuntu-22.04-riscv64
+      image: ubuntu/22.04
       pipeline: true
       pre_scripts:
         - >-
