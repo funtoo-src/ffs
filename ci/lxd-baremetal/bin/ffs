@@ -2,6 +2,21 @@
 REPOPATH="$( git rev-parse --show-toplevel )"
 export ffs_build=$1
 export ffs_arch=$2
+[ -z "$ffs_build" ] && echo "Please specify build as first argument" && exit 1
+[ -z "$ffs_arch" ] && echo "Please specify arch as second argument" && exit 1
+if [ "$ffs_build" = "gnu" ]; then
+	echo "Funtoo GNU build"
+elif [ "$ffs_build" = "musl" ]; then
+	echo "Alkaline MUSL build"
+else
+	echo "Unknown build: $ffs_build"
+	exit 1
+fi
+arch_yaml="$REPOPATH/profiles/$ffs_build/arches/$ffs_arch.yaml"
+if [ ! -e "$arch_yaml" ]; then
+	echo "Required file $arch_yaml not found. Exiting."
+	exit 1
+fi
 export SOURCE_IMAGE="funtoo-fchroot"
 export EMERGE_PACKAGES="fchroot pyyaml jinja"
 export TEST_NAME="ffs-${USER}-${ffs_arch}-${ffs_build}"
@@ -14,7 +29,7 @@ if ! lxc image info $SOURCE_IMAGE >/dev/null 2>&1; then
 	echo "Source image $SOURCE_IMAGE does not exist. Exiting."
 fi
 CNAME=${TEST_NAME}-test
-echo "Building Funtoo from Scratch arch $ffs_arch build $ffs_build in container $CNAME"
+echo "Building in container $CNAME"
 echo "This script will use the current branch and local uncommmitted changes in your working ffs repo."
 # clean up previous instance if it exists...
 if lxc info $CNAME >/dev/null 2>&1; then
