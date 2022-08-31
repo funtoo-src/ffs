@@ -6,41 +6,111 @@ be found here:
 
   https://www.funtoo.org/Funtoo:Evolved_Bootstrap
 
-This repository contains simple bootstrapping code which currently builds and arm-64bit environment using
-a cross compiler, and is based on invakid404's work here:
+This technology can be used to bootstrap a Funtoo stage1 tarball, as well as "Alkaline" MUSL
+micro-containers, completely from sources, bootstrapping the system using a cross-compiler
+(which itself is bootstrapped using a local compiler) to ensure the resultant built binary
+environment is a completely new, "greenfield" environment built from source code, not inheriting
+any binary parts from any previously-built environment.
 
-  https://www.funtoo.org/User:Invakid404/CLFS
+It leverages the ``fchroot`` tool to perform building of non-native arches, such as arm-64bit,
+on x86-64bit systems.
 
-Using
-=====
+Supported Build Artifacts
+=========================
 
-This directory tree is a work in progress and is simply designed to cleanly automate the process of
-performing a cross-build. It is being actively developed. To use the repository contents, perform the
-following steps::
+* ``gnu`` -- Funtoo Stage1 Tarball -- this is an initial Funtoo Linux system that can be used by ``metro``
+  to build a full Funtoo Linux system. Supported build system is x86-64bit, and supported targets
+  are x86-64bit, arm-64bit (aarch64) and riscv-64bit.
 
-  $ export CLFS=$(pwd)
-  $ bin/sourcer fetch
+* ``musl`` -- Alkaline MUSL Micro-Container -- this is a functioning MUSL-based environment that can be used
+  as a starting point for building custom runtimes. Supported build system is x86-64bit, and
+  supported targets are x86-64bit, arm-64bit (aarch64) and riscv-64bit. Work is ongoing on support
+  for powerpc-64bit.
 
-This step above will use ``wget`` to download all the source code and versions defined in the
-``sources.yaml`` file contained in the repository. This file contains URLs as well as the versions of
-the source code, all conveniently organized in a single, central location.
+Supported Build Systems
+=======================
 
-Once sources have been fetched, you can now initiate building as follows::
+It is possible to run Funtoo From Scratch in any Linux or any Linux-like environment that has a
+C compiler, with minimal dependencies. If you want to bootstrap on something that is missing
+common modern things like Python 3, it is indeed possible to adapt things to do this.
 
-  $ bin/builder cross_tools
-  $ bin/builder tools
+However, most people will prefer having the ability to dynamically generate the build scripts
+on the build system directly based YAML and templates, and this requires Python 3, PyYAML and
+Jinja2 installed. The Python scripts will dynamically generate bash scripts from YAML which
+will perform the actual build process. Our YAML is designed to be clean, elegant and intuitive
+to use so it's what you want to edit if you are working on improving or augmenting the build
+steps.
 
-This will use the steps defined in ``steps.yaml`` to build the cross compiler toolchain, and then will
-also use these sources to cross-compile the "tools". These tools will be installed into the
-``$CLFS/cross-tools`` and ``$CLFS/tools`` directories, respectively.
+To use Funtoo From Scratch to build for a non-native architecture, ``fchroot`` and its associated
+QEMU and QEMU-related dependencies must be installed, and a Linux system must be used.
 
-TODO
-====
+The Ideal Setup
+===============
 
-While all the compilation of invakid404's steps has been automated, the finalization steps have not yet
-been added -- So the steps from this point forward are not automated yet:
+The "ideal" setup for Funtoo From Scratch is on a Linux system with LXD installed, for which we have
+a developer-centric build system that will do the full FFS build within an isolated Funtoo
+container. This means that you don't actually need PyYAML, Jinja2, QEMU and Fchroot on your
+local system, as they will be automatically installed and used inside the container.
 
-  https://www.funtoo.org/User:Invakid404/CLFS#Finishing_touches
+This allows for rapid and isolated development of Funtoo from Scratch, as well as
+launching multiple simultaneous builds, the use of incremental snapshots to allow re-launching
+the build from the last successful phase, and other handy features.
 
-However, all building is working correctly, at least for me (drobbins) on my development system, and we
-have a nice, clean foundation for a maintainable bootstrap.
+We recommend you start with the LXD environment under Funtoo if at all possible, and once comfortable
+in that environment, explore more minimal approaches to using Funtoo from Scratch if needed.
+We actively use the LXD setup so it is the official supported and maintained method at this time.
+
+LXD Setup
+=========
+
+This section documents the "ideal" LXD-based setup which we recommend as a starting point.
+
+First, you will want to set up LXD under Funtoo Linux as documented here:
+
+  https://www.funtoo.org/LXD
+
+You will want to ensure that ``lxdbr0`` is configured to provide network connectivity to your
+containers and that the ``default`` profile is sufficient to provide a single network interface
+on this network.
+
+If these assumptions are not suitable for your environment, the following
+environment variables can be exported to customize the behavior of the ``ffs`` script:
+
+* ``LXD_LAUNCH_EXTRA_ARGS`` which defaults to ``-p default -n lxdbr0``.
+* ``LXD_FFS_SOURCE_IMAGE`` which sets the LXD image to use for builds and defaults to ``funtoo-fchroot``.
+* ``LXD_INTERFACE`` which specifies the interface to configure inside the LXD container and defaults to ``eth0``.
+
+Next, import a suitable LXD tarball from https://build.funtoo.org and
+save it with the alias of ``funtoo-fchroot``::
+
+  $ wget https://build.funtoo.org/next/x86-64bit/intel64-skylake/2022-07-21/lxd-intel64-skylake-next-2022-07-21.tar.xz
+  $ lxc image import lxd-intel64-skylake-next-2022-07-21.tar.xz --alias funtoo-fchroot
+
+Fchroot does not need to be pre-installed in this image, but if you do customize it to pre-install
+Fchroot, then it will speed up repeated launches of builds as Fchroot and QEMU will not need to
+be emerged each time.
+
+To launch a Funtoo from Scratch build, you will simply use our ``ffs`` script located
+under ``ci/lxd-baremetal/bin``::
+
+  $ cd ~/ffs
+  $ ci/lxd-baremetal/bin/ffs gnu arm-64bit
+
+This will instantiate a container named ``ffs-<username>-arm-64bit-gnu-test``, and will perform
+the build inside the container at the path ``/root/ffs-repo``. You will see output
+of the build as it runs on your console, but the actual build itself is happening within the
+container. To stop the build, press ^C. As various phases of the build are completed, snapshots
+will be taken. If you restart the build, you will be prompted as to whether you would like to use
+these snapshots as a starting point, or if you want to delete them instead. This is a handy feature
+if you are trying to fix a build issue that happens relatively late in the bootstrap.
+
+It's also important to note that our magic ``ffs`` script uses special tricks to grab any local
+changes you have made within the ``ffs`` repository when launching a build. This allows you to
+develop locally on a Linux host, and the builds you fire off inside LXD will grab these changes
+automatically.
+
+This should allow you to start playing with Funtoo from Scratch. While we have covered the basic
+first steps here, we have just introduced you to the first layer of Funtoo from Scratch. We also
+need to describe the YAML files in this repository that define what packages get built, and how
+they get built, so that you know how to customize builds as needed. This will be covered in the
+next sections, coming soon.
