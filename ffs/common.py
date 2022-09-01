@@ -71,7 +71,7 @@ class Sourcer:
 			package_path = os.path.join(os.environ["CLFS"], "packages", package_name)
 			if not os.path.exists(package_path):
 				raise FileNotFoundError(f"Package referenced for {sources} not found: {package_path}")
-			out = "fcd ${{CLFS}} && tar xpvf ${{CLFS}}/packages/{package_name} -C ${{CLFS}}\n"
+			out = f"cd ${{CLFS}} && tar xpvf ${{CLFS}}/packages/{package_name} -C ${{CLFS}}\n"
 			out += f"export {sources.replace('-', '_').upper()}_VERSION=\"{self.sources[sources]['version']}\"\n"
 			return out
 		else:
