@@ -67,7 +67,7 @@ class Sourcer:
 		if "," not in sources and "package" in self.sources[sources]:
 			# binary package -- just extract to CLFS. Build steps can include rootfs customizations
 			# rather than actual build steps.
-			package_name = self.sources[sources]["package"] + '.tbz2'
+			package_name = self.sources[sources]["package"]
 			package_path = os.path.join(os.environ["CLFS"], "packages", package_name)
 			if not os.path.exists(package_path):
 				raise FileNotFoundError(f"Package referenced for {sources} not found: {package_path}")
