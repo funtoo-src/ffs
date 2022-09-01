@@ -131,6 +131,7 @@ sources:
             - portage-3.0.29-allow-matches-in-package-updates.patch
             - portage-3.0.29-track-and-deny-keywords-r1.patch
             - portage-3.0.29-aliases-name-check.patch
+            - portage-3.0.14-cdn-feature-ignore-mirror.patch
             - portage-3.0.30-revert-default-enable-soname-dependencies.patch
       - ego:
           version: 2.8.6

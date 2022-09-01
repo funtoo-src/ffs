@@ -145,6 +145,7 @@ fchroot:
         FEATURES="-pid-sandbox"
         FETCHCOMMAND="wget --no-check-certificate -t 3 -T 60 --passive-ftp -O \"\${DISTDIR}/\${FILE}\" \"\${URI}\""
         RESUMECOMMAND="wget --no-check-certificate -c -t 3 -T 60 --passive-ftp -O \"\${DISTDIR}/\${FILE}\" \"\${URI}\""
+        GENTOO_MIRRORS=https://direct.funtoo.org
         MKCF_EOF
         ln -sf portage/make.conf /etc/make.conf
         install -d /etc/portage/make.profile
