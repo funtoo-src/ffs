@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 
 from yaml import safe_load
@@ -61,24 +62,36 @@ class Sourcer:
 
 	def unpack(self, sources):
 		os.makedirs(os.path.join(os.environ["CLFS"], "build"), exist_ok=True)
-		first_source = None
-		out = ""
-		for source in sources.split(','):
-			if first_source is None:
-				first_source = self.sources[source]
-			for url in self.sources[source]["sources"]:
-				tarball = url.split("/")[-1]
-				out += f"cd ${{CLFS}}/build && tar xf ${{CLFS}}/sources/{tarball}\n"
-				out += f"export {source.replace('-', '_').upper()}_VERSION=\"{self.sources[source]['version']}\"\n"
-		if "srcdir" in first_source:
-			srcdir = first_source["srcdir"]
+		if "," not in sources and "package" in self.sources[sources]:
+			# binary package -- just extract to CLFS. Build steps can include rootfs customizations
+			# rather than actual build steps.
+			package_name = self.sources[sources]["package"] + '.tbz2'
+			package_path = os.path.join(os.environ["CLFS"], "packages", package_name)
+			if not os.path.exists(package_path):
+				raise FileNotFoundError(f"Package referenced for {sources} not found: {package_path}")
+			out = "fcd ${{CLFS}} && tar xpvf ${{CLFS}}/packages/{package_name} -C ${{CLFS}}\n"
+			out += f"export {sources.replace('-', '_').upper()}_VERSION=\"{self.sources[sources]['version']}\"\n"
 		else:
-			srcdir = f"{first_source['name']}-{first_source['version']}"
-		out += f"cd ${{CLFS}}/build/{srcdir}\n"
-		if "patches" in first_source:
-			for patch in first_source["patches"]:
-				out += f"cat ${{CLFS}}/patches/{patch} | patch -p1\n"
-		return out
+			# build from sources using build steps defined in steps/<step>.yaml
+			os.makedirs(os.path.join(os.environ["CLFS"], "build"), exist_ok=True)
+			first_source = None
+			out = ""
+			for source in sources.split(','):
+				if first_source is None:
+					first_source = self.sources[source]
+				for url in self.sources[source]["sources"]:
+					tarball = url.split("/")[-1]
+					out += f"cd ${{CLFS}}/build && tar xf ${{CLFS}}/sources/{tarball}\n"
+					out += f"export {source.replace('-', '_').upper()}_VERSION=\"{self.sources[source]['version']}\"\n"
+			if "srcdir" in first_source:
+				srcdir = first_source["srcdir"]
+			else:
+				srcdir = f"{first_source['name']}-{first_source['version']}"
+			out += f"cd ${{CLFS}}/build/{srcdir}\n"
+			if "patches" in first_source:
+				for patch in first_source["patches"]:
+					out += f"cat ${{CLFS}}/patches/{patch} | patch -p1\n"
+			return out
 
 	def fetch(self):
 		for key, val in self.sources.items():
