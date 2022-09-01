@@ -47,6 +47,8 @@ class Sourcer:
 						elif "urls" in pkginfo and isinstance("urls", list):
 							sources = pkginfo["urls"]
 							del pkginfo["urls"]
+						elif "package" in pkginfo:
+							pass
 						else:
 							raise ValueError(f"Expecting string ('url') or list of strings ('urls'): {pkginfo['url']}")
 						sources_kwargs = {}
