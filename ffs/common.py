@@ -73,6 +73,7 @@ class Sourcer:
 				raise FileNotFoundError(f"Package referenced for {sources} not found: {package_path}")
 			out = "fcd ${{CLFS}} && tar xpvf ${{CLFS}}/packages/{package_name} -C ${{CLFS}}\n"
 			out += f"export {sources.replace('-', '_').upper()}_VERSION=\"{self.sources[sources]['version']}\"\n"
+			return out
 		else:
 			# build from sources using build steps defined in steps/<step>.yaml
 			os.makedirs(os.path.join(os.environ["CLFS"], "build"), exist_ok=True)
