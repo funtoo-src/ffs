@@ -17,16 +17,17 @@ if [ ! -e "$arch_yaml" ]; then
 	echo "Required file $arch_yaml not found. Exiting."
 	exit 1
 fi
-export SOURCE_IMAGE="funtoo-fchroot"
+export LXD_FFS_SOURCE_IMAGE="funtoo-fchroot"
 export EMERGE_PACKAGES="fchroot pyyaml jinja"
 export TEST_NAME="ffs-${USER}-${ffs_arch}-${ffs_build}"
 export LXD_INTERFACE=${LXD_INTERFACE:-eth0}
 export EMERGE_JOBS=${EMERGE_JOBS:-10}
+export LXD_LAUNCH_EXTRA_ARGS=${LXD_LAUNCH_EXTRA_ARGS:--p default -n lxdbr0}
 if [ -n "$MAKEOPTS" ]; then
 	export MAKEOPTS
 fi
-if ! lxc image info $SOURCE_IMAGE >/dev/null 2>&1; then
-	echo "Source image $SOURCE_IMAGE does not exist. Exiting."
+if ! lxc image info $LXD_FFS_SOURCE_IMAGE >/dev/null 2>&1; then
+	echo "Source image $LXD_FFS_SOURCE_IMAGE does not exist. Exiting."
 fi
 CNAME=${TEST_NAME}-test
 echo "Building in container $CNAME"
@@ -50,9 +51,8 @@ network_test() {
 		echo "no"
 	fi
 }
-export LXD_LAUNCH_EXTRA_ARGS="-p default -n lxdbr0"
 cur_step=""
-create="$SOURCE_IMAGE"
+create="$LXD_FFS_SOURCE_IMAGE"
 for step in fchroot tools cross_tools; do
 	if [ -n "$(lxc image list -cl -f csv | grep $CNAME-$step)" ]; then
 		echo -n "A snapshot image exists for step $step:"
