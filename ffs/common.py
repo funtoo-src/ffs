@@ -1,8 +1,25 @@
 import os
-import shutil
 import sys
 
 from yaml import safe_load
+
+def expand_url(in_url):
+	"""
+	This function takes a URL specification, and returns the URL along with the final
+	name of the file. We support "https://foo -> bar" which will expand to "https://foo", "bar".
+	Without the "->", we expect a single string URL and will return the in_url, and the last
+	component of the in_url as the filename.
+	:param in_url: the string from sources.yaml specifying the URL.
+	:return: a tuple containing download URL and final name for the file.
+	"""
+	usplit = in_url.split()
+	if len(usplit) == 3:
+		if usplit[1] == "->":
+			return usplit[0], usplit[2]
+		else:
+			raise ValueError("Invalid url for {key}: {in_url}")
+	else:
+		return in_url, os.path.basename(in_url)
 
 
 class Sourcer:
@@ -82,8 +99,8 @@ class Sourcer:
 			for source in sources.split(','):
 				if first_source is None:
 					first_source = self.sources[source]
-				for url in self.sources[source]["sources"]:
-					tarball = url.split("/")[-1]
+				for in_url in self.sources[source]["sources"]:
+					url, tarball = expand_url(in_url)
 					out += f"cd ${{CLFS}}/build && tar xf ${{CLFS}}/sources/{tarball}\n"
 					out += f"export {source.replace('-', '_').upper()}_VERSION=\"{self.sources[source]['version']}\"\n"
 			if "srcdir" in first_source:
