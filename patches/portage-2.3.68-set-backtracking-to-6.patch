@@ -12,15 +12,15 @@ diff --git a/lib/_emerge/depgraph.py b/lib/_emerge/depgraph.py
 index 3e99ac077..61d92d951 100644
 --- a/lib/_emerge/depgraph.py
 +++ b/lib/_emerge/depgraph.py
-@@ -11500,7 +11500,7 @@ def _backtrack_depgraph(settings, trees, myopts, myparams, myaction, myfiles, sp
+@@ -9755,7 +9755,7 @@ def _backtrack_depgraph(settings, trees, myopts, myparams, myaction, myfiles, sp
  
-     debug = "--debug" in myopts
-     mydepgraph = None
--    max_retries = myopts.get("--backtrack", 10)
-+    max_retries = myopts.get("--backtrack", 6)
-     max_depth = max(1, (max_retries + 1) // 2)
-     allow_backtracking = max_retries > 0
-     backtracker = Backtracker(max_depth)
+ 	debug = "--debug" in myopts
+ 	mydepgraph = None
+-	max_retries = myopts.get('--backtrack', 10)
++	max_retries = myopts.get('--backtrack', 6)
+ 	max_depth = max(1, (max_retries + 1) // 2)
+ 	allow_backtracking = max_retries > 0
+ 	backtracker = Backtracker(max_depth)
 diff --git a/man/emerge.1 b/man/emerge.1
 index 4db2b3e62..72b540f48 100644
 --- a/man/emerge.1
@@ -36,3 +36,4 @@ index 4db2b3e62..72b540f48 100644
  Tells emerge to ignore binary packages for which the corresponding
 -- 
 2.22.0
+

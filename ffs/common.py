@@ -71,7 +71,7 @@ class Sourcer:
 			package_path = os.path.join(os.environ["CLFS"], "packages", package_name)
 			if not os.path.exists(package_path):
 				raise FileNotFoundError(f"Package referenced for {sources} not found: {package_path}")
-			out = f"cd ${{CLFS}} && tar xpvf ${{CLFS}}/packages/{package_name} -C ${{CLFS}}\n"
+			out = f"cd ${{CLFS}} && tar xpvf ${{CLFS}}/packages/{package_name} -C ${{CLFS}} || true\n"
 			out += f"export {sources.replace('-', '_').upper()}_VERSION=\"{self.sources[sources]['version']}\"\n"
 			return out
 		else:
@@ -99,9 +99,19 @@ class Sourcer:
 	def fetch(self):
 		for key, val in self.sources.items():
 			print(f"Fetching {key}")
-			for url in val["sources"]:
-				outfile = os.path.basename(url)
+			for in_url in val["sources"]:
+				usplit = in_url.split()
+				if len(usplit) == 3:
+					if usplit[1] == "->":
+						url = usplit[0]
+						outfile = usplit[2]
+					else:
+						raise ValueError("Invalid url for {key}: {in_url}")
+				else:
+					url = in_url
+					outfile = os.path.basename(url)
+
 				if not os.path.exists(f"{self.clfs_path}/sources/{outfile}"):
-					result = os.system(f"( cd {self.clfs_path}/sources && wget -nc {url})")
+					result = os.system(f"( cd {self.clfs_path}/sources && wget -O {outfile} -nc {url})")
 					if result != 0:
 						sys.exit(0)

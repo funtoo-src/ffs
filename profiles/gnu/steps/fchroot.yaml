@@ -137,11 +137,16 @@ fchroot:
         portage::250:portage
         GROUP_EOF
     - portage: |
+    - portage: |
+        python3 setup.py build
+        python3 setup.py install
+        rm -f /usr/share/portage/config/repos.conf
         install -d /etc/portage
         cat > /etc/portage/make.conf << "MKCF_EOF"
         FEATURES="-pid-sandbox"
         FETCHCOMMAND="wget --no-check-certificate -t 3 -T 60 --passive-ftp -O \"\${DISTDIR}/\${FILE}\" \"\${URI}\""
         RESUMECOMMAND="wget --no-check-certificate -c -t 3 -T 60 --passive-ftp -O \"\${DISTDIR}/\${FILE}\" \"\${URI}\""
+        GENTOO_MIRRORS=https://direct.funtoo.org
         MKCF_EOF
         ln -sf portage/make.conf /etc/make.conf
         install -d /etc/portage/make.profile
