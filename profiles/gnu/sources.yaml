@@ -118,6 +118,7 @@ sources:
           url: https://gitweb.gentoo.org/proj/sandbox.git/snapshot/sandbox-{version}.tar.bz2
       - portage:
           version: 3.0.14-r10
+          srcdir: zmedico-portage-261f0f7
           url: https://github.com/zmedico/portage/tarball/261f0f763888d9392927a6cae2af50292fc694a1 -> portage-3.0.14-r10.tar.gz
           patches:
             - portage-2.4.3-remove-gentoo-repos-conf.patch
