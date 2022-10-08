@@ -150,12 +150,7 @@ fchroot:
         MKCF_EOF
         ln -sf portage/make.conf /etc/make.conf
         install -d /etc/portage/make.profile
-        cat > /etc/portage/make.profile/parent << "MKP_EOF"
-        core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}
-        core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}/subarch/{{ego_subarch}}
-        core-kit:funtoo/1.0/linux-gnu/build/current
-        core-kit:funtoo/1.0/linux-gnu/flavor/core
-        MKP_EOF
+
         install -d /var/db/pkg/sys-apps/portage-${PORTAGE_VERSION}
     - ego: |
         install -d /usr/share/ego

@@ -23,10 +23,14 @@ fchroot:
         install -d ${ROOT}/{proc,sys,dev}
         # create symlink to real meta-repo to allow ego to pick up profiles inside ROOT...
         install -m 0755 -o 250 -g 250 -d $ROOT/var/git
-        install -d ${ROOT}/etc
+        install -d ${ROOT}/etc/portage/make.profile
         ln -sf /var/git/meta-repo $ROOT/var/git/
-        ln -sf /etc/portage ${ROOT}/etc/
+        cat > ${ROOT}/etc/portage/make.profile/parent << "MKP_EOF"
+        core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}
+        core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}/subarch/{{ego_subarch}}
+        MKP_EOF
         ego profile mix-in +stage1
+        ego profile flavor core
         # fix a circular dep
         install -d /var/db/pkg/sys-apps/openrc-9999
         # It's important to merge baselayout first so it can set perms on key dirs
@@ -72,3 +76,4 @@ fchroot:
         emerge --noreplace --oneshot --jobs=3 $TO_BUILD
         gcc-config 1
         ego profile mix-in -stage1
+        rm -f $ROOT/var/git
