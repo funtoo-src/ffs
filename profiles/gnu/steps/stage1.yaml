@@ -28,9 +28,9 @@ fchroot:
         cat > ${ROOT}/etc/portage/make.profile/parent << "MKP_EOF"
         core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}
         core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}/subarch/{{ego_subarch}}
+        core-kit:funtoo/1.0/linux-gnu/flavor/core
+        core-kit:funtoo/1.0/linux-gnu/mix-in/stage1
         MKP_EOF
-        ego profile mix-in +stage1
-        ego profile flavor core
         # fix a circular dep
         install -d /var/db/pkg/sys-apps/openrc-9999
         # It's important to merge baselayout first so it can set perms on key dirs
@@ -76,4 +76,4 @@ fchroot:
         emerge --noreplace --oneshot --jobs=3 $TO_BUILD
         gcc-config 1
         ego profile mix-in -stage1
-        rm -f $ROOT/var/git
+        rm -f $ROOT/var/git/meta-repo
