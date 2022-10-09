@@ -3,6 +3,8 @@ fchroot:
     template: stage1.tmpl
   steps:
     - none: |
+        # Do this so we have an updated tree if resuming from here:
+        GIT_SSL_NO_VERIFY=true ego sync
         # Do this before setting ROOT:
         /usr/sbin/env-update
         /sbin/ldconfig
