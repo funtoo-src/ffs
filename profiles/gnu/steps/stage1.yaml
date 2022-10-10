@@ -17,6 +17,8 @@ fchroot:
         rm -rf $ROOT
         install -m 0755 -d $ROOT/usr/bin
         install -m 0755 -d $ROOT/bin
+        # without this, /sbin ends up being a symlink to /usr/sbin?!
+        install -m 0755 -d $ROOT/sbin
         # also fix a lib issue -- did I miss some steps from metro?
         install -m 0755 -d $ROOT/lib64
         ln -sf lib64 $ROOT/lib
