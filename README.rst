@@ -63,6 +63,31 @@ We actively use the LXD setup so it is the official supported and maintained met
 LXD Setup
 =========
 
+.. note::
+   If you are using this method for non-native (i.e. arm-64bit on x86-64bit) builds, then prior
+   to starting the build described below, you will need to perform an initialization step on
+   the host.
+
+   Let's say you are building for arm-64bit and your host is x86-64bit. You would download and
+   extract a stage3 for arm-64bit to a temporary directory on the host. This stage3 is used
+   solely for the purpose of giving fchroot something to "fchroot into" so it can initialize
+   the kernel settings to support arm-64bit emulation on the host, so it's active and ready
+   for lxd containers.
+
+   This extra step is currently needed because Linux at this time does not provide a
+   container-local namespace for binfmt so it all has to be set up on the host first. You will
+   only need to do this once per power-on cycle -- you'll need to repeat these steps after every
+   reboot of the host.
+
+   Once initialization is complete on the host, fchroot will work correctly in the LXD container.
+
+   We would like to fix this issue via a Linux kernel fix, which we are tracking in this Funtoo
+   Linux issue: https://bugs.funtoo.org/browse/FL-9989
+
+   Until the Linux kernel offers this capability to containers, we will work to make this
+   workaround less painful -- likely by adding a capability to fchroot so it can easily be used
+   to "initialize" a host without downloading and extracting a stage3.
+
 This section documents the "ideal" LXD-based setup which we recommend as a starting point.
 
 First, you will want to set up LXD under Funtoo Linux as documented here:
