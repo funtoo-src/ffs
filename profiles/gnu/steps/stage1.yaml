@@ -3,6 +3,8 @@ fchroot:
     template: stage1.tmpl
   steps:
     - none: |
+        # Do this so we have an updated tree if resuming from here:
+        GIT_SSL_NO_VERIFY=true ego sync
         # Do this before setting ROOT:
         /usr/sbin/env-update
         /sbin/ldconfig
@@ -15,6 +17,10 @@ fchroot:
         rm -rf $ROOT
         install -m 0755 -d $ROOT/usr/bin
         install -m 0755 -d $ROOT/bin
+        # without this, /sbin ends up being a symlink to /usr/sbin?!
+        install -m 0755 -d $ROOT/sbin
+        # without this, /usr/sbin ends up being a link to bin?!
+        install -m 0755 -d $ROOT/usr/sbin
         # also fix a lib issue -- did I miss some steps from metro?
         install -m 0755 -d $ROOT/lib64
         ln -sf lib64 $ROOT/lib
@@ -23,10 +29,15 @@ fchroot:
         install -d ${ROOT}/{proc,sys,dev}
         # create symlink to real meta-repo to allow ego to pick up profiles inside ROOT...
         install -m 0755 -o 250 -g 250 -d $ROOT/var/git
-        install -d ${ROOT}/etc
+        install -d ${ROOT}/etc/portage/make.profile
         ln -sf /var/git/meta-repo $ROOT/var/git/
-        ln -sf /etc/portage ${ROOT}/etc/
-        ego profile mix-in +stage1
+        cat > ${ROOT}/etc/portage/make.profile/parent << "MKP_EOF"
+        core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}
+        core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}/subarch/{{ego_subarch}}
+        core-kit:funtoo/1.0/linux-gnu/build/next
+        core-kit:funtoo/1.0/linux-gnu/flavor/core
+        core-kit:funtoo/1.0/linux-gnu/mix-ins/stage1
+        MKP_EOF
         # fix a circular dep
         install -d /var/db/pkg/sys-apps/openrc-9999
         # It's important to merge baselayout first so it can set perms on key dirs
@@ -72,3 +83,4 @@ fchroot:
         emerge --noreplace --oneshot --jobs=3 $TO_BUILD
         gcc-config 1
         ego profile mix-in -stage1
+        rm -f $ROOT/var/git/meta-repo

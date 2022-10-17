@@ -137,7 +137,6 @@ fchroot:
         portage::250:portage
         GROUP_EOF
     - portage: |
-    - portage: |
         python3 setup.py build
         python3 setup.py install
         rm -f /usr/share/portage/config/repos.conf
@@ -153,8 +152,9 @@ fchroot:
         cat > /etc/portage/make.profile/parent << "MKP_EOF"
         core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}
         core-kit:funtoo/1.0/linux-gnu/arch/{{ego_arch}}/subarch/{{ego_subarch}}
-        core-kit:funtoo/1.0/linux-gnu/build/current
+        core-kit:funtoo/1.0/linux-gnu/build/next
         core-kit:funtoo/1.0/linux-gnu/flavor/core
+        core-kit:funtoo/1.0/linux-gnu/mix-ins/stage1
         MKP_EOF
         install -d /var/db/pkg/sys-apps/portage-${PORTAGE_VERSION}
     - ego: |
@@ -185,9 +185,6 @@ fchroot:
         source /etc/profile
         test -e /etc/ld.so.conf
         test -e /etc/ld.so.cache
-        # fix a required USE flag
-        install -d /etc/portage/package.use
-        echo "dev-libs/libxml2 python" > /etc/portage/package.use/libxml2
 
         # remove to prevent binutils mistakenly linking against this, which is non-PIC and won't work.
         rm -f /usr/lib/libiberty.a

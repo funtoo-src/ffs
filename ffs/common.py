@@ -131,4 +131,4 @@ class Sourcer:
 				if not os.path.exists(f"{self.clfs_path}/sources/{outfile}"):
 					result = os.system(f"( cd {self.clfs_path}/sources && wget -O {outfile} -nc {url})")
 					if result != 0:
-						sys.exit(0)
+						sys.exit(1)

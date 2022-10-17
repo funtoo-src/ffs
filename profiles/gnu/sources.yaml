@@ -61,7 +61,7 @@ sources:
           version: 1.2.3
           url: https://musl.libc.org/releases/musl-{version}.tar.gz
       - zlib:
-          version: 1.2.12
+          version: 1.2.13
           url: https://zlib.net/zlib-{version}.tar.gz
       - perl:
           version: 5.32.0

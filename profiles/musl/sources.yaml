@@ -64,7 +64,7 @@ sources:
           version: 0.24
           url: https://libisl.sourceforge.io/isl-{version}.tar.bz2
       - zlib:
-          version: 1.2.12
+          version: 1.2.13
           url: https://zlib.net/zlib-{version}.tar.gz
       - perl:
           version: 5.34.1
