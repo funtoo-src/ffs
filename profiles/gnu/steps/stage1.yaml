@@ -48,6 +48,7 @@ fchroot:
           app-arch/gzip
           app-arch/tar
           app-arch/xz-utils
+          app-admin/eselect
           app-shells/bash
           net-misc/rsync
           net-misc/wget
