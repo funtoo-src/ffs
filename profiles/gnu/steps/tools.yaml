@@ -184,11 +184,12 @@ tools:
         --cache-file=config.cache
         make
         make DESTDIR=${CLFS} install
-        test -x ${CLFS}/usr/bin/bash
+        install -d ${CLFS}/bin
+        mv ${CLFS}/usr/bin/bash ${CLFS}/bin
+        test -x ${CLFS}/bin/bash
         # set up initial shells in correct location for "#!/bin/sh" and "#!/bin/bash" scripts:
         rm -f ${CLFS}/bin/bash ${CLFS}/bin/sh || true
-        ln -sf ../usr/bin/bash ${CLFS}/bin/bash
-        ln -sf ../usr/bin/bash ${CLFS}/bin/sh
+        ln -sf bash ${CLFS}/bin/sh
         install -d ${CLFS}/var/db/pkg/app-shells/bash-${BASH_VERSION}
     - bzip2: |
         sed -i \
@@ -217,6 +218,32 @@ tools:
         sed -i -e 's/^man1_MANS/#man1_MANS/' Makefile
         make
         make DESTDIR=${CLFS} install
+        # Move critical binaries into /bin. For this tools build, if "dd" is in /usr/bin, other configure scripts
+        # will build their scripts assuming that /usr/bin/dd is its official location in Funtoo. So we need to match
+        # Funtoo:
+        install -d ${CLFS}/bin
+        # First, we need to handle /bin/mv manually:
+        mv ${CLFS}/usr/bin/mv ${CLFS}/bin/mv
+        # Forget old, cached location:
+        for bin in cat chgrp chmod chown cp date dd df echo \
+                    false hostname ln ls mkdir mknod pwd rm \
+                    rmdir stty sync true uname \
+                    basename chroot cut dir dirname du env expr \
+                    head mkfifo mktemp readlink seq sleep sort \
+                    tail touch tr tty vdir wc yes; do
+          if [ ! -e ${CLFS}/bin/${bin} ] && [ -e ${CLFS}/usr/bin/${bin} ]; then
+            mv ${CLFS}/usr/bin/${bin} ${CLFS}/bin
+          fi
+        done
+        # A subset of these moved binaries get /usr/bin compatibility symlinks pointing to their
+        # new location. This may still be required by some scripts:
+        for sym in basename chroot cut dir dirname du env expr \
+                    head mkfifo mktemp readlink seq sleep sort \
+                    tail touch tr tty vdir wc yes; do
+          if [ ! -e  ${CLFS}/usr/bin/${sym} ]; then
+            ln -s ../../bin/${sym} ${CLFS}/usr/bin/${sym}
+          fi
+        done
         install -d ${CLFS}/var/db/pkg/sys-apps/coreutils-${COREUTILS_VERSION}
     - diffutils: |
         ./configure \
@@ -262,8 +289,8 @@ tools:
         ln -sf gawk ${CLFS}/usr/bin/awk
         install -d ${CLFS}/var/db/pkg/sys-apps/gawk-${GAWK_VERSION}
     - grep: |
-        #--bindir=/bin \
         ./configure \
+        --bindir=/bin \
         --prefix=/usr \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET}
