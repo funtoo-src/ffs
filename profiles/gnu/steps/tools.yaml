@@ -188,7 +188,7 @@ tools:
         mv ${CLFS}/usr/bin/bash ${CLFS}/bin
         test -x ${CLFS}/bin/bash
         # set up initial shells in correct location for "#!/bin/sh" and "#!/bin/bash" scripts:
-        rm -f ${CLFS}/bin/bash ${CLFS}/bin/sh || true
+        rm -f ${CLFS}/bin/sh || true
         ln -sf bash ${CLFS}/bin/sh
         install -d ${CLFS}/var/db/pkg/app-shells/bash-${BASH_VERSION}
     - bzip2: |
@@ -222,17 +222,16 @@ tools:
         # will build their scripts assuming that /usr/bin/dd is its official location in Funtoo. So we need to match
         # Funtoo:
         install -d ${CLFS}/bin
-        # First, we need to handle /bin/mv manually:
-        mv ${CLFS}/usr/bin/mv ${CLFS}/bin/mv
-        # Forget old, cached location:
+        # Try to avoid an issue related to moving the mv command by referencing our pre-existing mv on rootfs:
+        MV=/bin/mv
         for bin in cat chgrp chmod chown cp date dd df echo \
-                    false hostname ln ls mkdir mknod pwd rm \
+                    false hostname ln ls mkdir mknod mv pwd rm \
                     rmdir stty sync true uname \
                     basename chroot cut dir dirname du env expr \
                     head mkfifo mktemp readlink seq sleep sort \
                     tail touch tr tty vdir wc yes; do
           if [ ! -e ${CLFS}/bin/${bin} ] && [ -e ${CLFS}/usr/bin/${bin} ]; then
-            mv ${CLFS}/usr/bin/${bin} ${CLFS}/bin
+            $MV ${CLFS}/usr/bin/${bin} ${CLFS}/bin
           fi
         done
         # A subset of these moved binaries get /usr/bin compatibility symlinks pointing to their

@@ -8,7 +8,8 @@ set -x
 umask 022
 install -d "${CLFS}/sources"
 install -d "${CLFS}/build"
-export PATH=${CLFS}/bin:${CLFS}/cross-tools/bin:/bin:/usr/bin
+# We may want to drop ${CLFS}/bin here, as it will contain tools for the non-native arch:
+export PATH=${CLFS}/cross-tools/bin:/bin:/usr/bin
 rm -rf "${CLFS}"/build/*
 {{unpack}}
 export LC_ALL=POSIX
