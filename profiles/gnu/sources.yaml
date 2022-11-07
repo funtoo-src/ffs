@@ -47,7 +47,7 @@ sources:
       - texinfo: 6.8
       - nano: 6.4
       - wget:
-          version: 2.0.1
+          version: 1.21.3
           ext: gz
   non-gnu:
     packages:
