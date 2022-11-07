@@ -16,7 +16,7 @@ sources:
       - gcc:
           url: https://ftp.gnu.org/gnu/{name}/{name}-{version}/{name}-{version}.tar.{ext}
           version: 12.2.0
-      - glibc: 2.33
+      - glibc: 2.36
       - ncurses:
           version: 6.3
           ext: gz
