@@ -81,7 +81,8 @@ fchroot:
           sys-apps/openrc
           dev-vcs/git"
 
-        emerge --noreplace --oneshot --jobs=3 $TO_BUILD
+        # pax-utils-1.3.5 requires the python USE flag to install
+        USE="python" emerge --noreplace --oneshot --jobs=3 $TO_BUILD
         gcc-config 1
         ego profile mix-in -stage1
         rm -f $ROOT/var/git/meta-repo
