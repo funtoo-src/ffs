@@ -50,6 +50,9 @@ fchroot:
           app-arch/xz-utils
           app-admin/eselect
           app-shells/bash
+          # https://bugs.funtoo.org/browse/FL-10753
+          # Added for stage2 binutils 2.39
+          dev-libs/isl
           net-misc/rsync
           net-misc/wget
           sys-devel/autoconf
