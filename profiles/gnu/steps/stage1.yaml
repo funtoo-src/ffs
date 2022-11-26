@@ -43,6 +43,8 @@ fchroot:
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
 
+        # https://bugs.funtoo.org/browse/FL-10753
+        # dev-libs/isl added for stage2 binutils 2.39
         TO_BUILD="
           app-arch/bzip2
           app-arch/gzip
@@ -50,8 +52,6 @@ fchroot:
           app-arch/xz-utils
           app-admin/eselect
           app-shells/bash
-          # https://bugs.funtoo.org/browse/FL-10753
-          # Added for stage2 binutils 2.39
           dev-libs/isl
           net-misc/rsync
           net-misc/wget
