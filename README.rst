@@ -139,3 +139,20 @@ first steps here, we have just introduced you to the first layer of Funtoo from 
 need to describe the YAML files in this repository that define what packages get built, and how
 they get built, so that you know how to customize builds as needed. This will be covered in the
 next sections, coming soon.
+
+Harvester Testing
+=================
+
+If you are developing new Funtoo changes such as to toolchains or other packages
+directly impact or are used by ffs fchroot and stage1 steps you can use Harvester to do so:
+
+  https://harvester.funtoo.org/
+
+To enable ffs to build with the latest Harvester meta-repo branch simply
+run this command before executing a ffs build:
+
+  ``git apply profiles/gnu/steps/harvester_fchroot.patch``
+
+Once this patch is applied when you execute ``ci/lxd-baremetal/bin/ffs``,
+the Harvester will be used for any ego syncing ran in ffs steps, thus allow you to build
+ffs Harvester based stage1s.
