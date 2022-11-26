@@ -143,16 +143,17 @@ next sections, coming soon.
 Harvester Testing
 =================
 
-If you are developing new Funtoo changes such as to toolchains or other packages
-directly impact or are used by ffs fchroot and stage1 steps you can use Harvester to do so:
+If you are developing new critical Funtoo changes such as toolchain updates or
+other packages that directly impact or are used by ffs fchroot and stage1 steps,
+you can use Harvester to integration test them in ffs:
 
   https://harvester.funtoo.org/
 
-To enable ffs to build with the latest Harvester meta-repo branch simply
-run this command before executing a ffs build:
+To configure an ffs build to use the latest Harvester meta-repo branch simply
+run this command before executing the build::
 
-  ``git apply profiles/gnu/steps/harvester_fchroot.patch``
+  $ git apply profiles/gnu/steps/harvester_fchroot.patch
 
-Once this patch is applied when you execute ``ci/lxd-baremetal/bin/ffs``,
-the Harvester will be used for any ego syncing ran in ffs steps, thus allow you to build
+Once this one line patch is applied, when you execute ``ci/lxd-baremetal/bin/ffs``,
+Harvester will be used for any ego syncing ran during ffs steps, thus allowing you to build
 ffs Harvester based stage1s.
