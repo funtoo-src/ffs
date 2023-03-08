@@ -1,0 +1,129 @@
+fchroot:
+  defaults:
+    template: fchroot.tmpl
+  steps:
+    - linux: |
+        make mrproper
+        make INSTALL_HDR_PATH=/usr headers_install
+        install -d /var/db/pkg/sys-kernel/linux-headers-${LINUX_VERSION}
+    - pkgconf: |
+        ./configure \
+        --prefix=/usr
+        make
+        make install
+        ln -sf pkgconf /usr/bin/pkg-config
+        install -d /var/db/pkg/dev-util/pkgconf-${PKGCONF_VERSION}
+    - perl: |
+        sh Configure -des \
+          -Dcc=gcc \
+          -Dprefix=/usr \
+          -Dsiteprefix=/usr/local \
+          -Dvendorprefix=/usr \
+          -Dscriptdir=/usr/bin \
+          -Dprivlib=/usr/lib/perl5/${PERL_VERSION} \
+          -Dsitelib=/usr/local/lib/perl5/${PERL_VERSION} \
+          -Dvendorlib=/usr/lib/perl5/vendor_perl/${PERL_VERSION} \
+          -Dlocincpth=/usr/include \
+          -Dglibpth="/lib /usr/lib" \
+          -Dmyhostname='localhost'
+        make
+        make install
+        install -d /var/db/pkg/dev-lang/perl-${PERL_VERSION}
+    - autoconf: |
+        ./configure \
+        --prefix=/usr
+        make
+        make install
+    - automake: |
+        ./configure \
+        --prefix=/usr
+        make
+        make install
+    - libtool: |
+        ./configure \
+        --prefix=/usr \
+        --disable-ltdl-install
+        make
+        make install
+    - openssl: |
+        ./config --prefix=/usr \
+        --openssldir=/etc/ssl \
+        shared \
+        zlib-dynamic
+        make
+        make install
+        install -d /var/db/pkg/dev-libs/openssl-${OPENSSL_VERSION}
+    - wget: |
+        ./configure \
+        ac_cv_libunistring=no \
+        --prefix=/usr \
+        --disable-assert \
+        --disable-pcre \
+        --disable-rpath \
+        --without-included-libunistring \
+        --without-libunistring-prefix \
+        --with-ssl=openssl
+        make
+        make install
+        install -d /var/db/pkg/net-misc/wget-${WGET_VERSION}
+    - curl: |
+        ./configure \
+        --prefix=/usr \
+        --with-openssl \
+        --disable-static
+        make
+        make install
+        install -d /var/db/pkg/net-misc/curl-${CURL_VERSION}
+    - libffi: |
+        ./configure \
+        --prefix=/usr \
+        --includedir=/usr/lib/libffi-${LIBFFI_VERSION/-/_}/include \
+        --disable-multi-os-directory \
+        --disable-static
+        make
+        make install
+        install -d /var/db/pkg/dev-libs/libffi-${LIBFFI_VERSION/-/_}
+    - python: |
+        ./configure \
+        --prefix=/usr \
+        --enable-shared \
+        --infodir=/usr/share/info \
+        --mandir=/usr/share/man \
+        --with-computed-gotos \
+        --with-libc= \
+        --enable-loadable-sqlite-extensions \
+        --without-ensurepip
+        make
+        make install
+        install -d /usr/lib/python-exec/python${PYTHON_VERSION%.*}
+        ln -sf /usr/bin/python${PYTHON_VERSION%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python${PYTHON_VERSION%%.*}
+        ln -sf python${PYTHON_VERSION%%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python
+        cat > /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python${PYTHON_VERSION%%.*}-config << "PYTHON_EOF"
+        #!/bin/sh
+        exec "python${PYTHON_VERSION%%.*}-config" "\${@}"
+        PYTHON_EOF
+        chmod +x /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python${PYTHON_VERSION%%.*}-config
+        ln -sf python${PYTHON_VERSION%%.*}-config /usr/lib/python-exec/python${PYTHON_VERSION%.*}/python-config
+        ln -sf /tools/bin/2to3-${PYTHON_VERSION%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/2to3
+        ln -sf /tools/bin/pydoc${PYTHON_VERSION%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/pydoc
+        ln -sf /tools/bin/pyvenv-${PYTHON_VERSION%.*} /usr/lib/python-exec/python${PYTHON_VERSION%.*}/pyvenv
+    - git: |
+        ./configure \
+        --prefix=/usr \
+        --sysconfdir=/etc
+        make
+        make install
+    - pax-utils: |
+        sed '/MPAGES/d' -i Makefile
+        make CC=gcc PV=${PAX_UTILS_VERSION}
+        make CC=gcc PV=${PAX_UTILS_VERSION} install
+    - none: |
+        cat > /etc/passwd << "PASSWD_EOF"
+        root:x:0:0:root:/root:/bin/bash
+        PASSWD_EOF
+        cat > /etc/group << "GROUP_EOF"
+        root:x:0:root
+        GROUP_EOF
+        # How to get git working:
+        #GIT_SSL_NO_VERIFY=true ego sync
+

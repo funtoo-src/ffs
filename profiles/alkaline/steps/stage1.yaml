@@ -1,0 +1,39 @@
+fchroot:
+  defaults:
+    template: alkaline.tmpl
+  packages:
+    # all these packages are for the new root.
+    # break out packages to separate scripts, which are simple.
+    - baselayout
+    - bzip2
+    - gzip
+    - tar
+    - xz-utils
+    - bash
+    - rsync
+    - wget
+    - autoconf
+    - automake
+    - libtool
+    - coreutils
+    - diffutils
+    - file
+    - findutils
+    - gawk
+    - grep
+    - less
+    - net-tools
+    - sed
+    - texinfo
+    - binutils
+    - bison
+    - flex
+    - gcc
+    - gettext
+    - gnuconfig
+    - make
+    - patch
+    - pam
+    - editor
+    - git
+    - openrc

@@ -1,0 +1,427 @@
+tools:
+  defaults:
+    template: tools_usr.tmpl
+  steps:
+    - none: |
+        # Cleanup /bin symlinks from previous runs
+        rm -f ${CLFS}/bin/bash ${CLFS}/bin/sh
+    - m4: |
+        ./configure \
+        --prefix=/usr \
+        --with-sysroot=${CLFS} \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - gmp: |
+        ./configure \
+        --prefix=/usr \
+        --with-sysroot=${CLFS} \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --enable-cxx
+        make
+        make DESTDIR=${CLFS} install
+    - mpfr: |
+        ./configure \
+        --prefix=/usr \
+        --with-sysroot=${CLFS} \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - mpc: |
+        ./configure \
+        --prefix=/usr \
+        --with-sysroot=${CLFS} \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - zlib: |
+        unset CC CXX AR AS RANLIB LD STRIP
+        CHOST=${CLFS_TARGET} \
+        ./configure \
+        --prefix=/usr
+        make
+        make DESTDIR=${CLFS} install
+    - gettext: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --disable-threads \
+        --without-emacs \
+        --disable-shared
+        make
+        make DESTDIR=${CLFS} install
+    - bison: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --docdir=/usr/share/doc/bison-${BISON_VERSION}
+        make
+        make DESTDIR=${CLFS} install
+    - binutils: |
+        mkdir binutils-build && cd binutils-build
+        ../configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --target=${CLFS_TARGET} \
+        --with-sysroot=${CLFS} \
+        --enable-ld=default \
+        --disable-nls \
+        --enable-shared \
+        --enable-64-bit-bfd \
+        --disable-multilib \
+        --enable-gold=yes \
+        --enable-plugins \
+        --with-system-zlib \
+        --enable-threads
+        make
+        make DESTDIR=${CLFS} install-bfd
+        make DESTDIR=${CLFS} install
+    - gcc: |
+        sed -i 's|^RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET|& -nostdinc++|' configure
+        mkdir gcc-build && cd gcc-build
+        ../configure \
+        {%- if arch == "powerpc" %}
+        --with-abi=elfv2 \
+        --enable-secureplt \
+        --enable-decimal-float=no \
+        {%- endif %}
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --target=${CLFS_TARGET} \
+        CC_FOR_TARGET="${CLFS_TARGET}-gcc" \
+        --with-build-sysroot=${CLFS} \
+        --disable-multilib \
+        --enable-languages=c,c++ \
+        --with-system-zlib \
+        --with-native-system-header-dir=/usr/include \
+        --disable-libssp \
+        --enable-initfini-array \
+        --enable-install-libiberty \
+        --disable-libstdcxx-pch \
+        --disable-libsanitizer \
+        --with-mpfr=${CLFS}/usr \
+        --with-gmp=${CLFS}/usr \
+        --with-mpc=${CLFS}/usr
+        make AS_FOR_TARGET="${AS}" \
+        LD_FOR_TARGET="${LD}"
+        make DESTDIR=${CLFS} install
+    - ncurses: |
+        sed -i -e "s/INSTALL_OPT_S=\\\"-s/& --strip-program=${STRIP}/" configure
+        mkdir ncurses-build && cd ncurses-build
+        ../configure \
+        --prefix=/usr \
+        --with-shared \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --without-debug \
+        --without-ada \
+        --enable-overwrite \
+        --with-build-cc=gcc \
+        --enable-overwrite \
+        --with-default-terminfo-dir=/usr/share/terminfo \
+        --without-termlib
+        # Note: As per FL-10034, --without-termlib must match default on Funtoo, so that things
+        #       like bash don't try linking against it and then expect ncurses[tinfo] on stage1.
+        make
+        make DESTDIR=${CLFS} install
+        cd .. && mkdir ncursesw-build && cd ncursesw-build
+        ../configure \
+        --prefix=/usr \
+        --with-shared \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --without-debug \
+        --without-ada \
+        --enable-overwrite \
+        --with-build-cc=gcc \
+        --enable-widec \
+        --includedir=/usr/include/ncursesw \
+        --with-default-terminfo-dir=/usr/share/terminfo \
+        --without-termlib
+        # Note: As per FL-10034, --without-termlib must match default on Funtoo, so that things
+        #       like bash don't try linking against it and then expect ncurses[tinfo] on stage1.
+        make
+        make DESTDIR=${CLFS} install
+    - bash: |
+        cat > config.cache << "BASH_EOF"
+        ac_cv_func_mmap_fixed_mapped=yes
+        ac_cv_func_strcoll_works=yes
+        ac_cv_func_working_mktime=yes
+        bash_cv_func_sigsetjmp=present
+        bash_cv_getcwd_malloc=yes
+        bash_cv_job_control_missing=present
+        bash_cv_printf_a_format=yes
+        bash_cv_sys_named_pipes=present
+        bash_cv_ulimit_maxfds=yes
+        bash_cv_under_sys_siglist=yes
+        bash_cv_unusable_rtsigs=no
+        gt_cv_int_divbyzero_sigfpe=yes
+        BASH_EOF
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --disable-profiling \
+        --with-curses \
+        --without-bash-malloc \
+        --cache-file=config.cache
+        make
+        make DESTDIR=${CLFS} install
+        install -d ${CLFS}/bin
+        mv ${CLFS}/usr/bin/bash ${CLFS}/bin
+        test -x ${CLFS}/bin/bash
+        # set up initial shells in correct location for "#!/bin/sh" and "#!/bin/bash" scripts:
+        rm -f ${CLFS}/bin/sh || true
+        ln -sf bash ${CLFS}/bin/sh
+    - bzip2: |
+        sed -i \
+          -e '/^all/s/ test$//' \
+          -e 's|CFLAGS=|&-fPIC |' \
+        Makefile
+        make CC="${CC}" AR="${AR}" RANLIB="${RANLIB}"
+        make PREFIX=${CLFS}/usr install
+    - check: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --disable-subunit
+        make
+        make DESTDIR=${CLFS} install
+    - coreutils: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --enable-install-program=hostname \
+        --cache-file=config.cache
+        sed -i -e 's/^man1_MANS/#man1_MANS/' Makefile
+        make
+        make DESTDIR=${CLFS} install
+        # Move critical binaries into /bin. For this tools build, if "dd" is in /usr/bin, other configure scripts
+        # will build their scripts assuming that /usr/bin/dd is its official location in Funtoo. So we need to match
+        # Funtoo:
+        install -d ${CLFS}/bin
+        # Try to avoid an issue related to moving the mv command by referencing our pre-existing mv on rootfs:
+        MV=/bin/mv
+        for bin in cat chgrp chmod chown cp date dd df echo \
+                    false hostname ln ls mkdir mknod mv pwd rm \
+                    rmdir stty sync true uname \
+                    basename chroot cut dir dirname du env expr \
+                    head mkfifo mktemp readlink seq sleep sort \
+                    tail touch tr tty vdir wc yes; do
+          if [ ! -e ${CLFS}/bin/${bin} ] && [ -e ${CLFS}/usr/bin/${bin} ]; then
+            $MV ${CLFS}/usr/bin/${bin} ${CLFS}/bin
+          fi
+        done
+        # A subset of these moved binaries get /usr/bin compatibility symlinks pointing to their
+        # new location. This may still be required by some scripts:
+        for sym in basename chroot cut dir dirname du env expr \
+                    head mkfifo mktemp readlink seq sleep sort \
+                    tail touch tr tty vdir wc yes; do
+          if [ ! -e  ${CLFS}/usr/bin/${sym} ]; then
+            ln -s ../../bin/${sym} ${CLFS}/usr/bin/${sym}
+          fi
+        done
+    - diffutils: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - file: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --with-pic=yes
+        make
+        make DESTDIR=${CLFS} install
+    - findutils: |
+        echo "gl_cv_func_wcwidth_works=yes" > config.cache
+        echo "ac_cv_func_fnmatch_gnu=yes" >> config.cache
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --cache-file=config.cache
+        make
+        make DESTDIR=${CLFS} install
+    - gawk: |
+        ./configure \
+        --prefix=/usr \
+        --libexec=/usr/lib/misc \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --with-sysroot=${CLFS} \
+        ac_cv_libsigsegv=no
+        make
+        make DESTDIR=${CLFS} install
+        cp *.h ${CLFS}/usr/include/awk/
+        rm ${CLFS}/usr/include/awk/config.h
+        ln -sf gawk ${CLFS}/usr/bin/awk
+    - grep: |
+        ./configure \
+        --bindir=/bin \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - gzip: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - make: |
+        ./configure \
+        --prefix=/usr \
+        --program-prefix=g \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --without-guile
+        make
+        make DESTDIR=${CLFS} install
+        ln -sf gmake ${CLFS}/usr/bin/make
+        ln -sf gmake.1 ${CLFS}/usr/share/man/man1/make.1
+    - patch: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - sed: |
+        #--exec-prefix=/ \
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - tar: |
+        #--bindir=/bin \
+        cat > config.cache << "BASH_EOF"
+        gl_cv_func_wcwidth_works=yes
+        gl_cv_func_btowc_eof=yes
+        ac_cv_func_malloc_0_nonnull=yes
+        gl_cv_func_mbrtowc_incomplete_state=yes
+        gl_cv_func_mbrtowc_nul_retval=yes
+        gl_cv_func_mbrtowc_null_arg1=yes
+        gl_cv_func_mbrtowc_null_arg2=yes
+        gl_cv_func_mbrtowc_retval=yes
+        gl_cv_func_wcrtomb_retval=yes
+        BASH_EOF
+        ./configure \
+        --prefix=/usr \
+        --libexecdir=/usr/sbin \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --cache-file=config.cache
+        make
+        make DESTDIR=${CLFS} install
+        ln -sf tar ${CLFS}/usr/bin/gtar
+    - texinfo: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - util-linux: |
+        # This must be disabled as per FL-10034.
+        # LDFLAGS="-ltinfow"
+        NCURSESW6_CONFIG=" " \
+        NCURSES6_CONFIG=" " \
+        NCURSESW5_CONFIG=" " \
+        NCURSES5_CONFIG=" " \
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --disable-bash-completion \
+        --disable-makeinstall-chown \
+        --disable-makeinstall-setuid \
+        --disable-chfn-chsh \
+        --disable-login \
+        --disable-newgrp \
+        --disable-nologin \
+        --disable-hardlink \
+        --disable-raw \
+        --disable-vipw \
+        --disable-libsmartcols \
+        --disable-unshare \
+        --disable-fallocate \
+        --disable-nsenter \
+        --disable-libmount \
+        --without-systemd \
+        --without-systemdsystemunitdir \
+        --disable-pylibmount \
+        --without-python
+        make
+        make DESTDIR=${CLFS} install
+    - nano: |
+        # This must be disabled as per FL-10034.
+        # LDFLAGS="-ltinfow"
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - xz-utils: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - zstd: |
+        make
+        make PREFIX=/usr LIBDIR=/usr/lib DESTDIR=${CLFS} install
+    - which: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET}
+        make
+        make DESTDIR=${CLFS} install
+    - rsync: |
+        ./configure \
+        --prefix=/usr \
+        --build=${CLFS_HOST} \
+        --host=${CLFS_TARGET} \
+        --with-rsyncd-conf=/etc/rsyncd.conf \
+        --disable-openssl \
+        --disable-xxhash \
+        --disable-zstd \
+        --disable-lz4
+        make
+        make DESTDIR=${CLFS} install
+    - none: |
+        cat > ${CLFS}/etc/profile << "PROFILE_EOF"
+        # Funtoo from Scratch /etc/profile for login shells in the temporary environment.
+        #
+        # The following settings allow terminal-aware programs to find the terminal definitions
+        # and also allow temporary tools to be found, while also allowing 'official' tools installed
+        # in FHS-compliant paths to gradually replace these tools.
+
+        export TERMINFO=/usr/share/terminfo
+        export PATH=/bin:/usr/bin:/sbin:/usr/sbin
+        export LD_LIBRARY_PATH=/lib:/usr/lib
+        export HOME=/
+
+        umask 022
+
+        PROFILE_EOF
