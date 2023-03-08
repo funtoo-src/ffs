@@ -43,6 +43,8 @@ fchroot:
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
 
+        # https://bugs.funtoo.org/browse/FL-10753
+        # dev-libs/isl added for stage2 binutils 2.39
         TO_BUILD="
           app-arch/bzip2
           app-arch/gzip
@@ -50,6 +52,7 @@ fchroot:
           app-arch/xz-utils
           app-admin/eselect
           app-shells/bash
+          dev-libs/isl
           net-misc/rsync
           net-misc/wget
           sys-devel/autoconf
@@ -81,7 +84,8 @@ fchroot:
           sys-apps/openrc
           dev-vcs/git"
 
-        emerge --noreplace --oneshot --jobs=3 $TO_BUILD
+        # pax-utils-1.3.5 requires the python USE flag to install
+        USE="python" emerge --noreplace --oneshot --jobs=3 $TO_BUILD
         gcc-config 1
         ego profile mix-in -stage1
         rm -f $ROOT/var/git/meta-repo

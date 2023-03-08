@@ -1,0 +1,19 @@
+# Applying this patch with git apply harvester_fchroot.patch
+# will force ffs fchroot and later steps to leverage the latest
+# Harvester (https://harvester.funtoo.org/) branch for its ego sync URL
+# If you want to integration test Harvester changes such as toolchain
+# updates or other changes affecting ffs steps packages, apply this patch
+
+diff --git a/profiles/gnu/steps/fchroot.yaml b/profiles/gnu/steps/fchroot.yaml
+index 7f2fbc3..7d3bf00 100644
+--- a/profiles/gnu/steps/fchroot.yaml
++++ b/profiles/gnu/steps/fchroot.yaml
+@@ -171,7 +171,7 @@ fchroot:
+         release = next
+         # To build a Harvester based ffs stage1 simple uncomment the line below
+         # For more details on Harvester see: https://harvester.funtoo.org/
+-        # sync_base_url = git://harvester.funtoo.org/funtoo/tree/{repo}
++        sync_base_url = git://harvester.funtoo.org/funtoo/tree/{repo}
+         EGO_EOF
+         install -d /var/db/pkg/app-admin/ego-${EGO_VERSION}
+         GIT_SSL_NO_VERIFY=true ego sync

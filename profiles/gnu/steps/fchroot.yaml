@@ -169,6 +169,9 @@ fchroot:
         cat > /etc/ego.conf << "EGO_EOF"
         [global]
         release = next
+        # To build a Harvester based ffs stage1 simple uncomment the line below
+        # For more details on Harvester see: https://harvester.funtoo.org/
+        # sync_base_url = git://harvester.funtoo.org/funtoo/tree/{repo}
         EGO_EOF
         install -d /var/db/pkg/app-admin/ego-${EGO_VERSION}
         GIT_SSL_NO_VERIFY=true ego sync
@@ -208,7 +211,10 @@ fchroot:
         # util-linux officially, glib will think libmount is installed but glib meson configure will fail
         # when the lib isn't found:
 
-        emerge --jobs=3 util-linux
+        # Python USE flag and meson are being added for pax-utils-1.3.5, which is required for glibc-2.36
+        # pax-utils-1.3.5 now requires meson, this ensures meson installs before pax-utils
+        #
+        USE="python" emerge --jobs=3 util-linux
         emerge --jobs=3 bash gcc
         gcc-config 1
 
