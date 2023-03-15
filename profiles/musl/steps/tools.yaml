@@ -327,6 +327,7 @@ tools:
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
         --disable-openssl \
+        --disable-roll-simd \
         --disable-xxhash \
         --disable-zstd \
         --disable-lz4
