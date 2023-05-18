@@ -52,8 +52,8 @@ sources:
   non-gnu:
     packages:
       - linux:
-          version: 4.19
-          url: https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-{version}.tar.xz
+          version: "5.10"
+          url: https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-{version}.tar.xz
       - git:
           version: 2.36.1
           url: https://cdn.kernel.org/pub/software/scm/git/git-{version}.tar.xz
