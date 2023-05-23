@@ -18,7 +18,6 @@ sources:
           version: 12.1.0
           patches:
             - gcc-12-calloc.patch
-      - glibc: 2.35
       - ncurses:
           version: 6.3
           ext: gz
