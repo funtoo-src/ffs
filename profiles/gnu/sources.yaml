@@ -93,7 +93,7 @@ sources:
           url: https://carlowood.github.io/which/which-{version}.tar.gz
       - pkgconf:
           version: 1.5.4
-          url: https://distfiles.dereferenced.org/pkgconf/pkgconf-{version}.tar.xz
+	  url: https://distfiles.ariadne.space/pkgconf/pkgconf-{version}.tar.xz
       - python:
           version: 3.9.13
           url: https://www.python.org/ftp/python/{version}/Python-{version}.tar.xz
