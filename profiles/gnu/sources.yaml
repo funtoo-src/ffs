@@ -57,9 +57,6 @@ sources:
       - git:
           version: 2.36.1
           url: https://cdn.kernel.org/pub/software/scm/git/git-{version}.tar.xz
-      - musl:
-          version: 1.2.3
-          url: https://musl.libc.org/releases/musl-{version}.tar.gz
       - zlib:
           version: 1.2.13
           url: https://zlib.net/zlib-{version}.tar.gz
