@@ -42,8 +42,6 @@ sources:
       - tar: 1.34
       - texinfo:
           version: 6.8
-          patches:
-            - texinfo-6.8-glibc-2.34-compat.patch
       - nano: 6.2
       - wget:
           version: 1.21.3
