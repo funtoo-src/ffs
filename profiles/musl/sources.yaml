@@ -60,7 +60,7 @@ sources:
           url: https://libisl.sourceforge.io/isl-{version}.tar.bz2
       - zlib:
           version: 1.2.13
-          url: https://zlib.net/zlib-{version}.tar.gz
+          url: https://github.com/madler/zlib/releases/download/v{version}/zlib-{version}.tar.gz
       - perl:
           version: 5.38.0
           url: https://www.cpan.org/src/5.0/perl-{version}.tar.gz

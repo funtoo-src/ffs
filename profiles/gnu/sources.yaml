@@ -59,7 +59,7 @@ sources:
           url: https://cdn.kernel.org/pub/software/scm/git/git-{version}.tar.xz
       - zlib:
           version: 1.2.13
-          url: https://zlib.net/zlib-{version}.tar.gz
+          url: https://github.com/madler/zlib/releases/download/v{version}/zlib-{version}.tar.gz
       - perl:
           version: 5.32.0
           url: https://www.cpan.org/src/5.0/perl-{version}.tar.gz
