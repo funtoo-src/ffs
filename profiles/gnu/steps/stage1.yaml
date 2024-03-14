@@ -84,4 +84,4 @@ fchroot:
         emerge --noreplace --oneshot --jobs=3 $TO_BUILD
         gcc-config 1
         ego profile mix-in -stage1
-        rm -f $ROOT/var/git/meta-repo
+        rm -rf $ROOT/var/git/meta-repo
