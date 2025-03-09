@@ -116,6 +116,7 @@ sources:
           url: https://github.com/gentoo/sandbox/archive/refs/tags/v{version}.tar.gz
       - portage:
           version: 3.0.14
+          srcdir: portage-portage-3.0.14
           url: https://github.com/gentoo/portage/archive/refs/tags/portage-{version}.tar.gz
           patches:
             - portage-2.4.3-remove-gentoo-repos-conf.patch
