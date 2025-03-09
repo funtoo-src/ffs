@@ -16,7 +16,10 @@ sources:
       - gcc:
           url: https://ftp.gnu.org/gnu/{name}/{name}-{version}/{name}-{version}.tar.{ext}
           version: 12.3.0
-      - glibc: 2.33
+      - glibc:
+          version: 2.33
+          patches:
+            - glibc-localealias.patch
       - ncurses:
           version: 6.5
           ext: gz
