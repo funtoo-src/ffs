@@ -104,6 +104,8 @@ echo -n "Waiting for network."
 while [ "$(network_test)" != "yes" ]; do
 	echo -n "."
 done
+lxc exec $CNAME -- sh -c "echo 'sync_base_url=https://github.com/funtoo-repo/{repo}' >> /etc/ego.conf" || die "sync base fail"
+lxc exec $CNAME -- sh -c "echo 'GENTOO_MIRRORS=https://direct-github.funmore.org' >> /etc/portage/make.conf"  || die "distfiles mirrors fail"
 lxc exec $CNAME ego sync || die "sync fail"
 if [ -n "$EGO_PROFILE_FLAVOR" ]; then
 	lxc exec $CNAME epro flavor $EGO_PROFILE_FLAVOR || die "flavor fail"
