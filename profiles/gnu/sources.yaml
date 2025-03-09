@@ -77,7 +77,7 @@ sources:
           url: https://download.samba.org/pub/rsync/src/rsync-{version}.tar.gz
       - util-linux:
           version: 2.40.4
-          url: https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.38/util-linux-{version}.tar.gz
+          url: https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.40/util-linux-{version}.tar.gz
       - xz-utils:
           version: 5.6.4
           url: https://tukaani.org/xz/xz-{version}.tar.gz
@@ -103,7 +103,7 @@ sources:
           url: https://github.com/libffi/libffi/releases/download/v{version}/libffi-{version}.tar.gz
       - curl:
           version: 8.12.1
-          url: https://github.com/curl/curl/releases/download/curl-7_83_1/curl-{version}.tar.bz2
+          url: https://github.com/curl/curl/releases/download/curl-8_12_1/curl-{version}.tar.bz2
       - openssl:
           version: 1.1.1q
           url: https://www.openssl.org/source/openssl-{version}.tar.gz
