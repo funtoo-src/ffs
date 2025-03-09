@@ -15,7 +15,7 @@ sources:
           ext: gz
       - gcc:
           url: https://ftp.gnu.org/gnu/{name}/{name}-{version}/{name}-{version}.tar.{ext}
-          version: 12.3.0
+          version: 12.1.0
       - glibc: 2.33
       - ncurses:
           version: 6.5
@@ -52,8 +52,8 @@ sources:
   non-gnu:
     packages:
       - linux:
-          version: "5.10"
-          url: https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-{version}.tar.xz
+          version: "6.12"
+          url: https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-{version}.tar.xz
       - git:
           version: 2.48.1
           url: https://cdn.kernel.org/pub/software/scm/git/git-{version}.tar.xz
