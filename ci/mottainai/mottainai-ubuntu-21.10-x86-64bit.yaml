@@ -12,5 +12,5 @@ environment:
 - LUET_NOLOCK=true
 - LUET_YES=true
 image: ubuntu/21.10
-source: https://code.funtoo.org/bitbucket/scm/core/ffs.git
+source: https://github.com/funtoo-src/ffs.git
 type: lxd

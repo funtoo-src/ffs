@@ -132,4 +132,4 @@ sources:
             - portage-3.0.14-cdn-feature-ignore-mirror.patch
       - ego:
           version: 2.8.6
-          url: https://github.com/funtoo/ego/archive/refs/tags/{version}.tar.gz
+          url: https://github.com/funtoo-src/ego/archive/refs/tags/{version}.tar.gz
