@@ -7,7 +7,7 @@ sources:
       - autoconf: 2.72
       - automake: 1.16.5
       - libtool: 2.4.6
-      - binutils: 2.40
+      - binutils: 2.44
       - mpfr: 4.2.1
       - gmp: 6.3.0
       - mpc:
