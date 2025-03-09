@@ -114,9 +114,9 @@ tools:
         --enable-install-libiberty \
         --disable-libstdcxx-pch \
         --disable-libsanitizer \
-        --with-mpfr=${CLFS}/usr \
-        --with-gmp=${CLFS}/usr \
-        --with-mpc=${CLFS}/usr
+        --with-mpfr=${CLFS}/usr/include \
+        --with-gmp=${CLFS}/usr/include \
+        --with-mpc=${CLFS}/usr/include
         make AS_FOR_TARGET="${AS}" \
         LD_FOR_TARGET="${LD}"
         make DESTDIR=${CLFS} install
