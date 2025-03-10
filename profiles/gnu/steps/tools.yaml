@@ -94,6 +94,9 @@ tools:
         sed -i 's|^RAW_CXX_FOR_TARGET="$CXX_FOR_TARGET|& -nostdinc++|' configure
         mkdir gcc-build && cd gcc-build
         ../configure \
+        LDFLAGS="-Wl,-rpath,${CLFS}/lib -Wl,-rpath-link,${CLFS}/lib" \
+        CFLAGS="-I${CLFS}/usr/include" \
+        CXXFLAGS="-I${CLFS}/usr/include" \
         {%- if arch == "powerpc" %}
         --with-abi=elfv2 \
         --enable-secureplt \
