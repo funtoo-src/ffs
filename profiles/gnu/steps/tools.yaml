@@ -178,6 +178,9 @@ tools:
         gt_cv_int_divbyzero_sigfpe=yes
         BASH_EOF
         ./configure \
+        LDFLAGS="-L${CLFS}/usr/lib -lncursesw -Wl,-rpath,${CLFS}/usr/lib -Wl,-rpath-link,${CLFS}/usr/lib" \
+        CFLAGS="-I${CLFS}/usr/include" \
+        CXXFLAGS="-I${CLFS}/usr/include" \
         --prefix=/usr \
         --build=${CLFS_HOST} \
         --host=${CLFS_TARGET} \
