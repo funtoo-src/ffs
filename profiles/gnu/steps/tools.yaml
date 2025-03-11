@@ -377,7 +377,7 @@ tools:
         NCURSES6_CONFIG=" " \
         NCURSESW5_CONFIG=" " \
         NCURSES5_CONFIG=" " \
-        LDFLAGS="-L${CLFS}/usr/lib -Wl,-rpath=${CLFS}/usr/lib -Wl,-rpath-link=${CLFS}/usr/lib" \
+        LDFLAGS="-L${CLFS}/usr/lib -L${CLFS}/lib -Wl,-rpath,${CLFS}/usr/lib -Wl,-rpath,${CLFS}/lib -Wl,-rpath-link=${CLFS}/usr/lib -Wl,-rpath-link=${CLFS}/lib" \
         CFLAGS="-I${CLFS}/usr/include" \
         ./configure \
         --prefix=/usr \
@@ -402,8 +402,9 @@ tools:
         --without-systemdsystemunitdir \
         --disable-pylibmount \
         --without-python \
-        --disable-liblastlog2  
-        make
+        --disable-liblastlog2  \
+        --disable-enosys
+      make
         make DESTDIR=${CLFS} install
         install -d ${CLFS}/var/db/pkg/sys-apps/util-linux-${UTIL_LINUX_VERSION}
     - nano: |
