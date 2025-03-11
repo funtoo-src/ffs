@@ -404,7 +404,7 @@ tools:
         --without-python \
         --disable-liblastlog2  \
         --disable-enosys
-      make
+        make
         make DESTDIR=${CLFS} install
         install -d ${CLFS}/var/db/pkg/sys-apps/util-linux-${UTIL_LINUX_VERSION}
     - nano: |
