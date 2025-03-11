@@ -377,6 +377,8 @@ tools:
         NCURSES6_CONFIG=" " \
         NCURSESW5_CONFIG=" " \
         NCURSES5_CONFIG=" " \
+        LDFLAGS="-L${CLFS}/usr/lib -Wl,-rpath=${CLFS}/usr/lib -Wl,-rpath-link=${CLFS}/usr/lib" \
+        CFLAGS="-I${CLFS}/usr/include" \
         ./configure \
         --prefix=/usr \
         --build=${CLFS_HOST} \
