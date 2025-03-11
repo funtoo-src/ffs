@@ -399,7 +399,8 @@ tools:
         --without-systemd \
         --without-systemdsystemunitdir \
         --disable-pylibmount \
-        --without-python
+        --without-python \
+        --disable-liblastlog2  
         make
         make DESTDIR=${CLFS} install
         install -d ${CLFS}/var/db/pkg/sys-apps/util-linux-${UTIL_LINUX_VERSION}
