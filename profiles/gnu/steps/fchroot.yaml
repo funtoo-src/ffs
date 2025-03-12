@@ -117,11 +117,11 @@ fchroot:
         make install
         install -d /var/db/pkg/dev-vcs/git-${GIT_VERSION}
     - pax-utils: |
-        meson setup build \
-        --prefix=/usr \
-        --buildtype=release
-        ninja -C build
-        ninja -C build install
+        git clone https://github.com/mesonbuild/meson.git  
+        ./meson/meson.py setup builddir --prefix=/usr --buildtype=release 
+        cd builddir
+        ../meson/meson.py compile
+        ../meson/meson.py install  
         install -d /var/db/pkg/app-misc/pax-utils-${PAX_UTILS_VERSION}
     - sandbox: |
         autoreconf -i -f
