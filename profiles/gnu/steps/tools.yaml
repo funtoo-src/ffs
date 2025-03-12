@@ -362,6 +362,10 @@ tools:
         make DESTDIR=${CLFS} install
         ln -sf tar ${CLFS}/usr/bin/gtar
         install -d ${CLFS}/var/db/pkg/app-arch/tar-${TAR_VERSION}
+    - zstd: |
+          make
+          make PREFIX=/usr LIBDIR=/usr/lib DESTDIR=${CLFS} install
+          install -d ${CLFS}/var/db/pkg/app-arch/zstd-${ZSTD_VERSION}
     - texinfo: |
         ./configure \
         --prefix=/usr \
@@ -425,10 +429,6 @@ tools:
         make
         make DESTDIR=${CLFS} install
         install -d ${CLFS}/var/db/pkg/app-arch/xz-utils-${XZ_UTILS_VERSION}
-    - zstd: |
-        make
-        make PREFIX=/usr LIBDIR=/usr/lib DESTDIR=${CLFS} install
-        install -d ${CLFS}/var/db/pkg/app-arch/zstd-${ZSTD_VERSION}
     - which: |
         ./configure \
         --prefix=/usr \
