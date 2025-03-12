@@ -117,7 +117,7 @@ fchroot:
         make install
         install -d /var/db/pkg/dev-vcs/git-${GIT_VERSION}
     - pax-utils: |
-        git clone https://github.com/mesonbuild/meson.git  
+        GIT_SSL_NO_VERIFY=true git clone https://github.com/mesonbuild/meson.git  
         ./meson/meson.py setup builddir --prefix=/usr --buildtype=release 
         cd builddir
         ../meson/meson.py compile
