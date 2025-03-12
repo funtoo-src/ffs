@@ -117,9 +117,11 @@ fchroot:
         make install
         install -d /var/db/pkg/dev-vcs/git-${GIT_VERSION}
     - pax-utils: |
-        sed '/MPAGES/d' -i Makefile
-        make CC=gcc PV=${PAX_UTILS_VERSION}
-        make CC=gcc PV=${PAX_UTILS_VERSION} install
+        meson setup build \
+        --prefix=/usr \
+        --buildtype=release
+        ninja -C build
+        ninja -C build install
         install -d /var/db/pkg/app-misc/pax-utils-${PAX_UTILS_VERSION}
     - sandbox: |
         autoreconf -i -f
