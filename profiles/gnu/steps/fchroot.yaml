@@ -117,6 +117,12 @@ fchroot:
         make install
         install -d /var/db/pkg/dev-vcs/git-${GIT_VERSION}
     - pax-utils: |
+        GIT_SSL_NO_VERIFY=true git clone https://github.com/ninja-build/ninja.git
+        cd ninja
+        ./configure.py --bootstrap
+        cd ..  
+        chmod +x ./ninja/ninja
+        export PATH=$PWD/ninja:$PATH 
         GIT_SSL_NO_VERIFY=true git clone https://github.com/mesonbuild/meson.git  
         ./meson/meson.py setup builddir --prefix=/usr --buildtype=release 
         cd builddir
