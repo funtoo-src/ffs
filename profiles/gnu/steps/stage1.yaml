@@ -49,6 +49,7 @@ fchroot:
           app-arch/tar
           app-arch/xz-utils
           app-admin/eselect
+          sys-libs/ncurses
           app-shells/bash
           net-misc/rsync
           net-misc/wget
