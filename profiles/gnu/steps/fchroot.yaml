@@ -219,6 +219,7 @@ fchroot:
         # when the lib isn't found:
 
         emerge --jobs=3 util-linux
+        emerge --jobs=3 ncurses
         emerge --jobs=3 bash gcc
         gcc-config 1
 
