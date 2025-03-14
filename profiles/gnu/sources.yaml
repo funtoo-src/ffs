@@ -43,7 +43,6 @@ sources:
       - sed: 4.9
       - tar: 1.35
       - texinfo: 7.2
-      - nano: 8.3
       - wget:
           version: 1.25.0
           ext: gz
