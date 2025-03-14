@@ -411,16 +411,6 @@ tools:
         make
         make DESTDIR=${CLFS} install
         install -d ${CLFS}/var/db/pkg/sys-apps/util-linux-${UTIL_LINUX_VERSION}
-    - nano: |
-        # This must be disabled as per FL-10034.
-        # LDFLAGS="-ltinfow"
-        ./configure \
-        --prefix=/usr \
-        --build=${CLFS_HOST} \
-        --host=${CLFS_TARGET}
-        make
-        make DESTDIR=${CLFS} install
-        install -d ${CLFS}/var/db/pkg/app-editors/nano-${NANO_VERSION}
     - xz-utils: |
         ./configure \
         --prefix=/usr \
