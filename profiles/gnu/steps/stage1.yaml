@@ -74,7 +74,6 @@ fchroot:
           sys-devel/make
           sys-devel/patch
           sys-libs/pam
-          virtual/editor
           virtual/libc
           virtual/os-headers
           virtual/package-manager
