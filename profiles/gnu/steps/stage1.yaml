@@ -15,12 +15,14 @@ fchroot:
 
         export ROOT=/tmp/stage1root
         rm -rf $ROOT
-        install -m 0755 -d $ROOT/usr/bin
-        install -m 0755 -d $ROOT/bin
-        # without this, /sbin ends up being a symlink to /usr/sbin?!
+        mkdir -p $ROOT/sbin
+        mkdir -p $ROOT/usr/sbin
+        mkdir -p $ROOT/bin
+        mkdir -p $ROOT/usr/bin
         install -m 0755 -d $ROOT/sbin
-        # without this, /usr/sbin ends up being a link to bin?!
         install -m 0755 -d $ROOT/usr/sbin
+        install -m 0755 -d $ROOT/bin
+        install -m 0755 -d $ROOT/usr/bin
         # also fix a lib issue -- did I miss some steps from metro?
         install -m 0755 -d $ROOT/lib64
         ln -sf lib64 $ROOT/lib
