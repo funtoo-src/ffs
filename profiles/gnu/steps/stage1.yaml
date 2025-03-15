@@ -40,7 +40,13 @@ fchroot:
         install -d /var/db/pkg/sys-apps/openrc-9999
         # It's important to merge baselayout first so it can set perms on key dirs
         emerge --nodeps baselayout
-
+        unlink $ROOT/bin 
+        unlink $ROOT/sbin   
+        unlink $ROOT/usr/sbin
+        install -m 0755 -d $ROOT/bin
+        install -m 0755 -d $ROOT/sbin
+        install -m 0755 -d $ROOT/usr/sbin
+        
         TO_BUILD="
           app-arch/bzip2
           app-arch/gzip
