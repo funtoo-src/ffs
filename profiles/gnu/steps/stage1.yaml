@@ -78,7 +78,9 @@ fchroot:
           sys-devel/make
           sys-devel/patch
           sys-libs/pam
+          app-editors/nano
           virtual/libc
+          virtual/editor
           virtual/os-headers
           virtual/package-manager
           sys-apps/openrc
